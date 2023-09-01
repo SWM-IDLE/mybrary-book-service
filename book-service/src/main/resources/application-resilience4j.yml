@@ -1,0 +1,82 @@
+resilience4j.retry:
+  configs:
+    aladinApiRetryConfig:
+      maxAttempts: 3
+      waitDuration: 1000
+      retryExceptions:
+        - org.springframework.web.client.HttpServerErrorException
+        - org.springframework.web.client.ResourceAccessException
+        - java.net.SocketTimeoutException
+        - java.net.ConnectException
+    userServiceFeignClientRetryConfig:
+      maxAttempts: 3
+      waitDuration: 1000
+      retryExceptions:
+        - java.net.UnknownHostException
+        - java.net.SocketTimeoutException
+        - java.net.ConnectException
+        - feign.RetryableException
+        - feign.FeignException.InternalServerError
+        - feign.FeignException.BadGateway
+        - feign.FeignException.GatewayTimeout
+        - feign.FeignException.TooManyRequests
+
+  instances:
+    aladinAPIRetryConfig:
+      baseConfig: aladinApiRetryConfig
+    userServiceRetryConfig:
+      baseConfig: userServiceFeignClientRetryConfig
+
+resilience4j.circuitbreaker:
+  configs:
+    aladinApiCircuitBreakerConfig:
+      slidingWindowType: COUNT_BASED
+      minimumNumberOfCalls: 10
+      slidingWindowSize: 10
+      waitDurationInOpenState: 10s
+
+      failureRateThreshold: 50
+
+      slowCallDurationThreshold: 10000
+      slowCallRateThreshold: 100
+
+      permittedNumberOfCallsInHalfOpenState: 10
+      automaticTransitionFromOpenToHalfOpenEnabled: true
+
+      eventConsumerBufferSize: 100
+
+      recordExceptions:
+        - org.springframework.web.client.HttpServerErrorException
+        - org.springframework.web.client.ResourceAccessException
+        - java.net.SocketTimeoutException
+        - java.net.ConnectException
+    userServiceFeignClientCircuitBreakerConfig:
+      slidingWindowType: COUNT_BASED
+      minimumNumberOfCalls: 10
+      slidingWindowSize: 10
+      waitDurationInOpenState: 10s
+
+      failureRateThreshold: 50
+
+      slowCallDurationThreshold: 10000
+      slowCallRateThreshold: 100
+
+      permittedNumberOfCallsInHalfOpenState: 10
+      automaticTransitionFromOpenToHalfOpenEnabled: true
+
+      eventConsumerBufferSize: 100
+
+      recordExceptions:
+        - java.net.UnknownHostException
+        - java.net.SocketTimeoutException
+        - java.net.ConnectException
+        - feign.RetryableException
+        - feign.FeignException.InternalServerError
+        - feign.FeignException.BadGateway
+        - feign.FeignException.GatewayTimeout
+        - feign.FeignException.TooManyRequests
+  instances:
+    aladinAPICircuitBreakerConfig:
+      baseConfig: aladinApiCircuitBreakerConfig
+    userServiceCircuitBreakerConfig:
+      baseConfig: userServiceFeignClientCircuitBreakerConfig
