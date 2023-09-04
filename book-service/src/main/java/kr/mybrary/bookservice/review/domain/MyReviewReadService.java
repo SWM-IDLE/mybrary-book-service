@@ -6,7 +6,6 @@ import java.util.stream.Collectors;
 import kr.mybrary.bookservice.book.domain.BookReadService;
 import kr.mybrary.bookservice.book.persistence.Book;
 import kr.mybrary.bookservice.client.user.api.UserServiceClient;
-import kr.mybrary.bookservice.client.user.dto.request.UserInfoRequest;
 import kr.mybrary.bookservice.client.user.dto.response.UserInfoServiceResponse;
 import kr.mybrary.bookservice.client.user.dto.response.UserInfoServiceResponse.UserInfo;
 import kr.mybrary.bookservice.global.util.DateUtils;
@@ -40,8 +39,7 @@ public class MyReviewReadService {
         Book book = bookReadService.getRegisteredBookByISBN13(request.getIsbn13());
         List<MyReviewElementModel> reviewElements = myBookReviewRepository.findReviewsByBook(book);
 
-        UserInfoServiceResponse usersInfo = userServiceClient.getUsersInfo(
-                UserInfoRequest.of(getUserIdFromMyBookReview(reviewElements)));
+        UserInfoServiceResponse usersInfo = userServiceClient.getUsersInfo(getUserIdFromMyBookReview(reviewElements));
 
         Map<String, UserInfo> userInfoMap = createUserInfoMapFromResponse(usersInfo.getData().getUserInfoElements());
 
@@ -63,7 +61,7 @@ public class MyReviewReadService {
 
         return myBookReviewRepository.findReviewByMyBook(myBook)
                 .map(MyReviewDtoMapper.INSTANCE::reviewOfMyBookModelToResponse)
-                .orElseGet(() -> null);
+                .orElse(null);
     }
 
     @NotNull
@@ -98,8 +96,8 @@ public class MyReviewReadService {
 
     private double getReviewStarRatingAverage(List<MyReviewElementModel> reviewsByBook) {
         return reviewsByBook.stream()
-                .mapToDouble(MyReviewElementModel::getStarRating)
-                .average().orElseGet(() -> 0.0);
+                .mapToDouble(MyReviewElementModel::getStarRating).average()
+                .orElse(0.0);
     }
 
     @NotNull
