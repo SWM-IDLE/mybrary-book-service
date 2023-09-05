@@ -12,6 +12,7 @@ import kr.mybrary.bookservice.mybook.domain.dto.request.MyBookReadCompletedStatu
 import kr.mybrary.bookservice.mybook.domain.dto.request.MyBookRegisteredStatusServiceRequest;
 import kr.mybrary.bookservice.mybook.domain.dto.request.MybookUpdateServiceRequest;
 import kr.mybrary.bookservice.mybook.domain.dto.request.MybookUpdateServiceRequest.MybookUpdateServiceRequestBuilder;
+import kr.mybrary.bookservice.mybook.domain.dto.request.UserInfoWithMyBookSetForBookServiceRequest;
 import kr.mybrary.bookservice.mybook.domain.dto.request.UserInfoWithReadCompletedForBookServiceRequest;
 import kr.mybrary.bookservice.mybook.persistence.MyBookOrderType;
 import kr.mybrary.bookservice.mybook.persistence.ReadStatus;
@@ -253,6 +254,12 @@ public class MybookDtoTestData {
                                 .nickname("USER_NICKNAME_2")
                                 .profileImageUrl("USER_PICTURE_URL_2")
                                 .build()))
+                .build();
+    }
+
+    public static UserInfoWithMyBookSetForBookServiceRequest createUserInfoWithMyBookSetForBookServiceRequest() {
+        return UserInfoWithMyBookSetForBookServiceRequest.builder()
+                .isbn13("1111111111111")
                 .build();
     }
 }

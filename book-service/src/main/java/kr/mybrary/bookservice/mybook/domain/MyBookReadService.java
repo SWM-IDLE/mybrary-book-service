@@ -12,6 +12,7 @@ import kr.mybrary.bookservice.mybook.domain.dto.request.MyBookFindAllServiceRequ
 import kr.mybrary.bookservice.mybook.domain.dto.request.MyBookFindByMeaningTagQuoteServiceRequest;
 import kr.mybrary.bookservice.mybook.domain.dto.request.MyBookReadCompletedStatusServiceRequest;
 import kr.mybrary.bookservice.mybook.domain.dto.request.MyBookRegisteredStatusServiceRequest;
+import kr.mybrary.bookservice.mybook.domain.dto.request.UserInfoWithMyBookSetForBookServiceRequest;
 import kr.mybrary.bookservice.mybook.domain.dto.request.UserInfoWithReadCompletedForBookServiceRequest;
 import kr.mybrary.bookservice.mybook.domain.exception.MyBookAccessDeniedException;
 import kr.mybrary.bookservice.mybook.domain.exception.MyBookNotFoundException;
@@ -25,8 +26,8 @@ import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookElementResp
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookReadCompletedStatusResponse;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookRegisteredStatusResponse;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookRegistrationCountResponse;
+import kr.mybrary.bookservice.mybook.presentation.dto.response.UserInfoWithMyBookSetForBookResponse;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.UserInfoWithReadCompletedForBookResponse;
-import kr.mybrary.bookservice.mybook.presentation.dto.response.UserInfoWithReadCompletedForBookResponse.UserInfoElement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -110,20 +111,18 @@ public class MyBookReadService {
 
         UserInfoServiceResponse usersInfo = userServiceClient.getUsersInfo(userIds);
 
-        return UserInfoWithReadCompletedForBookResponse.builder()
-                .userInfos(mapUserInfo(usersInfo))
-                .build();
+        return UserInfoWithReadCompletedForBookResponse.of(usersInfo);
     }
 
-    private List<UserInfoElement> mapUserInfo(UserInfoServiceResponse usersInfo) {
-        return usersInfo.getData().getUserInfoElements()
-                .stream()
-                .map(user -> UserInfoElement.builder()
-                        .userId(user.getUserId())
-                        .nickname(user.getNickname())
-                        .profileImageUrl(user.getProfileImageUrl())
-                        .build())
-                .toList();
+    public UserInfoWithMyBookSetForBookResponse getMyBookSetUserIdListByBook(
+            UserInfoWithMyBookSetForBookServiceRequest request) {
+
+        Book book = bookReadService.getRegisteredBookByISBN13(request.getIsbn13());
+        List<String> userIds = myBookRepository.getMyBookUserIdListByBook(book);
+
+        UserInfoServiceResponse usersInfo = userServiceClient.getUsersInfo(userIds);
+
+        return UserInfoWithMyBookSetForBookResponse.of(usersInfo);
     }
 
     private static boolean isOwnerSameAsRequester(String ownerId, String requesterId) {
