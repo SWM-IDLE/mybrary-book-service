@@ -85,6 +85,15 @@ public class MyBookRepositoryCustomImpl implements MyBookRepositoryCustom {
                 .fetch();
     }
 
+    @Override
+    public List<String> getMyBookUserIdListByBook(Book book) {
+        return queryFactory.select(myBook.userId)
+                .from(myBook)
+                .where(myBook.book.eq(book),
+                        myBook.showable.eq(true))
+                .fetch();
+    }
+
     private BooleanExpression eqReadStatus(ReadStatus readStatus) {
 
         if (readStatus == null) {

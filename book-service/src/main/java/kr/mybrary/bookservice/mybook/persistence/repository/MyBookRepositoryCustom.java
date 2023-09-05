@@ -15,4 +15,6 @@ public interface MyBookRepositoryCustom {
 
     List<String> getReadCompletedUserIdListByBook(Book book);
 
+    List<String> getMyBookUserIdListByBook(Book book);
+
 }

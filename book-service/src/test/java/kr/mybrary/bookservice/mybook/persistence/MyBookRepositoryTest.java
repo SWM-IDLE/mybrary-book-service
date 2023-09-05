@@ -455,4 +455,32 @@ class MyBookRepositoryTest {
                 () -> assertThat(readCompletedUserIdList).containsExactlyInAnyOrder(myBook_1.getUserId(), myBook_3.getUserId())
         );
     }
+
+    @DisplayName("한 도서를 마이북으로 설정한 유저의 목록을 조회한다.")
+    @Test
+    void getMyBookUserIdListByBook() {
+
+        // given
+        Book savedBook = bookRepository.save(BookFixture.COMMON_BOOK_WITHOUT_RELATION.getBook());
+        MyBook myBook_1 = myBookRepository.save(MyBookFixture.MY_BOOK_WITHOUT_RELATION.getMyBookBuilder()
+                .book(savedBook).userId("USER_ID_1").build());
+        MyBook myBook_2 = myBookRepository.save(MyBookFixture.MY_BOOK_WITHOUT_RELATION.getMyBookBuilder()
+                .book(savedBook).userId("USER_ID_2").build());
+        MyBook myBook_3 = myBookRepository.save(MyBookFixture.MY_BOOK_WITHOUT_RELATION.getMyBookBuilder()
+                .book(savedBook).userId("USER_ID_3").build());
+        MyBook myBook_4 = myBookRepository.save(MyBookFixture.MY_BOOK_WITHOUT_RELATION.getMyBookBuilder()
+                .book(savedBook).userId("USER_ID_4").showable(false).build());
+
+        entityManager.flush();
+        entityManager.clear();
+
+        // when
+        List<String> myBookUserIdList = myBookRepository.getMyBookUserIdListByBook(savedBook);
+
+        // then
+        assertAll(
+                () -> assertThat(myBookUserIdList.size()).isEqualTo(3),
+                () -> assertThat(myBookUserIdList).containsExactlyInAnyOrder(myBook_1.getUserId(), myBook_2.getUserId(), myBook_3.getUserId())
+        );
+    }
 }
