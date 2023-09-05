@@ -1,5 +1,6 @@
 package kr.mybrary.bookservice.mybook.presentation;
 
+import java.util.List;
 import kr.mybrary.bookservice.global.dto.response.SuccessResponse;
 import kr.mybrary.bookservice.mybook.domain.MyBookReadService;
 import kr.mybrary.bookservice.mybook.domain.MyBookWriteService;
@@ -16,6 +17,15 @@ import kr.mybrary.bookservice.mybook.persistence.MyBookOrderType;
 import kr.mybrary.bookservice.mybook.persistence.ReadStatus;
 import kr.mybrary.bookservice.mybook.presentation.dto.request.MyBookCreateRequest;
 import kr.mybrary.bookservice.mybook.presentation.dto.request.MyBookUpdateRequest;
+import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookDetailResponse;
+import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookElementFromMeaningTagResponse;
+import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookElementResponse;
+import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookReadCompletedStatusResponse;
+import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookRegisteredStatusResponse;
+import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookRegistrationCountResponse;
+import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookUpdateResponse;
+import kr.mybrary.bookservice.mybook.presentation.dto.response.UserInfoWithMyBookSetForBookResponse;
+import kr.mybrary.bookservice.mybook.presentation.dto.response.UserInfoWithReadCompletedForBookResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,8 +49,9 @@ public class MyBookController {
     private final MyBookWriteService myBookWriteService;
 
     @PostMapping("/mybooks")
-    public ResponseEntity<SuccessResponse> createMyBook(@RequestHeader("USER-ID") String loginId,
-                                                        @RequestBody MyBookCreateRequest request) {
+    public ResponseEntity<SuccessResponse<Void>> createMyBook(
+            @RequestHeader("USER-ID") String loginId,
+            @RequestBody MyBookCreateRequest request) {
 
         myBookWriteService.create(request.toServiceRequest(loginId));
 
@@ -49,7 +60,7 @@ public class MyBookController {
     }
 
     @GetMapping("/users/{userId}/mybooks")
-    public ResponseEntity<SuccessResponse> findAllMyBooks(
+    public ResponseEntity<SuccessResponse<List<MyBookElementResponse>>> findAllMyBooks(
             @RequestHeader("USER-ID") String loginId,
             @PathVariable("userId") String userId,
             @RequestParam(value = "order", required = false, defaultValue = "none") String order,
@@ -63,8 +74,9 @@ public class MyBookController {
     }
 
     @GetMapping("/mybooks/{mybookId}")
-    public ResponseEntity<SuccessResponse> findMyBookDetail(@RequestHeader("USER-ID") String loginId,
-                                                            @PathVariable("mybookId") Long mybookId) {
+    public ResponseEntity<SuccessResponse<MyBookDetailResponse>> findMyBookDetail(
+            @RequestHeader("USER-ID") String loginId,
+            @PathVariable("mybookId") Long mybookId) {
 
         MyBookDetailServiceRequest request = MyBookDetailServiceRequest.of(loginId, mybookId);
 
@@ -73,8 +85,9 @@ public class MyBookController {
     }
 
     @DeleteMapping("/mybooks/{mybookId}")
-    public ResponseEntity<SuccessResponse> deleteMyBook(@RequestHeader("USER-ID") String loginId,
-                                                        @PathVariable Long mybookId) {
+    public ResponseEntity<SuccessResponse<Void>> deleteMyBook(
+            @RequestHeader("USER-ID") String loginId,
+            @PathVariable Long mybookId) {
 
         MyBookDeleteServiceRequest request = MyBookDeleteServiceRequest.of(loginId, mybookId);
 
@@ -84,9 +97,10 @@ public class MyBookController {
     }
 
     @PutMapping("/mybooks/{mybookId}")
-    public ResponseEntity<SuccessResponse> updateMyBookProperties(@RequestHeader("USER-ID") String loginId,
-                                                                  @PathVariable Long mybookId,
-                                                                  @RequestBody MyBookUpdateRequest request) {
+    public ResponseEntity<SuccessResponse<MyBookUpdateResponse>> updateMyBookProperties(
+            @RequestHeader("USER-ID") String loginId,
+            @PathVariable Long mybookId,
+            @RequestBody MyBookUpdateRequest request) {
 
         MybookUpdateServiceRequest serviceRequest = request.toServiceRequest(loginId, mybookId);
 
@@ -95,8 +109,9 @@ public class MyBookController {
     }
 
     @GetMapping("/mybooks/meaning-tags/{meaningTagQuote}")
-    public ResponseEntity<SuccessResponse> findMyBooksByMeaningTag(@RequestHeader("USER-ID") String loginId,
-                                                                   @PathVariable String meaningTagQuote) {
+    public ResponseEntity<SuccessResponse<List<MyBookElementFromMeaningTagResponse>>> findMyBooksByMeaningTag(
+            @RequestHeader("USER-ID") String loginId,
+            @PathVariable String meaningTagQuote) {
 
         MyBookFindByMeaningTagQuoteServiceRequest request = MyBookFindByMeaningTagQuoteServiceRequest.of(loginId,
                 meaningTagQuote);
@@ -106,15 +121,16 @@ public class MyBookController {
     }
 
     @GetMapping("/mybooks/today-registration-count")
-    public ResponseEntity<SuccessResponse> getTodayRegistrationCount() {
+    public ResponseEntity<SuccessResponse<MyBookRegistrationCountResponse>> getTodayRegistrationCount() {
 
         return ResponseEntity.ok(SuccessResponse.of(HttpStatus.OK.toString(), "오늘의 마이북 등록 수입니다.",
                 myBookReadService.getBookRegistrationCountOfToday()));
     }
 
     @GetMapping("/books/{isbn13}/mybook-registered-status")
-    public ResponseEntity<SuccessResponse> getMyBookRegisteredStatus(@RequestHeader("USER-ID") String loginId,
-                                                                     @PathVariable String isbn13) {
+    public ResponseEntity<SuccessResponse<MyBookRegisteredStatusResponse>> getMyBookRegisteredStatus(
+            @RequestHeader("USER-ID") String loginId,
+            @PathVariable String isbn13) {
 
         MyBookRegisteredStatusServiceRequest serviceRequest = MyBookRegisteredStatusServiceRequest.of(loginId, isbn13);
 
@@ -123,8 +139,9 @@ public class MyBookController {
     }
 
     @GetMapping("/books/{isbn13}/read-complete-status")
-    public ResponseEntity<SuccessResponse> getReadCompletedStatus(@RequestHeader("USER-ID") String loginId,
-                                                                  @PathVariable String isbn13) {
+    public ResponseEntity<SuccessResponse<MyBookReadCompletedStatusResponse>> getReadCompletedStatus(
+            @RequestHeader("USER-ID") String loginId,
+            @PathVariable String isbn13) {
 
         MyBookReadCompletedStatusServiceRequest serviceRequest = MyBookReadCompletedStatusServiceRequest.of(loginId, isbn13);
 
@@ -133,7 +150,8 @@ public class MyBookController {
     }
 
     @GetMapping("/books/{isbn13}/read-complete/userInfos")
-    public ResponseEntity<SuccessResponse> getUserInfoWithReadCompletedForBook(@PathVariable("isbn13") String isbn13) {
+    public ResponseEntity<SuccessResponse<UserInfoWithReadCompletedForBookResponse>> getUserInfoWithReadCompletedForBook(
+            @PathVariable("isbn13") String isbn13) {
 
         UserInfoWithReadCompletedForBookServiceRequest request = UserInfoWithReadCompletedForBookServiceRequest.of(isbn13);
 
@@ -142,7 +160,8 @@ public class MyBookController {
     }
 
     @GetMapping("/books/{isbn13}/mybook/userInfos")
-    public ResponseEntity<SuccessResponse> getUserInfoWithMyBookSettingForBook(@PathVariable("isbn13") String isbn13) {
+    public ResponseEntity<SuccessResponse<UserInfoWithMyBookSetForBookResponse>> getUserInfoWithMyBookSettingForBook(
+            @PathVariable("isbn13") String isbn13) {
 
         UserInfoWithMyBookSetForBookServiceRequest request = UserInfoWithMyBookSetForBookServiceRequest.of(isbn13);
 
