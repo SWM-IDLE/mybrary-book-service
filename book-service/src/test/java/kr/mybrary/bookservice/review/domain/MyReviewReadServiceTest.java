@@ -1,8 +1,12 @@
 package kr.mybrary.bookservice.review.domain;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.BDDMockito.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.BDDMockito.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.times;
+import static org.mockito.BDDMockito.verify;
 
 import java.util.List;
 import java.util.Optional;
@@ -12,13 +16,13 @@ import kr.mybrary.bookservice.book.persistence.Book;
 import kr.mybrary.bookservice.client.user.api.UserServiceClient;
 import kr.mybrary.bookservice.client.user.dto.response.UserInfoServiceResponse;
 import kr.mybrary.bookservice.mybook.MyBookFixture;
-import kr.mybrary.bookservice.mybook.domain.MyBookService;
+import kr.mybrary.bookservice.mybook.domain.MyBookReadService;
 import kr.mybrary.bookservice.mybook.persistence.MyBook;
 import kr.mybrary.bookservice.review.MyReviewDtoTestData;
 import kr.mybrary.bookservice.review.domain.dto.request.MyReviewOfMyBookGetServiceRequest;
 import kr.mybrary.bookservice.review.domain.dto.request.MyReviewsOfBookGetServiceRequest;
-import kr.mybrary.bookservice.review.persistence.model.MyReviewFromMyBookModel;
 import kr.mybrary.bookservice.review.persistence.model.MyReviewElementModel;
+import kr.mybrary.bookservice.review.persistence.model.MyReviewFromMyBookModel;
 import kr.mybrary.bookservice.review.persistence.repository.MyReviewRepository;
 import kr.mybrary.bookservice.review.presentation.dto.response.MyReviewOfMyBookGetResponse;
 import kr.mybrary.bookservice.review.presentation.dto.response.MyReviewsOfBookGetResponse;
@@ -47,7 +51,7 @@ class MyReviewReadServiceTest {
     private UserServiceClient userServiceClient;
 
     @Mock
-    private MyBookService myBookService;
+    private MyBookReadService myBookReadService;
 
     @DisplayName("하나의 책에 대한 모든 리뷰를 조회한다.")
     @Test
@@ -93,7 +97,7 @@ class MyReviewReadServiceTest {
         MyReviewFromMyBookModel model = MyReviewDtoTestData.createReviewFromMyBookModel();
         MyReviewOfMyBookGetServiceRequest request = MyReviewDtoTestData.createReviewOfMyBookGetServiceRequest();
 
-        given(myBookService.findMyBookById(any())).willReturn(myBook);
+        given(myBookReadService.findMyBookById(any())).willReturn(myBook);
         given(myBookReviewRepository.findReviewByMyBook(any())).willReturn(Optional.ofNullable(model));
 
         // when
@@ -109,7 +113,7 @@ class MyReviewReadServiceTest {
                     assertThat(response.getStarRating()).isEqualTo(model.getStarRating());
                 },
                 () -> verify(myBookReviewRepository, times(1)).findReviewByMyBook(any()),
-                () -> verify(myBookService, times(1)).findMyBookById(any())
+                () -> verify(myBookReadService, times(1)).findMyBookById(any())
         );
     }
 
@@ -121,7 +125,7 @@ class MyReviewReadServiceTest {
         MyBook myBook = MyBookFixture.COMMON_LOGIN_USER_MYBOOK.getMyBook();
         MyReviewOfMyBookGetServiceRequest request = MyReviewDtoTestData.createReviewOfMyBookGetServiceRequest();
 
-        given(myBookService.findMyBookById(any())).willReturn(myBook);
+        given(myBookReadService.findMyBookById(any())).willReturn(myBook);
         given(myBookReviewRepository.findReviewByMyBook(any())).willReturn(Optional.empty());
 
         // when
@@ -131,7 +135,7 @@ class MyReviewReadServiceTest {
         assertAll(
                 () -> assertThat(response).isNull(),
                 () -> verify(myBookReviewRepository, times(1)).findReviewByMyBook(any()),
-                () -> verify(myBookService, times(1)).findMyBookById(any())
+                () -> verify(myBookReadService, times(1)).findMyBookById(any())
         );
     }
 }

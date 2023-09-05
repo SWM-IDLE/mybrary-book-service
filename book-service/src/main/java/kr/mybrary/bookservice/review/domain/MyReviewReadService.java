@@ -9,7 +9,7 @@ import kr.mybrary.bookservice.client.user.api.UserServiceClient;
 import kr.mybrary.bookservice.client.user.dto.response.UserInfoServiceResponse;
 import kr.mybrary.bookservice.client.user.dto.response.UserInfoServiceResponse.UserInfo;
 import kr.mybrary.bookservice.global.util.DateUtils;
-import kr.mybrary.bookservice.mybook.domain.MyBookService;
+import kr.mybrary.bookservice.mybook.domain.MyBookReadService;
 import kr.mybrary.bookservice.mybook.persistence.MyBook;
 import kr.mybrary.bookservice.review.domain.dto.MyReviewDtoMapper;
 import kr.mybrary.bookservice.review.domain.dto.request.MyReviewOfMyBookGetServiceRequest;
@@ -31,7 +31,7 @@ public class MyReviewReadService {
 
     private final MyReviewRepository myBookReviewRepository;
     private final BookReadService bookReadService;
-    private final MyBookService myBookService;
+    private final MyBookReadService myBookReadService;
     private final UserServiceClient userServiceClient;
 
     public MyReviewsOfBookGetResponse getReviewsFromBook(MyReviewsOfBookGetServiceRequest request) {
@@ -57,7 +57,7 @@ public class MyReviewReadService {
 
     public MyReviewOfMyBookGetResponse getReviewFromMyBook(MyReviewOfMyBookGetServiceRequest request) {
 
-        MyBook myBook = myBookService.findMyBookById(request.getMyBookId());
+        MyBook myBook = myBookReadService.findMyBookById(request.getMyBookId());
 
         return myBookReviewRepository.findReviewByMyBook(myBook)
                 .map(MyReviewDtoMapper.INSTANCE::reviewOfMyBookModelToResponse)
