@@ -122,10 +122,20 @@ sonar {
 	}
 }
 
+jacoco {
+	toolVersion = "0.8.8"
+}
+
+test {
+	useJUnitPlatform()
+	finalizedBy jacocoTestReport
+}
+
 jacocoTestReport {
 	dependsOn test
 	reports {
 		xml.enabled true
 		html.enabled true
 	}
+	finalizedBy 'jacocoTestCoverageVerification'
 }
