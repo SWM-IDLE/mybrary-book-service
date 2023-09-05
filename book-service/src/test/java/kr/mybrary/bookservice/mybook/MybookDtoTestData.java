@@ -29,6 +29,7 @@ import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookReadComplet
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookRegisteredStatusResponse;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookRegistrationCountResponse;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookUpdateResponse;
+import kr.mybrary.bookservice.mybook.presentation.dto.response.UserInfoWithMyBookSetForBookResponse;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.UserInfoWithReadCompletedForBookResponse;
 
 public class MybookDtoTestData {
@@ -260,6 +261,22 @@ public class MybookDtoTestData {
     public static UserInfoWithMyBookSetForBookServiceRequest createUserInfoWithMyBookSetForBookServiceRequest() {
         return UserInfoWithMyBookSetForBookServiceRequest.builder()
                 .isbn13("1111111111111")
+                .build();
+    }
+
+    public static UserInfoWithMyBookSetForBookResponse createUserInfoWithMyBookSetForBookResponse() {
+        return UserInfoWithMyBookSetForBookResponse.builder()
+                .userInfos(List.of(
+                        UserInfoWithMyBookSetForBookResponse.UserInfoElement.builder()
+                                .userId("USER_ID_1")
+                                .nickname("USER_NICKNAME_1")
+                                .profileImageUrl("USER_PICTURE_URL_1")
+                                .build(),
+                        UserInfoWithMyBookSetForBookResponse.UserInfoElement.builder()
+                                .userId("USER_ID_2")
+                                .nickname("USER_NICKNAME_2")
+                                .profileImageUrl("USER_PICTURE_URL_2")
+                                .build()))
                 .build();
     }
 }
