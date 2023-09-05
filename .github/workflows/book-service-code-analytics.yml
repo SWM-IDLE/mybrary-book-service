@@ -26,6 +26,7 @@ jobs:
         with:
           java-version: 17
           distribution: 'zulu'
+
       - name: Setup Application Test Yaml
         uses: microsoft/variable-substitution@v1
         with:
@@ -40,16 +41,6 @@ jobs:
           files: book-service/src/main/resources/bootstrap.yml
         env:
           spring.profiles.active: test
-
-      - name: analyze test coverage
-        id: jacoco
-        uses: madrapps/jacoco-report@v1.2
-        with:
-          title: Test Coverage Report
-          paths: book-service/build/reports/jacoco/test/jacocoTestReport.xml
-          token: ${{ secrets.PR_ACCESS_KEY }}
-          min-coverage-overall: 60
-          min-coverage-changed-files: 60
 
       - name: Cache SonarCloud packages
         uses: actions/cache@v3
@@ -68,6 +59,16 @@ jobs:
       - name: Build and analyze
         working-directory: book-service
         env:
-          GITHUB_TOKEN: ${{ secrets.PR_ACCESS_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: ./gradlew build sonar --info
+
+      - name: analyze test coverage
+        id: jacoco
+        uses: madrapps/jacoco-report@v1.2
+        with:
+          title: Test Coverage Report
+          paths: ${{ github.workspace }}/build/reports/jacoco/test/jacocoTestReport.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          min-coverage-overall: 60
+          min-coverage-changed-files: 60
