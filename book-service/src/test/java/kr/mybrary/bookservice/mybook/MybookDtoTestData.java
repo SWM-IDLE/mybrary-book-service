@@ -28,6 +28,7 @@ import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookReadComplet
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookRegisteredStatusResponse;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookRegistrationCountResponse;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookUpdateResponse;
+import kr.mybrary.bookservice.mybook.presentation.dto.response.UserInfoWithReadCompletedForBookResponse;
 
 public class MybookDtoTestData {
 
@@ -236,6 +237,22 @@ public class MybookDtoTestData {
                 .data(UserInfoServiceResponse.UserInfoList.builder()
                         .userInfoElements(list)
                         .build())
+                .build();
+    }
+
+    public static UserInfoWithReadCompletedForBookResponse createUserInfoWithReadCompletedForBookResponse() {
+        return UserInfoWithReadCompletedForBookResponse.builder()
+                .userInfos(List.of(
+                        UserInfoWithReadCompletedForBookResponse.UserInfoElement.builder()
+                                .userId("USER_ID_1")
+                                .nickname("USER_NICKNAME_1")
+                                .profileImageUrl("USER_PICTURE_URL_1")
+                                .build(),
+                        UserInfoWithReadCompletedForBookResponse.UserInfoElement.builder()
+                                .userId("USER_ID_2")
+                                .nickname("USER_NICKNAME_2")
+                                .profileImageUrl("USER_PICTURE_URL_2")
+                                .build()))
                 .build();
     }
 }

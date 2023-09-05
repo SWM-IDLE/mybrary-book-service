@@ -39,6 +39,7 @@ import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookReadComplet
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookRegisteredStatusResponse;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookRegistrationCountResponse;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookUpdateResponse;
+import kr.mybrary.bookservice.mybook.presentation.dto.response.UserInfoWithReadCompletedForBookResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -522,6 +523,47 @@ class MyBookControllerTest {
                                                 fieldWithPath("status").type(STRING).description("응답 상태"),
                                                 fieldWithPath("message").type(STRING).description("응답 메시지"),
                                                 fieldWithPath("data.completed").type(SimpleType.BOOLEAN).description("도서 완독 여부")
+                                        ).build())));
+    }
+
+    @DisplayName("한 도서에 대해서 완독한 유저의 정보를 조회한다.")
+    @Test
+    void getUserInfoWithReadCompletedForBook() throws Exception {
+
+        // given
+        UserInfoWithReadCompletedForBookResponse response = MybookDtoTestData.createUserInfoWithReadCompletedForBookResponse();
+
+        given(myBookReadService.getReadCompletedUserIdListByBook(any())).willReturn(response);
+
+        // when
+        ResultActions actions = mockMvc.perform(get("/api/v1/books/{isbn13}/read-complete/userInfos", "9788932917245"));
+
+        // then
+        actions
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("200 OK"))
+                .andExpect(jsonPath("$.message").value("도서를 완독한 유저 목록 조회에 성공했습니다."))
+                .andExpect(jsonPath("$.data").isNotEmpty());
+
+        // document
+        actions
+                .andDo(document("get-userInfos-with-read-completed-for-book",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        resource(
+                                ResourceSnippetParameters.builder()
+                                        .tag("mybook")
+                                        .summary("한 도서에 대해서 완독한 유저의 정보를 조회한다.")
+                                        .pathParameters(
+                                                parameterWithName("isbn13").type(SimpleType.STRING).description("도서 ISBN13")
+                                        )
+                                        .responseSchema(Schema.schema("get_userInfos_with_read_completed_for_book_response_body"))
+                                        .responseFields(
+                                                fieldWithPath("status").type(STRING).description("응답 상태"),
+                                                fieldWithPath("message").type(STRING).description("응답 메시지"),
+                                                fieldWithPath("data.userInfos[0].userId").type(STRING).description("유저 ID"),
+                                                fieldWithPath("data.userInfos[0].nickname").type(STRING).description("유저 닉네임"),
+                                                fieldWithPath("data.userInfos[0].profileImageUrl").type(STRING).description("유저 프로필 이미지 URL")
                                         ).build())));
     }
 }
