@@ -3,12 +3,16 @@ package kr.mybrary.bookservice.mybook.domain;
 import java.time.LocalDate;
 import java.util.List;
 import kr.mybrary.bookservice.book.domain.BookReadService;
+import kr.mybrary.bookservice.book.persistence.Book;
+import kr.mybrary.bookservice.client.user.api.UserServiceClient;
+import kr.mybrary.bookservice.client.user.dto.response.UserInfoServiceResponse;
 import kr.mybrary.bookservice.mybook.domain.dto.MyBookDtoMapper;
 import kr.mybrary.bookservice.mybook.domain.dto.request.MyBookDetailServiceRequest;
 import kr.mybrary.bookservice.mybook.domain.dto.request.MyBookFindAllServiceRequest;
 import kr.mybrary.bookservice.mybook.domain.dto.request.MyBookFindByMeaningTagQuoteServiceRequest;
 import kr.mybrary.bookservice.mybook.domain.dto.request.MyBookReadCompletedStatusServiceRequest;
 import kr.mybrary.bookservice.mybook.domain.dto.request.MyBookRegisteredStatusServiceRequest;
+import kr.mybrary.bookservice.mybook.domain.dto.request.UserInfoWithReadCompletedForBookServiceRequest;
 import kr.mybrary.bookservice.mybook.domain.exception.MyBookAccessDeniedException;
 import kr.mybrary.bookservice.mybook.domain.exception.MyBookNotFoundException;
 import kr.mybrary.bookservice.mybook.persistence.MyBook;
@@ -21,6 +25,8 @@ import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookElementResp
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookReadCompletedStatusResponse;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookRegisteredStatusResponse;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookRegistrationCountResponse;
+import kr.mybrary.bookservice.mybook.presentation.dto.response.UserInfoWithReadCompletedForBookResponse;
+import kr.mybrary.bookservice.mybook.presentation.dto.response.UserInfoWithReadCompletedForBookResponse.UserInfoElement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +38,7 @@ public class MyBookReadService {
 
     private final MyBookRepository myBookRepository;
     private final BookReadService bookReadService;
+    private final UserServiceClient userServiceClient;
 
     public List<MyBookElementResponse> findAllMyBooks(MyBookFindAllServiceRequest request) {
 
@@ -93,6 +100,30 @@ public class MyBookReadService {
                         .map(myBook -> MyBookReadCompletedStatusResponse.of(myBook.getReadStatus() == ReadStatus.COMPLETED))
                         .orElseGet(() -> MyBookReadCompletedStatusResponse.of(false)))
                 .orElseGet(() -> MyBookReadCompletedStatusResponse.of(false));
+    }
+
+    public UserInfoWithReadCompletedForBookResponse getReadCompletedUserIdListByBook(
+            UserInfoWithReadCompletedForBookServiceRequest request) {
+
+        Book book = bookReadService.getRegisteredBookByISBN13(request.getIsbn13());
+        List<String> userIds = myBookRepository.getReadCompletedUserIdListByBook(book);
+
+        UserInfoServiceResponse usersInfo = userServiceClient.getUsersInfo(userIds);
+
+        return UserInfoWithReadCompletedForBookResponse.builder()
+                .userInfos(mapUserInfo(usersInfo))
+                .build();
+    }
+
+    private List<UserInfoElement> mapUserInfo(UserInfoServiceResponse usersInfo) {
+        return usersInfo.getData().getUserInfoElements()
+                .stream()
+                .map(user -> UserInfoElement.builder()
+                        .userId(user.getUserId())
+                        .nickname(user.getNickname())
+                        .profileImageUrl(user.getProfileImageUrl())
+                        .build())
+                .toList();
     }
 
     private static boolean isOwnerSameAsRequester(String ownerId, String requesterId) {

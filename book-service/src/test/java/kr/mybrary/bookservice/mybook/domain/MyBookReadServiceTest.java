@@ -17,6 +17,7 @@ import java.util.Optional;
 import kr.mybrary.bookservice.book.BookFixture;
 import kr.mybrary.bookservice.book.domain.BookReadService;
 import kr.mybrary.bookservice.book.persistence.Book;
+import kr.mybrary.bookservice.client.user.api.UserServiceClient;
 import kr.mybrary.bookservice.mybook.MyBookFixture;
 import kr.mybrary.bookservice.mybook.MybookDtoTestData;
 import kr.mybrary.bookservice.mybook.domain.dto.request.MyBookDetailServiceRequest;
@@ -24,6 +25,7 @@ import kr.mybrary.bookservice.mybook.domain.dto.request.MyBookFindAllServiceRequ
 import kr.mybrary.bookservice.mybook.domain.dto.request.MyBookFindByMeaningTagQuoteServiceRequest;
 import kr.mybrary.bookservice.mybook.domain.dto.request.MyBookReadCompletedStatusServiceRequest;
 import kr.mybrary.bookservice.mybook.domain.dto.request.MyBookRegisteredStatusServiceRequest;
+import kr.mybrary.bookservice.mybook.domain.dto.request.UserInfoWithReadCompletedForBookServiceRequest;
 import kr.mybrary.bookservice.mybook.domain.exception.MyBookAccessDeniedException;
 import kr.mybrary.bookservice.mybook.domain.exception.MyBookNotFoundException;
 import kr.mybrary.bookservice.mybook.persistence.MyBook;
@@ -35,6 +37,7 @@ import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookElementResp
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookReadCompletedStatusResponse;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookRegisteredStatusResponse;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookRegistrationCountResponse;
+import kr.mybrary.bookservice.mybook.presentation.dto.response.UserInfoWithReadCompletedForBookResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -55,6 +58,9 @@ class MyBookReadServiceTest {
 
     @Mock
     private BookReadService bookReadService;
+
+    @Mock
+    private UserServiceClient userServiceClient;
 
     private static final String LOGIN_ID = "LOGIN_USER_ID";
     private static final String OTHER_USER_ID = "OTHER_USER_ID";
@@ -348,6 +354,32 @@ class MyBookReadServiceTest {
                 () -> verify(bookReadService, times(1)).findOptionalBookByISBN13(anyString()),
                 () -> verify(myBookRepository, times(1)).findByUserIdAndBook(any(), any()),
                 () -> assertThat(response.isCompleted()).isFalse()
+        );
+    }
+
+    @DisplayName("한 도서에 대해서 완독한 유저들의 정보를 조회한다.")
+    @Test
+    void getReadCompletedUserIdListByBook() {
+
+        // given
+        UserInfoWithReadCompletedForBookServiceRequest request = MybookDtoTestData.createUserInfoWithReadCompletedForBookServiceRequest();
+        Book book = BookFixture.COMMON_BOOK.getBook();
+        List<String> userIds = List.of("user1", "user2");
+
+        given(bookReadService.getRegisteredBookByISBN13(request.getIsbn13())).willReturn(book);
+        given(myBookRepository.getReadCompletedUserIdListByBook(book)).willReturn(userIds);
+        given(userServiceClient.getUsersInfo(userIds)).willReturn(MybookDtoTestData.createUserInfoResponseList(userIds));
+
+        // when
+        UserInfoWithReadCompletedForBookResponse response = myBookReadService.getReadCompletedUserIdListByBook(request);
+
+        // then
+        assertAll(
+                () -> assertThat(response.getUserInfos().size()).isEqualTo(2),
+                () -> assertThat(response.getUserInfos()).extracting("userId").containsExactlyInAnyOrder("user1", "user2"),
+                () -> verify(bookReadService, times(1)).getRegisteredBookByISBN13(anyString()),
+                () -> verify(myBookRepository, times(1)).getReadCompletedUserIdListByBook(any()),
+                () -> verify(userServiceClient, times(1)).getUsersInfo(any())
         );
     }
 }

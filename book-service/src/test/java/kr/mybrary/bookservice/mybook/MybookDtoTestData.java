@@ -4,12 +4,15 @@ import java.time.LocalDateTime;
 import java.util.List;
 import kr.mybrary.bookservice.book.persistence.bookInfo.Author;
 import kr.mybrary.bookservice.book.persistence.bookInfo.BookAuthor;
+import kr.mybrary.bookservice.client.user.dto.response.UserInfoServiceResponse;
+import kr.mybrary.bookservice.client.user.dto.response.UserInfoServiceResponse.UserInfo;
 import kr.mybrary.bookservice.mybook.domain.dto.request.MyBookCreateServiceRequest;
 import kr.mybrary.bookservice.mybook.domain.dto.request.MyBookFindAllServiceRequest;
 import kr.mybrary.bookservice.mybook.domain.dto.request.MyBookReadCompletedStatusServiceRequest;
 import kr.mybrary.bookservice.mybook.domain.dto.request.MyBookRegisteredStatusServiceRequest;
 import kr.mybrary.bookservice.mybook.domain.dto.request.MybookUpdateServiceRequest;
 import kr.mybrary.bookservice.mybook.domain.dto.request.MybookUpdateServiceRequest.MybookUpdateServiceRequestBuilder;
+import kr.mybrary.bookservice.mybook.domain.dto.request.UserInfoWithReadCompletedForBookServiceRequest;
 import kr.mybrary.bookservice.mybook.persistence.MyBookOrderType;
 import kr.mybrary.bookservice.mybook.persistence.ReadStatus;
 import kr.mybrary.bookservice.mybook.persistence.model.MyBookListDisplayElementModel;
@@ -210,6 +213,29 @@ public class MybookDtoTestData {
     public static MyBookReadCompletedStatusResponse createMyBookReadCompletedStatusResponse() {
         return MyBookReadCompletedStatusResponse.builder()
                 .completed(true)
+                .build();
+    }
+
+    public static UserInfoWithReadCompletedForBookServiceRequest createUserInfoWithReadCompletedForBookServiceRequest() {
+        return UserInfoWithReadCompletedForBookServiceRequest.builder()
+                .isbn13("1111111111111")
+                .build();
+    }
+
+    public static UserInfoServiceResponse createUserInfoResponseList(List<String> userIds) {
+
+        List<UserInfo> list = userIds.stream()
+                .map(userId -> UserInfo.builder()
+                        .userId(userId)
+                        .nickname("USER_NICKNAME_" + userId)
+                        .profileImageUrl("USER_PICTURE_URL_" + userId)
+                        .build())
+                .toList();
+
+        return UserInfoServiceResponse.builder()
+                .data(UserInfoServiceResponse.UserInfoList.builder()
+                        .userInfoElements(list)
+                        .build())
                 .build();
     }
 }
