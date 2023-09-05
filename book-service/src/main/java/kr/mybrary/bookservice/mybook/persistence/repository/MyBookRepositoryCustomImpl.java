@@ -12,6 +12,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import kr.mybrary.bookservice.book.persistence.Book;
 import kr.mybrary.bookservice.book.persistence.bookInfo.BookAuthor;
 import kr.mybrary.bookservice.mybook.persistence.MyBookOrderType;
 import kr.mybrary.bookservice.mybook.persistence.ReadStatus;
@@ -72,6 +73,16 @@ public class MyBookRepositoryCustomImpl implements MyBookRepositoryCustom {
                 .from(myBook)
                 .where(myBook.createdAt.between(start, end))
                 .fetchOne();
+    }
+
+    @Override
+    public List<String> getReadCompletedUserIdListByBook(Book book) {
+        return queryFactory.select(myBook.userId)
+                .from(myBook)
+                .where(myBook.book.eq(book),
+                        myBook.readStatus.eq(ReadStatus.COMPLETED),
+                        myBook.showable.eq(true))
+                .fetch();
     }
 
     private BooleanExpression eqReadStatus(ReadStatus readStatus) {

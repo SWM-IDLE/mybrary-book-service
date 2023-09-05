@@ -427,4 +427,32 @@ class MyBookRepositoryTest {
                 }
         );
     }
+
+    @DisplayName("한 도서를 완독한 유저의 목록을 조회한다.")
+    @Test
+    void getReadCompletedUserIdListByBook() {
+
+        // given
+        Book savedBook = bookRepository.save(BookFixture.COMMON_BOOK_WITHOUT_RELATION.getBook());
+        MyBook myBook_1 = myBookRepository.save(MyBookFixture.MY_BOOK_WITHOUT_RELATION.getMyBookBuilder()
+                .book(savedBook).userId("USER_ID_1").readStatus(ReadStatus.COMPLETED).build());
+        MyBook myBook_2 = myBookRepository.save(MyBookFixture.MY_BOOK_WITHOUT_RELATION.getMyBookBuilder()
+                .book(savedBook).userId("USER_ID_2").readStatus(ReadStatus.TO_READ).build());
+        MyBook myBook_3 = myBookRepository.save(MyBookFixture.MY_BOOK_WITHOUT_RELATION.getMyBookBuilder()
+                .book(savedBook).userId("USER_ID_3").readStatus(ReadStatus.COMPLETED).build());
+        MyBook myBook_4 = myBookRepository.save(MyBookFixture.MY_BOOK_WITHOUT_RELATION.getMyBookBuilder()
+                .book(savedBook).userId("USER_ID_4").showable(false).readStatus(ReadStatus.COMPLETED).build());
+
+        entityManager.flush();
+        entityManager.clear();
+
+        // when
+        List<String> readCompletedUserIdList = myBookRepository.getReadCompletedUserIdListByBook(savedBook);
+
+        // then
+        assertAll(
+                () -> assertThat(readCompletedUserIdList.size()).isEqualTo(2),
+                () -> assertThat(readCompletedUserIdList).containsExactlyInAnyOrder(myBook_1.getUserId(), myBook_3.getUserId())
+        );
+    }
 }
