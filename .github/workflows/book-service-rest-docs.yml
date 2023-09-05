@@ -1,16 +1,11 @@
 name: 'book-service api specification to s3'
 
 on:
-  push:
-    branches:
-      - master
-    paths:
-      - 'backend/book-service/**'
   pull_request:
     branches:
-      - master
+      - develop
     paths:
-      - 'backend/book-service/**'
+      - 'book-service/**'
 
 jobs:
   build:
@@ -28,7 +23,7 @@ jobs:
       - name: Setup Application Test Yaml
         uses: microsoft/variable-substitution@v1
         with:
-          files: backend/book-service/src/main/resources/application-test.yml
+          files: book-service/src/main/resources/application-test.yml
         env:
           aladin.api.key : ${{ secrets.ALADIN_API_KEY }}
           kakao.api.key : ${{ secrets.KAKAO_API_KEY }}
@@ -36,23 +31,23 @@ jobs:
       - name: Setup Bootstrap Yaml
         uses: microsoft/variable-substitution@v1
         with:
-          files: backend/book-service/src/main/resources/bootstrap.yml
+          files: book-service/src/main/resources/bootstrap.yml
         env:
           spring.profiles.active: test
           
       - name: Create Output Directory
-        working-directory: backend/book-service 
+        working-directory: book-service
         run: |
             mkdir -p build/resources/main/static/docs
             echo "test" > build/resources/main/static/docs/book-service.json
                   
       - name: Run Openapi3
-        working-directory: backend/book-service
+        working-directory: book-service
         run: |
           ./gradlew openapi3
           
       - name: Upload OpenApi Specification to S3
-        working-directory: backend/book-service
+        working-directory: book-service
         run: |
           aws s3 cp build/resources/main/static/docs/book-service.json s3://mybrary-swagger-ui/docs/book-service.json
         env:
