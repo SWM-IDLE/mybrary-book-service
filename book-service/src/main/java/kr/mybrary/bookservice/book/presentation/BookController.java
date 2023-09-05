@@ -7,6 +7,7 @@ import kr.mybrary.bookservice.book.domain.dto.request.BookDetailServiceRequest;
 import kr.mybrary.bookservice.book.domain.dto.request.BookInterestServiceRequest;
 import kr.mybrary.bookservice.book.domain.dto.request.BookInterestStatusServiceRequest;
 import kr.mybrary.bookservice.book.domain.dto.request.BookMyInterestFindServiceRequest;
+import kr.mybrary.bookservice.book.domain.dto.request.UserInfoWithInterestForBookServiceRequest;
 import kr.mybrary.bookservice.book.persistence.BookOrderType;
 import kr.mybrary.bookservice.book.presentation.dto.request.BookCreateRequest;
 import kr.mybrary.bookservice.global.dto.response.SuccessResponse;
@@ -40,10 +41,9 @@ public class BookController {
     }
 
     @GetMapping("/detail")
-    public ResponseEntity getBookDetail(
-            @RequestParam(value = "isbn10", required = false, defaultValue = "") String isbn10,
-            @RequestParam("isbn13") String isbn13,
-            @RequestHeader("USER-ID") String loginId) {
+    public ResponseEntity getBookDetail(@RequestParam(value = "isbn10", required = false, defaultValue = "") String isbn10,
+                                        @RequestParam("isbn13") String isbn13,
+                                        @RequestHeader("USER-ID") String loginId) {
 
         BookDetailServiceRequest serviceRequest = BookDetailServiceRequest.of(loginId, isbn10, isbn13);
 
@@ -52,9 +52,8 @@ public class BookController {
     }
 
     @PostMapping("/{isbn13}/interest")
-    public ResponseEntity handleBookInterest(
-            @PathVariable("isbn13") String isbn13,
-            @RequestHeader("USER-ID") String loginId) {
+    public ResponseEntity handleBookInterest(@PathVariable("isbn13") String isbn13,
+                                             @RequestHeader("USER-ID") String loginId) {
 
         BookInterestServiceRequest serviceRequest = BookInterestServiceRequest.of(isbn13, loginId);
 
@@ -63,9 +62,8 @@ public class BookController {
     }
 
     @GetMapping("/users/{userId}/interest")
-    public ResponseEntity getInterestBooks(
-            @PathVariable("userId") String userId,
-            @RequestParam(value = "order", required = false, defaultValue = "none") String order) {
+    public ResponseEntity getInterestBooks(@PathVariable("userId") String userId,
+                                           @RequestParam(value = "order", required = false, defaultValue = "none") String order) {
 
         BookMyInterestFindServiceRequest serviceRequest = BookMyInterestFindServiceRequest.of(userId, BookOrderType.of(order));
 
@@ -74,13 +72,22 @@ public class BookController {
     }
 
     @GetMapping("/{isbn13}/interest-status")
-    public ResponseEntity getInterestStatus(
-            @PathVariable("isbn13") String isbn13,
-            @RequestHeader("USER-ID") String loginId) {
+    public ResponseEntity getInterestStatus(@PathVariable("isbn13") String isbn13,
+                                            @RequestHeader("USER-ID") String loginId) {
 
         BookInterestStatusServiceRequest serviceRequest = BookInterestStatusServiceRequest.of(loginId, isbn13);
 
         return ResponseEntity.ok(SuccessResponse.of(HttpStatus.OK.toString(), "관심 도서 상태 조회에 성공했습니다.",
                 bookInterestService.getInterestStatus(serviceRequest)));
     }
+
+    @GetMapping("/{isbn13}/interest/userInfos")
+    public ResponseEntity getUserInfoWithInterestForBook(@PathVariable("isbn13") String isbn13) {
+
+        UserInfoWithInterestForBookServiceRequest request = UserInfoWithInterestForBookServiceRequest.of(isbn13);
+
+        return ResponseEntity.ok(SuccessResponse.of(HttpStatus.OK.toString(), "관심 도서를 등록한 유저 목록 조회에 성공했습니다.",
+                bookInterestService.getUserInfoWithInterestForBook(request)));
+    }
+
 }

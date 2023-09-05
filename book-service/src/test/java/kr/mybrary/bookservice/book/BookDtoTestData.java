@@ -14,6 +14,7 @@ import kr.mybrary.bookservice.book.presentation.dto.request.BookCreateRequest;
 import kr.mybrary.bookservice.book.presentation.dto.response.BookInterestElementResponse;
 import kr.mybrary.bookservice.book.presentation.dto.response.BookInterestHandleResponse;
 import kr.mybrary.bookservice.book.presentation.dto.response.BookInterestStatusResponse;
+import kr.mybrary.bookservice.book.presentation.dto.response.UserInfoWithInterestForBookResponse;
 import kr.mybrary.bookservice.client.user.dto.response.UserInfoServiceResponse;
 import kr.mybrary.bookservice.client.user.dto.response.UserInfoServiceResponse.UserInfo;
 
@@ -228,5 +229,22 @@ public class BookDtoTestData {
                         .userInfoElements(list)
                         .build())
                 .build();
+    }
+
+    public static UserInfoWithInterestForBookResponse createUserInfoWithInterestForBookResponse() {
+
+        return UserInfoWithInterestForBookResponse.builder()
+                .userInfos(List.of(
+                        UserInfoWithInterestForBookResponse.UserInfoElement.builder()
+                                .userId("USER_ID_1")
+                                .nickname("USER_NICKNAME_1")
+                                .profileImageUrl("USER_PICTURE_URL_1")
+                                .build(),
+                        UserInfoWithInterestForBookResponse.UserInfoElement.builder()
+                                .userId("USER_ID_2")
+                                .nickname("USER_NICKNAME_2")
+                                .profileImageUrl("USER_PICTURE_URL_2")
+                                .build()
+                )).build();
     }
 }
