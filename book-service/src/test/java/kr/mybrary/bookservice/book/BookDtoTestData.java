@@ -7,12 +7,15 @@ import kr.mybrary.bookservice.book.domain.dto.request.BookDetailServiceRequest;
 import kr.mybrary.bookservice.book.domain.dto.request.BookInterestServiceRequest;
 import kr.mybrary.bookservice.book.domain.dto.request.BookInterestStatusServiceRequest;
 import kr.mybrary.bookservice.book.domain.dto.request.BookMyInterestFindServiceRequest;
+import kr.mybrary.bookservice.book.domain.dto.request.UserInfoWithInterestForBookServiceRequest;
 import kr.mybrary.bookservice.book.presentation.dto.response.BookDetailResponse;
 import kr.mybrary.bookservice.book.persistence.BookOrderType;
 import kr.mybrary.bookservice.book.presentation.dto.request.BookCreateRequest;
 import kr.mybrary.bookservice.book.presentation.dto.response.BookInterestElementResponse;
 import kr.mybrary.bookservice.book.presentation.dto.response.BookInterestHandleResponse;
 import kr.mybrary.bookservice.book.presentation.dto.response.BookInterestStatusResponse;
+import kr.mybrary.bookservice.client.user.dto.response.UserInfoServiceResponse;
+import kr.mybrary.bookservice.client.user.dto.response.UserInfoServiceResponse.UserInfo;
 
 public class BookDtoTestData {
 
@@ -201,6 +204,29 @@ public class BookDtoTestData {
     public static BookInterestStatusResponse createBookInterestStatusResponse() {
         return BookInterestStatusResponse.builder()
                 .interested(true)
+                .build();
+    }
+
+    public static UserInfoWithInterestForBookServiceRequest createUserInfoWithInterestForBookServiceRequest() {
+        return UserInfoWithInterestForBookServiceRequest.builder()
+                .isbn13("1111111111111")
+                .build();
+    }
+
+    public static UserInfoServiceResponse createUserInfoResponseList(List<String> userIds) {
+
+        List<UserInfo> list = userIds.stream()
+                .map(userId -> UserInfo.builder()
+                        .userId(userId)
+                        .nickname("USER_NICKNAME_" + userId)
+                        .profileImageUrl("USER_PICTURE_URL_" + userId)
+                        .build())
+                .toList();
+
+        return UserInfoServiceResponse.builder()
+                .data(UserInfoServiceResponse.UserInfoList.builder()
+                        .userInfoElements(list)
+                        .build())
                 .build();
     }
 }

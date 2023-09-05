@@ -18,6 +18,7 @@ import kr.mybrary.bookservice.book.BookInterestFixture;
 import kr.mybrary.bookservice.book.domain.dto.request.BookInterestServiceRequest;
 import kr.mybrary.bookservice.book.domain.dto.request.BookInterestStatusServiceRequest;
 import kr.mybrary.bookservice.book.domain.dto.request.BookMyInterestFindServiceRequest;
+import kr.mybrary.bookservice.book.domain.dto.request.UserInfoWithInterestForBookServiceRequest;
 import kr.mybrary.bookservice.book.persistence.Book;
 import kr.mybrary.bookservice.book.persistence.BookInterest;
 import kr.mybrary.bookservice.book.persistence.BookOrderType;
@@ -25,6 +26,8 @@ import kr.mybrary.bookservice.book.persistence.repository.BookInterestRepository
 import kr.mybrary.bookservice.book.presentation.dto.response.BookInterestElementResponse;
 import kr.mybrary.bookservice.book.presentation.dto.response.BookInterestHandleResponse;
 import kr.mybrary.bookservice.book.presentation.dto.response.BookInterestStatusResponse;
+import kr.mybrary.bookservice.book.presentation.dto.response.UserInfoWithInterestForBookResponse;
+import kr.mybrary.bookservice.client.user.api.UserServiceClient;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -45,6 +48,9 @@ class BookInterestServiceTest {
 
     @Mock
     private BookReadService bookReadService;
+
+    @Mock
+    private UserServiceClient userServiceClient;
 
     @DisplayName("관심 도서로 등록한다.")
     @Test
@@ -164,6 +170,32 @@ class BookInterestServiceTest {
                 () -> verify(bookReadService, times(1)).findOptionalBookByISBN13(anyString()),
                 () -> verify(bookInterestRepository, never()).existsByBookAndUserId(any(Book.class), anyString()),
                 () -> assertThat(response.isInterested()).isFalse()
+        );
+    }
+
+    @DisplayName("한 도서에 대해서 관심 도서로 등록한 유저들의 정보를 조회한다.")
+    @Test
+    void getUserInfoWithInterestForBook() {
+
+        // given
+        UserInfoWithInterestForBookServiceRequest request = BookDtoTestData.createUserInfoWithInterestForBookServiceRequest();
+        Book book = BookFixture.COMMON_BOOK.getBook();
+        List<String> userIds = List.of("user1", "user2");
+
+        given(bookReadService.getRegisteredBookByISBN13(request.getIsbn13())).willReturn(book);
+        given(bookInterestRepository.findUserIdsByBook(book)).willReturn(userIds);
+        given(userServiceClient.getUsersInfo(userIds)).willReturn(BookDtoTestData.createUserInfoResponseList(userIds));
+
+        // when
+        UserInfoWithInterestForBookResponse response = bookInterestService.getUserInfoWithInterestForBook(request);
+
+        // then
+        assertAll(
+                () -> assertThat(response.getUserInfos().size()).isEqualTo(2),
+                () -> assertThat(response.getUserInfos()).extracting("userId").containsExactlyInAnyOrder("user1", "user2"),
+                () -> verify(bookReadService, times(1)).getRegisteredBookByISBN13(anyString()),
+                () -> verify(bookInterestRepository, times(1)).findUserIdsByBook(any(Book.class)),
+                () -> verify(userServiceClient, times(1)).getUsersInfo(any(List.class))
         );
     }
 }
