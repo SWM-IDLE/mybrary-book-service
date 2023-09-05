@@ -534,7 +534,7 @@ class MyBookControllerTest {
         // given
         UserInfoWithReadCompletedForBookResponse response = MybookDtoTestData.createUserInfoWithReadCompletedForBookResponse();
 
-        given(myBookReadService.getReadCompletedUserIdListByBook(any())).willReturn(response);
+        given(myBookReadService.getUserIdWithReadCompletedListByBook(any())).willReturn(response);
 
         // when
         ResultActions actions = mockMvc.perform(get("/api/v1/books/{isbn13}/read-complete/userInfos", "9788932917245"));
@@ -575,7 +575,7 @@ class MyBookControllerTest {
         // given
         UserInfoWithMyBookSetForBookResponse response = MybookDtoTestData.createUserInfoWithMyBookSetForBookResponse();
 
-        given(myBookReadService.getMyBookSetUserIdListByBook(any())).willReturn(response);
+        given(myBookReadService.getUserIdListWithMyBookSettingByBook(any())).willReturn(response);
 
         // when
         ResultActions actions = mockMvc.perform(get("/api/v1/books/{isbn13}/mybook/userInfos", "9788932917245"));

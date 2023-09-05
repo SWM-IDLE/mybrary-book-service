@@ -373,7 +373,7 @@ class MyBookReadServiceTest {
         given(userServiceClient.getUsersInfo(userIds)).willReturn(MybookDtoTestData.createUserInfoResponseList(userIds));
 
         // when
-        UserInfoWithReadCompletedForBookResponse response = myBookReadService.getReadCompletedUserIdListByBook(request);
+        UserInfoWithReadCompletedForBookResponse response = myBookReadService.getUserIdWithReadCompletedListByBook(request);
 
         // then
         assertAll(
@@ -399,7 +399,7 @@ class MyBookReadServiceTest {
         given(userServiceClient.getUsersInfo(userIds)).willReturn(MybookDtoTestData.createUserInfoResponseList(userIds));
 
         // when
-        UserInfoWithMyBookSetForBookResponse response = myBookReadService.getMyBookSetUserIdListByBook(request);
+        UserInfoWithMyBookSetForBookResponse response = myBookReadService.getUserIdListWithMyBookSettingByBook(request);
 
         // then
         assertAll(

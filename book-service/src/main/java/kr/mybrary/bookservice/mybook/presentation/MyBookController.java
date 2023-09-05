@@ -125,8 +125,7 @@ public class MyBookController {
     public ResponseEntity getReadCompletedStatus(@RequestHeader("USER-ID") String loginId,
                                                  @PathVariable String isbn13) {
 
-        MyBookReadCompletedStatusServiceRequest serviceRequest = MyBookReadCompletedStatusServiceRequest.of(loginId,
-                isbn13);
+        MyBookReadCompletedStatusServiceRequest serviceRequest = MyBookReadCompletedStatusServiceRequest.of(loginId, isbn13);
 
         return ResponseEntity.ok(SuccessResponse.of(HttpStatus.OK.toString(), "해당 도서 완독 여부 입니다.",
                 myBookReadService.getMyBookReadCompletedStatus(serviceRequest)));
@@ -138,7 +137,7 @@ public class MyBookController {
         UserInfoWithReadCompletedForBookServiceRequest request = UserInfoWithReadCompletedForBookServiceRequest.of(isbn13);
 
         return ResponseEntity.ok(SuccessResponse.of(HttpStatus.OK.toString(), "도서를 완독한 유저 목록 조회에 성공했습니다.",
-                myBookReadService.getReadCompletedUserIdListByBook(request)));
+                myBookReadService.getUserIdWithReadCompletedListByBook(request)));
     }
 
     @GetMapping("/books/{isbn13}/mybook/userInfos")
@@ -147,6 +146,6 @@ public class MyBookController {
         UserInfoWithMyBookSetForBookServiceRequest request = UserInfoWithMyBookSetForBookServiceRequest.of(isbn13);
 
         return ResponseEntity.ok(SuccessResponse.of(HttpStatus.OK.toString(), "도서를 마이북에 등록한 유저 목록 조회에 성공했습니다.",
-                myBookReadService.getMyBookSetUserIdListByBook(request)));
+                myBookReadService.getUserIdListWithMyBookSettingByBook(request)));
     }
 }

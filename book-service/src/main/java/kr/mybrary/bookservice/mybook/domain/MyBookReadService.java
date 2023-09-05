@@ -103,7 +103,7 @@ public class MyBookReadService {
                 .orElseGet(() -> MyBookReadCompletedStatusResponse.of(false));
     }
 
-    public UserInfoWithReadCompletedForBookResponse getReadCompletedUserIdListByBook(
+    public UserInfoWithReadCompletedForBookResponse getUserIdWithReadCompletedListByBook(
             UserInfoWithReadCompletedForBookServiceRequest request) {
 
         Book book = bookReadService.getRegisteredBookByISBN13(request.getIsbn13());
@@ -114,7 +114,7 @@ public class MyBookReadService {
         return UserInfoWithReadCompletedForBookResponse.of(usersInfo);
     }
 
-    public UserInfoWithMyBookSetForBookResponse getMyBookSetUserIdListByBook(
+    public UserInfoWithMyBookSetForBookResponse getUserIdListWithMyBookSettingByBook(
             UserInfoWithMyBookSetForBookServiceRequest request) {
 
         Book book = bookReadService.getRegisteredBookByISBN13(request.getIsbn13());
