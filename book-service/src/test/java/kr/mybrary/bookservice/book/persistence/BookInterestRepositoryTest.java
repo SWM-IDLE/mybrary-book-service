@@ -269,7 +269,7 @@ class BookInterestRepositoryTest {
 
         // then
         assertAll(
-                () -> assertThat(userIds.size()).isEqualTo(2),
+                () -> assertThat(userIds).hasSize(2),
                 () -> assertThat(userIds).containsExactlyInAnyOrder("LOGIN_USER_ID_1", "LOGIN_USER_ID_2")
         );
     }

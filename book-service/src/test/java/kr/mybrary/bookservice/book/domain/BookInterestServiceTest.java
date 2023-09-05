@@ -191,7 +191,7 @@ class BookInterestServiceTest {
 
         // then
         assertAll(
-                () -> assertThat(response.getUserInfos().size()).isEqualTo(2),
+                () -> assertThat(response.getUserInfos()).hasSize(2),
                 () -> assertThat(response.getUserInfos()).extracting("userId").containsExactlyInAnyOrder("user1", "user2"),
                 () -> verify(bookReadService, times(1)).getRegisteredBookByISBN13(anyString()),
                 () -> verify(bookInterestRepository, times(1)).findUserIdsByBook(any(Book.class)),

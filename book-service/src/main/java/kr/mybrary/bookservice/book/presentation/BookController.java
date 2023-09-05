@@ -33,7 +33,7 @@ public class BookController {
     private final BookInterestService bookInterestService;
 
     @PostMapping
-    public ResponseEntity create(@RequestBody BookCreateRequest request) {
+    public ResponseEntity<SuccessResponse> create(@RequestBody BookCreateRequest request) {
         bookWriteService.create(request.toServiceRequest());
 
         return ResponseEntity.status(201).body(
@@ -41,9 +41,10 @@ public class BookController {
     }
 
     @GetMapping("/detail")
-    public ResponseEntity getBookDetail(@RequestParam(value = "isbn10", required = false, defaultValue = "") String isbn10,
-                                        @RequestParam("isbn13") String isbn13,
-                                        @RequestHeader("USER-ID") String loginId) {
+    public ResponseEntity<SuccessResponse> getBookDetail(
+            @RequestParam(value = "isbn10", required = false, defaultValue = "") String isbn10,
+            @RequestParam("isbn13") String isbn13,
+            @RequestHeader("USER-ID") String loginId) {
 
         BookDetailServiceRequest serviceRequest = BookDetailServiceRequest.of(loginId, isbn10, isbn13);
 
@@ -52,8 +53,8 @@ public class BookController {
     }
 
     @PostMapping("/{isbn13}/interest")
-    public ResponseEntity handleBookInterest(@PathVariable("isbn13") String isbn13,
-                                             @RequestHeader("USER-ID") String loginId) {
+    public ResponseEntity<SuccessResponse> handleBookInterest(@PathVariable("isbn13") String isbn13,
+                                                              @RequestHeader("USER-ID") String loginId) {
 
         BookInterestServiceRequest serviceRequest = BookInterestServiceRequest.of(isbn13, loginId);
 
@@ -62,8 +63,9 @@ public class BookController {
     }
 
     @GetMapping("/users/{userId}/interest")
-    public ResponseEntity getInterestBooks(@PathVariable("userId") String userId,
-                                           @RequestParam(value = "order", required = false, defaultValue = "none") String order) {
+    public ResponseEntity<SuccessResponse> getInterestBooks(
+            @PathVariable("userId") String userId,
+            @RequestParam(value = "order", required = false, defaultValue = "none") String order) {
 
         BookMyInterestFindServiceRequest serviceRequest = BookMyInterestFindServiceRequest.of(userId, BookOrderType.of(order));
 
@@ -72,8 +74,8 @@ public class BookController {
     }
 
     @GetMapping("/{isbn13}/interest-status")
-    public ResponseEntity getInterestStatus(@PathVariable("isbn13") String isbn13,
-                                            @RequestHeader("USER-ID") String loginId) {
+    public ResponseEntity<SuccessResponse> getInterestStatus(@PathVariable("isbn13") String isbn13,
+                                                             @RequestHeader("USER-ID") String loginId) {
 
         BookInterestStatusServiceRequest serviceRequest = BookInterestStatusServiceRequest.of(loginId, isbn13);
 
@@ -82,7 +84,7 @@ public class BookController {
     }
 
     @GetMapping("/{isbn13}/interest/userInfos")
-    public ResponseEntity getUserInfoWithInterestForBook(@PathVariable("isbn13") String isbn13) {
+    public ResponseEntity<SuccessResponse> getUserInfoWithInterestForBook(@PathVariable("isbn13") String isbn13) {
 
         UserInfoWithInterestForBookServiceRequest request = UserInfoWithInterestForBookServiceRequest.of(isbn13);
 

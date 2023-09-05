@@ -112,7 +112,7 @@ class MyBookRepositoryTest {
         List<MyBook> myBooks = myBookRepository.findAllByUserId("LOGIN_USER_ID");
 
         // then
-        assertThat(myBooks.size()).isEqualTo(2);
+        assertThat(myBooks).hasSize(2);
     }
 
     @DisplayName("마이북 ID로 마이북을 조회한다. (삭제된 책은 보여주지 않는다.)")
@@ -189,7 +189,7 @@ class MyBookRepositoryTest {
 
         // then
         assertAll(
-                () -> assertThat(myBooks.size()).isEqualTo(2)
+                () -> assertThat(myBooks).hasSize(2)
         );
     }
 
@@ -321,7 +321,7 @@ class MyBookRepositoryTest {
 
         // then
         assertAll(
-                () -> assertThat(myBookList.size()).isEqualTo(3),
+                () -> assertThat(myBookList).hasSize(3),
                 () -> assertThat(myBookList).extracting("myBookId")
                         .contains(myBook_1.getId(), myBook_2.getId(), myBook_3.getId()),
                 () -> assertThat(myBookList.get(0).getBookAuthors().get(0).getAuthor()).isNotInstanceOf(HibernateProxy.class),
@@ -363,7 +363,7 @@ class MyBookRepositoryTest {
 
         // then
         assertAll(
-                () -> assertThat(myBookList.size()).isEqualTo(2),
+                () -> assertThat(myBookList).hasSize(2),
                 () -> assertThat(myBookList).extracting("myBookId")
                         .contains(myBook_1.getId(), myBook_2.getId())
         );
@@ -451,7 +451,7 @@ class MyBookRepositoryTest {
 
         // then
         assertAll(
-                () -> assertThat(readCompletedUserIdList.size()).isEqualTo(2),
+                () -> assertThat(readCompletedUserIdList).hasSize(2),
                 () -> assertThat(readCompletedUserIdList).containsExactlyInAnyOrder(myBook_1.getUserId(), myBook_3.getUserId())
         );
     }
@@ -479,7 +479,7 @@ class MyBookRepositoryTest {
 
         // then
         assertAll(
-                () -> assertThat(myBookUserIdList.size()).isEqualTo(3),
+                () -> assertThat(myBookUserIdList).hasSize(3),
                 () -> assertThat(myBookUserIdList).containsExactlyInAnyOrder(myBook_1.getUserId(), myBook_2.getUserId(), myBook_3.getUserId())
         );
     }

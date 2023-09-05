@@ -83,7 +83,7 @@ class MyBookReadServiceTest {
 
         // then
         assertAll(
-                () -> assertThat(response.size()).isEqualTo(2),
+                () -> assertThat(response).hasSize(2),
                 () -> verify(myBookRepository).findMyBookListDisplayElementModelsByUserId(any(), any(), any())
         );
     }
@@ -104,7 +104,7 @@ class MyBookReadServiceTest {
 
         // then
         assertAll(
-                () -> assertThat(response.size()).isEqualTo(1),
+                () -> assertThat(response).hasSize(1),
                 () -> verify(myBookRepository).findMyBookListDisplayElementModelsByUserId(any(), any(), any())
         );
     }
@@ -186,7 +186,7 @@ class MyBookReadServiceTest {
         // then
         assertAll(
                 () -> verify(myBookRepository, times(1)).findByMeaningTagQuote(request.getQuote()),
-                () -> assertThat(result.size()).isEqualTo(1)
+                () -> assertThat(result).hasSize(1)
         );
     }
 
@@ -210,7 +210,7 @@ class MyBookReadServiceTest {
         // then
         assertAll(
                 () -> verify(myBookRepository, times(1)).findByMeaningTagQuote(request.getQuote()),
-                () -> assertThat(result.size()).isEqualTo(2)
+                () -> assertThat(result).hasSize(2)
         );
     }
 
@@ -377,7 +377,7 @@ class MyBookReadServiceTest {
 
         // then
         assertAll(
-                () -> assertThat(response.getUserInfos().size()).isEqualTo(2),
+                () -> assertThat(response.getUserInfos()).hasSize(2),
                 () -> assertThat(response.getUserInfos()).extracting("userId").containsExactlyInAnyOrder("user1", "user2"),
                 () -> verify(bookReadService, times(1)).getRegisteredBookByISBN13(anyString()),
                 () -> verify(myBookRepository, times(1)).getReadCompletedUserIdListByBook(any()),
@@ -403,7 +403,7 @@ class MyBookReadServiceTest {
 
         // then
         assertAll(
-                () -> assertThat(response.getUserInfos().size()).isEqualTo(2),
+                () -> assertThat(response.getUserInfos()).hasSize(2),
                 () -> assertThat(response.getUserInfos()).extracting("userId").containsExactlyInAnyOrder("user1", "user2"),
                 () -> verify(bookReadService, times(1)).getRegisteredBookByISBN13(anyString()),
                 () -> verify(myBookRepository, times(1)).getMyBookUserIdListByBook(any()),

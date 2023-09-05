@@ -39,8 +39,8 @@ public class MyBookController {
     private final MyBookWriteService myBookWriteService;
 
     @PostMapping("/mybooks")
-    public ResponseEntity createMyBook(@RequestHeader("USER-ID") String loginId,
-                                       @RequestBody MyBookCreateRequest request) {
+    public ResponseEntity<SuccessResponse> createMyBook(@RequestHeader("USER-ID") String loginId,
+                                                        @RequestBody MyBookCreateRequest request) {
 
         myBookWriteService.create(request.toServiceRequest(loginId));
 
@@ -49,10 +49,11 @@ public class MyBookController {
     }
 
     @GetMapping("/users/{userId}/mybooks")
-    public ResponseEntity findAllMyBooks(@RequestHeader("USER-ID") String loginId,
-                                         @PathVariable("userId") String userId,
-                                         @RequestParam(value = "order", required = false, defaultValue = "none") String order,
-                                         @RequestParam(value = "readStatus", required = false) String readStatus) {
+    public ResponseEntity<SuccessResponse> findAllMyBooks(
+            @RequestHeader("USER-ID") String loginId,
+            @PathVariable("userId") String userId,
+            @RequestParam(value = "order", required = false, defaultValue = "none") String order,
+            @RequestParam(value = "readStatus", required = false) String readStatus) {
 
         MyBookFindAllServiceRequest request = MyBookFindAllServiceRequest.of(loginId, userId, MyBookOrderType.of(order),
                 ReadStatus.of(readStatus));
@@ -62,8 +63,8 @@ public class MyBookController {
     }
 
     @GetMapping("/mybooks/{mybookId}")
-    public ResponseEntity findMyBookDetail(@RequestHeader("USER-ID") String loginId,
-                                           @PathVariable("mybookId") Long mybookId) {
+    public ResponseEntity<SuccessResponse> findMyBookDetail(@RequestHeader("USER-ID") String loginId,
+                                                            @PathVariable("mybookId") Long mybookId) {
 
         MyBookDetailServiceRequest request = MyBookDetailServiceRequest.of(loginId, mybookId);
 
@@ -72,8 +73,8 @@ public class MyBookController {
     }
 
     @DeleteMapping("/mybooks/{mybookId}")
-    public ResponseEntity deleteMyBook(@RequestHeader("USER-ID") String loginId,
-                                       @PathVariable Long mybookId) {
+    public ResponseEntity<SuccessResponse> deleteMyBook(@RequestHeader("USER-ID") String loginId,
+                                                        @PathVariable Long mybookId) {
 
         MyBookDeleteServiceRequest request = MyBookDeleteServiceRequest.of(loginId, mybookId);
 
@@ -83,9 +84,9 @@ public class MyBookController {
     }
 
     @PutMapping("/mybooks/{mybookId}")
-    public ResponseEntity updateMyBookProperties(@RequestHeader("USER-ID") String loginId,
-                                                 @PathVariable Long mybookId,
-                                                 @RequestBody MyBookUpdateRequest request) {
+    public ResponseEntity<SuccessResponse> updateMyBookProperties(@RequestHeader("USER-ID") String loginId,
+                                                                  @PathVariable Long mybookId,
+                                                                  @RequestBody MyBookUpdateRequest request) {
 
         MybookUpdateServiceRequest serviceRequest = request.toServiceRequest(loginId, mybookId);
 
@@ -94,8 +95,8 @@ public class MyBookController {
     }
 
     @GetMapping("/mybooks/meaning-tags/{meaningTagQuote}")
-    public ResponseEntity findMyBooksByMeaningTag(@RequestHeader("USER-ID") String loginId,
-                                                  @PathVariable String meaningTagQuote) {
+    public ResponseEntity<SuccessResponse> findMyBooksByMeaningTag(@RequestHeader("USER-ID") String loginId,
+                                                                   @PathVariable String meaningTagQuote) {
 
         MyBookFindByMeaningTagQuoteServiceRequest request = MyBookFindByMeaningTagQuoteServiceRequest.of(loginId,
                 meaningTagQuote);
@@ -105,15 +106,15 @@ public class MyBookController {
     }
 
     @GetMapping("/mybooks/today-registration-count")
-    public ResponseEntity getTodayRegistrationCount() {
+    public ResponseEntity<SuccessResponse> getTodayRegistrationCount() {
 
         return ResponseEntity.ok(SuccessResponse.of(HttpStatus.OK.toString(), "오늘의 마이북 등록 수입니다.",
                 myBookReadService.getBookRegistrationCountOfToday()));
     }
 
     @GetMapping("/books/{isbn13}/mybook-registered-status")
-    public ResponseEntity getMyBookRegisteredStatus(@RequestHeader("USER-ID") String loginId,
-                                                    @PathVariable String isbn13) {
+    public ResponseEntity<SuccessResponse> getMyBookRegisteredStatus(@RequestHeader("USER-ID") String loginId,
+                                                                     @PathVariable String isbn13) {
 
         MyBookRegisteredStatusServiceRequest serviceRequest = MyBookRegisteredStatusServiceRequest.of(loginId, isbn13);
 
@@ -122,8 +123,8 @@ public class MyBookController {
     }
 
     @GetMapping("/books/{isbn13}/read-complete-status")
-    public ResponseEntity getReadCompletedStatus(@RequestHeader("USER-ID") String loginId,
-                                                 @PathVariable String isbn13) {
+    public ResponseEntity<SuccessResponse> getReadCompletedStatus(@RequestHeader("USER-ID") String loginId,
+                                                                  @PathVariable String isbn13) {
 
         MyBookReadCompletedStatusServiceRequest serviceRequest = MyBookReadCompletedStatusServiceRequest.of(loginId, isbn13);
 
@@ -132,7 +133,7 @@ public class MyBookController {
     }
 
     @GetMapping("/books/{isbn13}/read-complete/userInfos")
-    public ResponseEntity getUserInfoWithReadCompletedForBook(@PathVariable("isbn13") String isbn13) {
+    public ResponseEntity<SuccessResponse> getUserInfoWithReadCompletedForBook(@PathVariable("isbn13") String isbn13) {
 
         UserInfoWithReadCompletedForBookServiceRequest request = UserInfoWithReadCompletedForBookServiceRequest.of(isbn13);
 
@@ -141,7 +142,7 @@ public class MyBookController {
     }
 
     @GetMapping("/books/{isbn13}/mybook/userInfos")
-    public ResponseEntity getUserInfoWithMyBookSettingForBook(@PathVariable("isbn13") String isbn13) {
+    public ResponseEntity<SuccessResponse> getUserInfoWithMyBookSettingForBook(@PathVariable("isbn13") String isbn13) {
 
         UserInfoWithMyBookSetForBookServiceRequest request = UserInfoWithMyBookSetForBookServiceRequest.of(isbn13);
 

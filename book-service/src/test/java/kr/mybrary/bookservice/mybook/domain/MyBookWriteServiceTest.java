@@ -38,7 +38,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 @ActiveProfiles("test")
 @ExtendWith(MockitoExtension.class)
-public class MyBookWriteServiceTest {
+class MyBookWriteServiceTest {
 
     @InjectMocks
     private MyBookWriteService myBookWriteService;
