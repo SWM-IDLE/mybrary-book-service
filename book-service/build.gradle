@@ -121,3 +121,11 @@ sonar {
 		property "sonar.host.url", "https://sonarcloud.io"
 	}
 }
+
+jacocoTestReport {
+	dependsOn test
+	reports {
+		xml.enabled true
+		html.enabled true
+	}
+}
