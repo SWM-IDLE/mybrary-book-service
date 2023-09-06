@@ -1,5 +1,6 @@
 package kr.mybrary.bookservice.book.presentation;
 
+import java.util.List;
 import kr.mybrary.bookservice.book.domain.BookInterestService;
 import kr.mybrary.bookservice.book.domain.BookReadService;
 import kr.mybrary.bookservice.book.domain.BookWriteService;
@@ -7,8 +8,14 @@ import kr.mybrary.bookservice.book.domain.dto.request.BookDetailServiceRequest;
 import kr.mybrary.bookservice.book.domain.dto.request.BookInterestServiceRequest;
 import kr.mybrary.bookservice.book.domain.dto.request.BookInterestStatusServiceRequest;
 import kr.mybrary.bookservice.book.domain.dto.request.BookMyInterestFindServiceRequest;
+import kr.mybrary.bookservice.book.domain.dto.request.UserInfoWithInterestForBookServiceRequest;
 import kr.mybrary.bookservice.book.persistence.BookOrderType;
 import kr.mybrary.bookservice.book.presentation.dto.request.BookCreateRequest;
+import kr.mybrary.bookservice.book.presentation.dto.response.BookDetailResponse;
+import kr.mybrary.bookservice.book.presentation.dto.response.BookInterestElementResponse;
+import kr.mybrary.bookservice.book.presentation.dto.response.BookInterestHandleResponse;
+import kr.mybrary.bookservice.book.presentation.dto.response.BookInterestStatusResponse;
+import kr.mybrary.bookservice.book.presentation.dto.response.UserInfoWithInterestForBookResponse;
 import kr.mybrary.bookservice.global.dto.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -32,7 +39,7 @@ public class BookController {
     private final BookInterestService bookInterestService;
 
     @PostMapping
-    public ResponseEntity create(@RequestBody BookCreateRequest request) {
+    public ResponseEntity<SuccessResponse<Void>> create(@RequestBody BookCreateRequest request) {
         bookWriteService.create(request.toServiceRequest());
 
         return ResponseEntity.status(201).body(
@@ -40,7 +47,7 @@ public class BookController {
     }
 
     @GetMapping("/detail")
-    public ResponseEntity getBookDetail(
+    public ResponseEntity<SuccessResponse<BookDetailResponse>> getBookDetail(
             @RequestParam(value = "isbn10", required = false, defaultValue = "") String isbn10,
             @RequestParam("isbn13") String isbn13,
             @RequestHeader("USER-ID") String loginId) {
@@ -52,7 +59,7 @@ public class BookController {
     }
 
     @PostMapping("/{isbn13}/interest")
-    public ResponseEntity handleBookInterest(
+    public ResponseEntity<SuccessResponse<BookInterestHandleResponse>> handleBookInterest(
             @PathVariable("isbn13") String isbn13,
             @RequestHeader("USER-ID") String loginId) {
 
@@ -63,7 +70,7 @@ public class BookController {
     }
 
     @GetMapping("/users/{userId}/interest")
-    public ResponseEntity getInterestBooks(
+    public ResponseEntity<SuccessResponse<List<BookInterestElementResponse>>> getInterestBooks(
             @PathVariable("userId") String userId,
             @RequestParam(value = "order", required = false, defaultValue = "none") String order) {
 
@@ -74,7 +81,7 @@ public class BookController {
     }
 
     @GetMapping("/{isbn13}/interest-status")
-    public ResponseEntity getInterestStatus(
+    public ResponseEntity<SuccessResponse<BookInterestStatusResponse>> getInterestStatus(
             @PathVariable("isbn13") String isbn13,
             @RequestHeader("USER-ID") String loginId) {
 
@@ -83,4 +90,15 @@ public class BookController {
         return ResponseEntity.ok(SuccessResponse.of(HttpStatus.OK.toString(), "관심 도서 상태 조회에 성공했습니다.",
                 bookInterestService.getInterestStatus(serviceRequest)));
     }
+
+    @GetMapping("/{isbn13}/interest/userInfos")
+    public ResponseEntity<SuccessResponse<UserInfoWithInterestForBookResponse>> getUserInfoWithInterestForBook(
+            @PathVariable("isbn13") String isbn13) {
+
+        UserInfoWithInterestForBookServiceRequest request = UserInfoWithInterestForBookServiceRequest.of(isbn13);
+
+        return ResponseEntity.ok(SuccessResponse.of(HttpStatus.OK.toString(), "관심 도서를 등록한 유저 목록 조회에 성공했습니다.",
+                bookInterestService.getUserInfoWithInterestForBook(request)));
+    }
+
 }

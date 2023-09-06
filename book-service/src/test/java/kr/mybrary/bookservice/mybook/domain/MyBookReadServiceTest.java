@@ -4,11 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -19,18 +17,17 @@ import java.util.Optional;
 import kr.mybrary.bookservice.book.BookFixture;
 import kr.mybrary.bookservice.book.domain.BookReadService;
 import kr.mybrary.bookservice.book.persistence.Book;
+import kr.mybrary.bookservice.client.user.api.UserServiceClient;
 import kr.mybrary.bookservice.mybook.MyBookFixture;
 import kr.mybrary.bookservice.mybook.MybookDtoTestData;
-import kr.mybrary.bookservice.mybook.domain.dto.request.MyBookCreateServiceRequest;
-import kr.mybrary.bookservice.mybook.domain.dto.request.MyBookDeleteServiceRequest;
 import kr.mybrary.bookservice.mybook.domain.dto.request.MyBookDetailServiceRequest;
 import kr.mybrary.bookservice.mybook.domain.dto.request.MyBookFindAllServiceRequest;
 import kr.mybrary.bookservice.mybook.domain.dto.request.MyBookFindByMeaningTagQuoteServiceRequest;
 import kr.mybrary.bookservice.mybook.domain.dto.request.MyBookReadCompletedStatusServiceRequest;
 import kr.mybrary.bookservice.mybook.domain.dto.request.MyBookRegisteredStatusServiceRequest;
-import kr.mybrary.bookservice.mybook.domain.dto.request.MybookUpdateServiceRequest;
+import kr.mybrary.bookservice.mybook.domain.dto.request.UserInfoWithMyBookSettingForBookServiceRequest;
+import kr.mybrary.bookservice.mybook.domain.dto.request.UserInfoWithReadCompletedForBookServiceRequest;
 import kr.mybrary.bookservice.mybook.domain.exception.MyBookAccessDeniedException;
-import kr.mybrary.bookservice.mybook.domain.exception.MyBookAlreadyExistsException;
 import kr.mybrary.bookservice.mybook.domain.exception.MyBookNotFoundException;
 import kr.mybrary.bookservice.mybook.persistence.MyBook;
 import kr.mybrary.bookservice.mybook.persistence.ReadStatus;
@@ -41,8 +38,8 @@ import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookElementResp
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookReadCompletedStatusResponse;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookRegisteredStatusResponse;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookRegistrationCountResponse;
-import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookUpdateResponse;
-import kr.mybrary.bookservice.tag.domain.MeaningTagService;
+import kr.mybrary.bookservice.mybook.presentation.dto.response.UserInfoWithMyBookSettingForBookResponse;
+import kr.mybrary.bookservice.mybook.presentation.dto.response.UserInfoWithReadCompletedForBookResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -56,7 +53,7 @@ import org.springframework.test.context.ActiveProfiles;
 class MyBookReadServiceTest {
 
     @InjectMocks
-    private MyBookService myBookService;
+    private MyBookReadService myBookReadService;
 
     @Mock
     private MyBookRepository myBookRepository;
@@ -65,56 +62,10 @@ class MyBookReadServiceTest {
     private BookReadService bookReadService;
 
     @Mock
-    private MeaningTagService meaningTagService;
+    private UserServiceClient userServiceClient;
 
     private static final String LOGIN_ID = "LOGIN_USER_ID";
     private static final String OTHER_USER_ID = "OTHER_USER_ID";
-    private static final Long MYBOOK_ID = 1L;
-
-    @DisplayName("도서를 마이북으로 등록한다.")
-    @Test
-    void registerMyBook() {
-
-        // given
-        MyBookCreateServiceRequest request = MybookDtoTestData.createMyBookCreateServiceRequest();
-        Book foundBook = BookFixture.COMMON_BOOK.getBook();
-        int foundBookHolderCount = foundBook.getHolderCount();
-
-        given(bookReadService.getRegisteredBookByISBN13(anyString())).willReturn(foundBook);
-        given(myBookRepository.existsByUserIdAndBook(any(), any())).willReturn(false);
-        given(myBookRepository.save(any())).willReturn(any());
-
-        // when
-        myBookService.create(request);
-
-        // then
-        assertAll(
-                () -> verify(bookReadService, times(1)).getRegisteredBookByISBN13(anyString()),
-                () -> verify(myBookRepository, times(1)).existsByUserIdAndBook(any(), any()),
-                () -> verify(myBookRepository, times(1)).save(any()),
-                () -> assertThat(foundBook.getHolderCount()).isEqualTo(foundBookHolderCount + 1)
-        );
-    }
-
-    @DisplayName("기존에 마이북으로 설정한 도서를 마이북으로 등록하면 예외가 발생한다.")
-    @Test
-    void occurExceptionWhenRegisterDuplicatedBook() {
-
-        // given
-        MyBookCreateServiceRequest request = MybookDtoTestData.createMyBookCreateServiceRequest();
-
-        given(bookReadService.getRegisteredBookByISBN13(anyString())).willReturn(Book.builder().id(1L).build());
-        given(myBookRepository.existsByUserIdAndBook(any(), any())).willReturn(true);
-
-        // when, then
-        assertThrows(MyBookAlreadyExistsException.class, () -> myBookService.create(request));
-
-        assertAll(
-                () -> verify(bookReadService, times(1)).getRegisteredBookByISBN13(anyString()),
-                () -> verify(myBookRepository, times(1)).existsByUserIdAndBook(any(), any()),
-                () -> verify(myBookRepository, never()).save(any())
-        );
-    }
 
     @DisplayName("나의 마이북을 모두 조회시, 비공개 설정된 마이북도 모두 조회한다.")
     @Test
@@ -128,11 +79,11 @@ class MyBookReadServiceTest {
                         MybookDtoTestData.createMyBookListDisplayElementModelBuilder().build()));
 
         // when,
-        List<MyBookElementResponse> response = myBookService.findAllMyBooks(request);
+        List<MyBookElementResponse> response = myBookReadService.findAllMyBooks(request);
 
         // then
         assertAll(
-                () -> assertThat(response.size()).isEqualTo(2),
+                () -> assertThat(response).hasSize(2),
                 () -> verify(myBookRepository).findMyBookListDisplayElementModelsByUserId(any(), any(), any())
         );
     }
@@ -149,11 +100,11 @@ class MyBookReadServiceTest {
                         MybookDtoTestData.createMyBookListDisplayElementModelBuilder().showable(false).build()));
 
         // when
-        List<MyBookElementResponse> response = myBookService.findAllMyBooks(request);
+        List<MyBookElementResponse> response = myBookReadService.findAllMyBooks(request);
 
         // then
         assertAll(
-                () -> assertThat(response.size()).isEqualTo(1),
+                () -> assertThat(response).hasSize(1),
                 () -> verify(myBookRepository).findMyBookListDisplayElementModelsByUserId(any(), any(), any())
         );
     }
@@ -169,7 +120,7 @@ class MyBookReadServiceTest {
         given(myBookRepository.findMyBookDetailUsingFetchJoin(any())).willReturn(Optional.ofNullable(myBook));
 
         // when
-        MyBookDetailResponse myBookDetail = myBookService.findMyBookDetail(request);
+        MyBookDetailResponse myBookDetail = myBookReadService.findMyBookDetail(request);
 
         // then
         assertAll(
@@ -193,7 +144,7 @@ class MyBookReadServiceTest {
 
         // when, then
         assertAll(
-                () -> assertThatThrownBy(() -> myBookService.findMyBookDetail(request))
+                () -> assertThatThrownBy(() -> myBookReadService.findMyBookDetail(request))
                         .isInstanceOf(MyBookNotFoundException.class),
                 () -> verify(myBookRepository).findMyBookDetailUsingFetchJoin(request.getMybookId())
         );
@@ -211,181 +162,12 @@ class MyBookReadServiceTest {
 
         // when, then
         assertAll(
-                () -> assertThatThrownBy(() -> myBookService.findMyBookDetail(request))
+                () -> assertThatThrownBy(() -> myBookReadService.findMyBookDetail(request))
                         .isInstanceOf(MyBookAccessDeniedException.class),
                 () -> verify(myBookRepository).findMyBookDetailUsingFetchJoin(request.getMybookId())
         );
     }
 
-    @DisplayName("마이북을 삭제한다.")
-    @Test
-    void deleteMyBook() {
-
-        //given
-        MyBookDeleteServiceRequest request = MyBookDeleteServiceRequest.of(LOGIN_ID, 1L);
-        MyBook myBook = MyBookFixture.COMMON_LOGIN_USER_MYBOOK.getMyBook();
-
-        int holderCount = myBook.getBook().getHolderCount();
-
-        given(myBookRepository.findById(any())).willReturn(Optional.of(myBook));
-
-        // when
-        myBookService.deleteMyBook(request);
-
-        // then
-        assertAll(
-                () -> verify(myBookRepository).findById(request.getMybookId()),
-                () -> {
-                    assertThat(myBook).isNotNull();
-                    assertThat(myBook.isDeleted()).isTrue();
-                },
-                () -> assertThat(myBook.getBook().getHolderCount()).isEqualTo(holderCount - 1)
-        );
-    }
-
-    @DisplayName("다른 유저의 마이북을 삭제시, 예외가 발생한다.")
-    @Test
-    void occurExceptionWhenDeleteOtherUserMyBook() {
-
-        //given
-        MyBookDeleteServiceRequest request = MyBookDeleteServiceRequest.of(LOGIN_ID, 1L);
-        MyBook myBook = MyBookFixture.COMMON_OTHER_USER_MYBOOK.getMyBook();
-
-        given(myBookRepository.findById(any())).willReturn(Optional.ofNullable(myBook));
-
-        // when, then
-        assertAll(
-                () -> assertThatThrownBy(() -> myBookService.deleteMyBook(request))
-                        .isInstanceOf(MyBookAccessDeniedException.class),
-                () -> {
-                    assertThat(myBook).isNotNull();
-                    assertThat(myBook.isDeleted()).isFalse();
-                },
-                () -> verify(myBookRepository).findById(request.getMybookId())
-        );
-    }
-
-    @DisplayName("마이북을 수정한다.")
-    @Test
-    void updateMyBook() {
-
-        //given
-        MybookUpdateServiceRequest request = MybookDtoTestData.createMyBookUpdateServiceRequest(LOGIN_ID, MYBOOK_ID).build();
-        MyBook myBook = MyBookFixture.COMMON_LOGIN_USER_MYBOOK.getMyBook();
-
-        given(myBookRepository.findById(any())).willReturn(Optional.ofNullable(myBook));
-        willDoNothing().given(meaningTagService).assignMeaningTag(any());
-
-        // when
-        MyBookUpdateResponse response = myBookService.updateMyBookProperties(request);
-
-        // then
-        assertAll(
-                () -> verify(myBookRepository).findById(request.getMyBookId()),
-                () -> {
-                    assertThat(myBook).isNotNull();
-                    assertThat(response.getStartDateOfPossession()).isEqualTo(request.getStartDateOfPossession());
-                    assertThat(response.isExchangeable()).isEqualTo(request.isExchangeable());
-                    assertThat(response.isShareable()).isEqualTo(request.isShareable());
-                    assertThat(response.isShowable()).isEqualTo(request.isShowable());
-                    assertThat(response.getReadStatus()).isEqualTo(request.getReadStatus());
-                    assertThat(response.getMeaningTag().getQuote()).isEqualTo(request.getMeaningTag().getQuote());
-                    assertThat(response.getMeaningTag().getColorCode()).isEqualTo(request.getMeaningTag().getColorCode());
-                }
-        );
-    }
-
-    @DisplayName("독서 상태를 완독으로 수정할 때, 도서의 readCount가 1 증가한다.")
-    @Test
-    void updateMyBookReadStatusToCompleted() {
-
-        //given
-        MybookUpdateServiceRequest request = MybookDtoTestData.createMyBookUpdateServiceRequest(LOGIN_ID, MYBOOK_ID)
-                .readStatus(ReadStatus.COMPLETED)
-                .build();
-
-        MyBook myBook = MyBookFixture.COMMON_LOGIN_USER_MYBOOK.getMyBook();
-        Integer originReadCount = myBook.getBook().getReadCount();
-
-        given(myBookRepository.findById(any())).willReturn(Optional.ofNullable(myBook));
-        willDoNothing().given(meaningTagService).assignMeaningTag(any());
-
-        // when
-        MyBookUpdateResponse response = myBookService.updateMyBookProperties(request);
-
-        // then
-        assertAll(
-                () -> verify(myBookRepository).findById(request.getMyBookId()),
-                () -> {
-                    assertThat(myBook).isNotNull();
-                    assertThat(myBook.getBook().getReadCount()).isEqualTo(originReadCount + 1);
-                    assertThat(response.getStartDateOfPossession()).isEqualTo(request.getStartDateOfPossession());
-                    assertThat(response.isExchangeable()).isEqualTo(request.isExchangeable());
-                    assertThat(response.isShareable()).isEqualTo(request.isShareable());
-                    assertThat(response.isShowable()).isEqualTo(request.isShowable());
-                    assertThat(response.getReadStatus()).isEqualTo(request.getReadStatus());
-                    assertThat(response.getMeaningTag().getQuote()).isEqualTo(request.getMeaningTag().getQuote());
-                    assertThat(response.getMeaningTag().getColorCode()).isEqualTo(request.getMeaningTag().getColorCode());
-                }
-        );
-    }
-
-    @DisplayName("독서 상태를 완독에서 읽는 중으로 수정할 때, 도서의 readCount가 1 감소한다")
-    @Test
-    void updateMyBookReadStatusToReadingFromCompleted() {
-
-        //given
-        MybookUpdateServiceRequest request = MybookDtoTestData.createMyBookUpdateServiceRequest(LOGIN_ID, MYBOOK_ID)
-                .readStatus(ReadStatus.READING)
-                .build();
-
-        MyBook myBook = MyBookFixture.COMMON_LOGIN_USER_MYBOOK.getMyBookBuilder()
-                .readStatus(ReadStatus.COMPLETED)
-                .build();
-
-        Integer originReadCount = myBook.getBook().getReadCount();
-
-        given(myBookRepository.findById(any())).willReturn(Optional.ofNullable(myBook));
-        willDoNothing().given(meaningTagService).assignMeaningTag(any());
-
-        // when
-        MyBookUpdateResponse response = myBookService.updateMyBookProperties(request);
-
-        // then
-        assertAll(
-                () -> verify(myBookRepository).findById(request.getMyBookId()),
-                () -> {
-                    assertThat(myBook).isNotNull();
-                    assertThat(myBook.getBook().getReadCount()).isEqualTo(originReadCount - 1);
-                    assertThat(response.getStartDateOfPossession()).isEqualTo(request.getStartDateOfPossession());
-                    assertThat(response.isExchangeable()).isEqualTo(request.isExchangeable());
-                    assertThat(response.isShareable()).isEqualTo(request.isShareable());
-                    assertThat(response.isShowable()).isEqualTo(request.isShowable());
-                    assertThat(response.getReadStatus()).isEqualTo(request.getReadStatus());
-                    assertThat(response.getMeaningTag().getQuote()).isEqualTo(request.getMeaningTag().getQuote());
-                    assertThat(response.getMeaningTag().getColorCode()).isEqualTo(request.getMeaningTag().getColorCode());
-                }
-        );
-    }
-
-    @DisplayName("다른 유저의 마이북을 수정시, 예외가 발생한다.")
-    @Test
-    void occurExceptionWhenUpdateOtherUserMyBook() {
-
-        //given
-        MybookUpdateServiceRequest request = MybookDtoTestData.createMyBookUpdateServiceRequest(LOGIN_ID, MYBOOK_ID).build();
-        MyBook myBook = MyBookFixture.COMMON_OTHER_USER_MYBOOK.getMyBook();
-
-        given(myBookRepository.findById(any())).willReturn(
-                Optional.ofNullable(myBook));
-
-        // when, then
-        assertAll(
-                () -> assertThatThrownBy(() -> myBookService.updateMyBookProperties(request))
-                        .isInstanceOf(MyBookAccessDeniedException.class),
-                () -> verify(myBookRepository).findById(request.getMyBookId())
-        );
-    }
 
     @DisplayName("의미 태그 문구를 통해서 마이북을 조회한다.")
     @Test
@@ -399,12 +181,12 @@ class MyBookReadServiceTest {
                 List.of(MyBookFixture.COMMON_LOGIN_USER_MYBOOK.getMyBook()));
 
         // when
-        List<MyBookElementFromMeaningTagResponse> result = myBookService.findByMeaningTagQuote(request);
+        List<MyBookElementFromMeaningTagResponse> result = myBookReadService.findByMeaningTagQuote(request);
 
         // then
         assertAll(
                 () -> verify(myBookRepository, times(1)).findByMeaningTagQuote(request.getQuote()),
-                () -> assertThat(result.size()).isEqualTo(1)
+                () -> assertThat(result).hasSize(1)
         );
     }
 
@@ -423,12 +205,12 @@ class MyBookReadServiceTest {
                         MyBookFixture.NOT_SHOWABLE_OTHER_USER_MYBOOK.getMyBook()));
 
         // when
-        List<MyBookElementFromMeaningTagResponse> result = myBookService.findByMeaningTagQuote(request);
+        List<MyBookElementFromMeaningTagResponse> result = myBookReadService.findByMeaningTagQuote(request);
 
         // then
         assertAll(
                 () -> verify(myBookRepository, times(1)).findByMeaningTagQuote(request.getQuote()),
-                () -> assertThat(result.size()).isEqualTo(2)
+                () -> assertThat(result).hasSize(2)
         );
     }
 
@@ -443,7 +225,7 @@ class MyBookReadServiceTest {
         given(myBookRepository.findByIdWithBook(myBookId)).willReturn(Optional.ofNullable(myBook));
 
         // when
-        MyBook foundMyBook = myBookService.findMyBookByIdWithBook(myBookId);
+        MyBook foundMyBook = myBookReadService.findMyBookByIdWithBook(myBookId);
 
         // then
         assertAll(
@@ -460,7 +242,7 @@ class MyBookReadServiceTest {
         given(myBookRepository.getBookRegistrationCountOfDay(LocalDate.now())).willReturn(1L);
 
         // when
-        MyBookRegistrationCountResponse response = myBookService.getBookRegistrationCountOfToday();
+        MyBookRegistrationCountResponse response = myBookReadService.getBookRegistrationCountOfToday();
 
         // then
         assertAll(
@@ -481,7 +263,7 @@ class MyBookReadServiceTest {
         given(myBookRepository.existsByUserIdAndBook(request.getLoginId(), book)).willReturn(true);
 
         // when
-        MyBookRegisteredStatusResponse response = myBookService.getMyBookRegisteredStatus(request);
+        MyBookRegisteredStatusResponse response = myBookReadService.getMyBookRegisteredStatus(request);
 
         // then
         assertAll(
@@ -501,7 +283,7 @@ class MyBookReadServiceTest {
         given(bookReadService.findOptionalBookByISBN13(request.getIsbn13())).willReturn(Optional.empty());
 
         // when
-        MyBookRegisteredStatusResponse response = myBookService.getMyBookRegisteredStatus(request);
+        MyBookRegisteredStatusResponse response = myBookReadService.getMyBookRegisteredStatus(request);
 
         // then
         assertAll(
@@ -525,7 +307,7 @@ class MyBookReadServiceTest {
         given(myBookRepository.findByUserIdAndBook(request.getLoginId(), book)).willReturn(Optional.of(myBook));
 
         // when
-        MyBookReadCompletedStatusResponse response = myBookService.getMyBookReadCompletedStatus(request);
+        MyBookReadCompletedStatusResponse response = myBookReadService.getMyBookReadCompletedStatus(request);
 
         // then
         assertAll(
@@ -544,7 +326,7 @@ class MyBookReadServiceTest {
         given(bookReadService.findOptionalBookByISBN13(request.getIsbn13())).willReturn(Optional.empty());
 
         // when
-        MyBookReadCompletedStatusResponse response = myBookService.getMyBookReadCompletedStatus(request);
+        MyBookReadCompletedStatusResponse response = myBookReadService.getMyBookReadCompletedStatus(request);
 
         // then
         assertAll(
@@ -567,13 +349,65 @@ class MyBookReadServiceTest {
         given(myBookRepository.findByUserIdAndBook(userId, book)).willReturn(Optional.empty());
 
         // when
-        MyBookReadCompletedStatusResponse response = myBookService.getMyBookReadCompletedStatus(request);
+        MyBookReadCompletedStatusResponse response = myBookReadService.getMyBookReadCompletedStatus(request);
 
         // then
         assertAll(
                 () -> verify(bookReadService, times(1)).findOptionalBookByISBN13(anyString()),
                 () -> verify(myBookRepository, times(1)).findByUserIdAndBook(any(), any()),
                 () -> assertThat(response.isCompleted()).isFalse()
+        );
+    }
+
+    @DisplayName("한 도서에 대해서 완독한 유저들의 정보를 조회한다.")
+    @Test
+    void getReadCompletedUserIdListByBook() {
+
+        // given
+        UserInfoWithReadCompletedForBookServiceRequest request = MybookDtoTestData.createUserInfoWithReadCompletedForBookServiceRequest();
+        Book book = BookFixture.COMMON_BOOK.getBook();
+        List<String> userIds = List.of("user1", "user2");
+
+        given(bookReadService.getRegisteredBookByISBN13(request.getIsbn13())).willReturn(book);
+        given(myBookRepository.getReadCompletedUserIdListByBook(book)).willReturn(userIds);
+        given(userServiceClient.getUsersInfo(userIds)).willReturn(MybookDtoTestData.createUserInfoResponseList(userIds));
+
+        // when
+        UserInfoWithReadCompletedForBookResponse response = myBookReadService.getUserIdWithReadCompletedListByBook(request);
+
+        // then
+        assertAll(
+                () -> assertThat(response.getUserInfos()).hasSize(2),
+                () -> assertThat(response.getUserInfos()).extracting("userId").containsExactlyInAnyOrder("user1", "user2"),
+                () -> verify(bookReadService, times(1)).getRegisteredBookByISBN13(anyString()),
+                () -> verify(myBookRepository, times(1)).getReadCompletedUserIdListByBook(any()),
+                () -> verify(userServiceClient, times(1)).getUsersInfo(any())
+        );
+    }
+
+    @DisplayName("한 도서에 대해서 마이북으로 설정한 유저들의 정보를 조회한다.")
+    @Test
+    void getMyBookSetUserIdListByBook() {
+
+        // given
+        UserInfoWithMyBookSettingForBookServiceRequest request = MybookDtoTestData.createUserInfoWithMyBookSetForBookServiceRequest();
+        Book book = BookFixture.COMMON_BOOK.getBook();
+        List<String> userIds = List.of("user1", "user2");
+
+        given(bookReadService.getRegisteredBookByISBN13(request.getIsbn13())).willReturn(book);
+        given(myBookRepository.getMyBookUserIdListByBook(book)).willReturn(userIds);
+        given(userServiceClient.getUsersInfo(userIds)).willReturn(MybookDtoTestData.createUserInfoResponseList(userIds));
+
+        // when
+        UserInfoWithMyBookSettingForBookResponse response = myBookReadService.getUserIdListWithMyBookSettingByBook(request);
+
+        // then
+        assertAll(
+                () -> assertThat(response.getUserInfos()).hasSize(2),
+                () -> assertThat(response.getUserInfos()).extracting("userId").containsExactlyInAnyOrder("user1", "user2"),
+                () -> verify(bookReadService, times(1)).getRegisteredBookByISBN13(anyString()),
+                () -> verify(myBookRepository, times(1)).getMyBookUserIdListByBook(any()),
+                () -> verify(userServiceClient, times(1)).getUsersInfo(any())
         );
     }
 }

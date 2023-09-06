@@ -1,6 +1,6 @@
 package kr.mybrary.bookservice.review.domain;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.BDDMockito.any;
@@ -11,7 +11,7 @@ import static org.mockito.BDDMockito.verify;
 
 import java.util.Optional;
 import kr.mybrary.bookservice.mybook.MyBookFixture;
-import kr.mybrary.bookservice.mybook.domain.MyBookService;
+import kr.mybrary.bookservice.mybook.domain.MyBookReadService;
 import kr.mybrary.bookservice.mybook.persistence.MyBook;
 import kr.mybrary.bookservice.review.MyReviewDtoTestData;
 import kr.mybrary.bookservice.review.MyReviewFixture;
@@ -42,7 +42,7 @@ class MyReviewWriteServiceTest {
     private MyReviewRepository myBookReviewRepository;
 
     @Mock
-    private MyBookService myBookService;
+    private MyBookReadService myBookReadService;
 
     @DisplayName("마이북 리뷰를 등록한다. 리뷰 등록시 Book의 리뷰 수와 별점이 변경된다.")
     @Test
@@ -54,7 +54,7 @@ class MyReviewWriteServiceTest {
         Integer originReviewCount = myBook.getBook().getReviewCount();
         Double originStarRating = myBook.getBook().getStarRating();
 
-        given(myBookService.findMyBookByIdWithBook(request.getMyBookId())).willReturn(myBook);
+        given(myBookReadService.findMyBookByIdWithBook(request.getMyBookId())).willReturn(myBook);
         given(myBookReviewRepository.existsByMyBook(myBook)).willReturn(false);
         given(myBookReviewRepository.save(any())).willReturn(any());
 
@@ -65,7 +65,7 @@ class MyReviewWriteServiceTest {
         assertAll(
                 () -> assertThat(myBook.getBook().getReviewCount()).isEqualTo(originReviewCount + 1),
                 () -> assertThat(myBook.getBook().getStarRating()).isEqualTo(originStarRating + request.getStarRating()),
-                () -> verify(myBookService, times(1)).findMyBookByIdWithBook(request.getMyBookId()),
+                () -> verify(myBookReadService, times(1)).findMyBookByIdWithBook(request.getMyBookId()),
                 () -> verify(myBookReviewRepository, times(1)).existsByMyBook(myBook),
                 () -> verify(myBookReviewRepository, times(1)).save(any())
         );
@@ -79,13 +79,13 @@ class MyReviewWriteServiceTest {
         MyReviewCreateServiceRequest request = MyReviewDtoTestData.createMyBookReviewCreateServiceRequest();
         MyBook myBook = MyBookFixture.COMMON_OTHER_USER_MYBOOK.getMyBook();
 
-        given(myBookService.findMyBookByIdWithBook(request.getMyBookId())).willReturn(myBook);
+        given(myBookReadService.findMyBookByIdWithBook(request.getMyBookId())).willReturn(myBook);
 
         // when, then
         assertAll(
                 () -> assertThatThrownBy(() -> myReviewWriteService.create(request))
                         .isInstanceOf(MyReviewAccessDeniedException.class),
-                () -> verify(myBookService, times(1)).findMyBookByIdWithBook(request.getMyBookId()),
+                () -> verify(myBookReadService, times(1)).findMyBookByIdWithBook(request.getMyBookId()),
                 () -> verify(myBookReviewRepository, never()).existsByMyBook(myBook),
                 () -> verify(myBookReviewRepository, never()).save(any())
         );
@@ -99,14 +99,14 @@ class MyReviewWriteServiceTest {
         MyReviewCreateServiceRequest request = MyReviewDtoTestData.createMyBookReviewCreateServiceRequest();
         MyBook myBook = MyBookFixture.COMMON_LOGIN_USER_MYBOOK.getMyBook();
 
-        given(myBookService.findMyBookByIdWithBook(request.getMyBookId())).willReturn(myBook);
+        given(myBookReadService.findMyBookByIdWithBook(request.getMyBookId())).willReturn(myBook);
         given(myBookReviewRepository.existsByMyBook(myBook)).willReturn(true);
 
         // when, then
         assertAll(
                 () -> assertThatThrownBy(() -> myReviewWriteService.create(request))
                         .isInstanceOf(MyReviewAlreadyExistsException.class),
-                () -> verify(myBookService, times(1)).findMyBookByIdWithBook(request.getMyBookId()),
+                () -> verify(myBookReadService, times(1)).findMyBookByIdWithBook(request.getMyBookId()),
                 () -> verify(myBookReviewRepository, times(1)).existsByMyBook(myBook),
                 () -> verify(myBookReviewRepository, never()).save(any())
         );

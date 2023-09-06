@@ -112,7 +112,7 @@ class MyBookRepositoryTest {
         List<MyBook> myBooks = myBookRepository.findAllByUserId("LOGIN_USER_ID");
 
         // then
-        assertThat(myBooks.size()).isEqualTo(2);
+        assertThat(myBooks).hasSize(2);
     }
 
     @DisplayName("마이북 ID로 마이북을 조회한다. (삭제된 책은 보여주지 않는다.)")
@@ -189,7 +189,7 @@ class MyBookRepositoryTest {
 
         // then
         assertAll(
-                () -> assertThat(myBooks.size()).isEqualTo(2)
+                () -> assertThat(myBooks).hasSize(2)
         );
     }
 
@@ -321,7 +321,7 @@ class MyBookRepositoryTest {
 
         // then
         assertAll(
-                () -> assertThat(myBookList.size()).isEqualTo(3),
+                () -> assertThat(myBookList).hasSize(3),
                 () -> assertThat(myBookList).extracting("myBookId")
                         .contains(myBook_1.getId(), myBook_2.getId(), myBook_3.getId()),
                 () -> assertThat(myBookList.get(0).getBookAuthors().get(0).getAuthor()).isNotInstanceOf(HibernateProxy.class),
@@ -363,7 +363,7 @@ class MyBookRepositoryTest {
 
         // then
         assertAll(
-                () -> assertThat(myBookList.size()).isEqualTo(2),
+                () -> assertThat(myBookList).hasSize(2),
                 () -> assertThat(myBookList).extracting("myBookId")
                         .contains(myBook_1.getId(), myBook_2.getId())
         );
@@ -425,6 +425,62 @@ class MyBookRepositoryTest {
                     assertThat(foundMyBook.get().getId()).isEqualTo(savedMyBook.getId());
                     assertThat(foundMyBook.get().getUserId()).isEqualTo(savedMyBook.getUserId());
                 }
+        );
+    }
+
+    @DisplayName("한 도서를 완독한 유저의 목록을 조회한다.")
+    @Test
+    void getReadCompletedUserIdListByBook() {
+
+        // given
+        Book savedBook = bookRepository.save(BookFixture.COMMON_BOOK_WITHOUT_RELATION.getBook());
+        MyBook myBook_1 = myBookRepository.save(MyBookFixture.MY_BOOK_WITHOUT_RELATION.getMyBookBuilder()
+                .book(savedBook).userId("USER_ID_1").readStatus(ReadStatus.COMPLETED).build());
+        MyBook myBook_2 = myBookRepository.save(MyBookFixture.MY_BOOK_WITHOUT_RELATION.getMyBookBuilder()
+                .book(savedBook).userId("USER_ID_2").readStatus(ReadStatus.TO_READ).build());
+        MyBook myBook_3 = myBookRepository.save(MyBookFixture.MY_BOOK_WITHOUT_RELATION.getMyBookBuilder()
+                .book(savedBook).userId("USER_ID_3").readStatus(ReadStatus.COMPLETED).build());
+        MyBook myBook_4 = myBookRepository.save(MyBookFixture.MY_BOOK_WITHOUT_RELATION.getMyBookBuilder()
+                .book(savedBook).userId("USER_ID_4").showable(false).readStatus(ReadStatus.COMPLETED).build());
+
+        entityManager.flush();
+        entityManager.clear();
+
+        // when
+        List<String> readCompletedUserIdList = myBookRepository.getReadCompletedUserIdListByBook(savedBook);
+
+        // then
+        assertAll(
+                () -> assertThat(readCompletedUserIdList).hasSize(2),
+                () -> assertThat(readCompletedUserIdList).containsExactlyInAnyOrder(myBook_1.getUserId(), myBook_3.getUserId())
+        );
+    }
+
+    @DisplayName("한 도서를 마이북으로 설정한 유저의 목록을 조회한다.")
+    @Test
+    void getMyBookUserIdListByBook() {
+
+        // given
+        Book savedBook = bookRepository.save(BookFixture.COMMON_BOOK_WITHOUT_RELATION.getBook());
+        MyBook myBook_1 = myBookRepository.save(MyBookFixture.MY_BOOK_WITHOUT_RELATION.getMyBookBuilder()
+                .book(savedBook).userId("USER_ID_1").build());
+        MyBook myBook_2 = myBookRepository.save(MyBookFixture.MY_BOOK_WITHOUT_RELATION.getMyBookBuilder()
+                .book(savedBook).userId("USER_ID_2").build());
+        MyBook myBook_3 = myBookRepository.save(MyBookFixture.MY_BOOK_WITHOUT_RELATION.getMyBookBuilder()
+                .book(savedBook).userId("USER_ID_3").build());
+        MyBook myBook_4 = myBookRepository.save(MyBookFixture.MY_BOOK_WITHOUT_RELATION.getMyBookBuilder()
+                .book(savedBook).userId("USER_ID_4").showable(false).build());
+
+        entityManager.flush();
+        entityManager.clear();
+
+        // when
+        List<String> myBookUserIdList = myBookRepository.getMyBookUserIdListByBook(savedBook);
+
+        // then
+        assertAll(
+                () -> assertThat(myBookUserIdList).hasSize(3),
+                () -> assertThat(myBookUserIdList).containsExactlyInAnyOrder(myBook_1.getUserId(), myBook_2.getUserId(), myBook_3.getUserId())
         );
     }
 }

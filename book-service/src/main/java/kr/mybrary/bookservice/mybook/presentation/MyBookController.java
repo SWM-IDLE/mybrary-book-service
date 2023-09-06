@@ -1,7 +1,9 @@
 package kr.mybrary.bookservice.mybook.presentation;
 
+import java.util.List;
 import kr.mybrary.bookservice.global.dto.response.SuccessResponse;
-import kr.mybrary.bookservice.mybook.domain.MyBookService;
+import kr.mybrary.bookservice.mybook.domain.MyBookReadService;
+import kr.mybrary.bookservice.mybook.domain.MyBookWriteService;
 import kr.mybrary.bookservice.mybook.domain.dto.request.MyBookDeleteServiceRequest;
 import kr.mybrary.bookservice.mybook.domain.dto.request.MyBookDetailServiceRequest;
 import kr.mybrary.bookservice.mybook.domain.dto.request.MyBookFindAllServiceRequest;
@@ -9,10 +11,21 @@ import kr.mybrary.bookservice.mybook.domain.dto.request.MyBookFindByMeaningTagQu
 import kr.mybrary.bookservice.mybook.domain.dto.request.MyBookReadCompletedStatusServiceRequest;
 import kr.mybrary.bookservice.mybook.domain.dto.request.MyBookRegisteredStatusServiceRequest;
 import kr.mybrary.bookservice.mybook.domain.dto.request.MybookUpdateServiceRequest;
+import kr.mybrary.bookservice.mybook.domain.dto.request.UserInfoWithMyBookSettingForBookServiceRequest;
+import kr.mybrary.bookservice.mybook.domain.dto.request.UserInfoWithReadCompletedForBookServiceRequest;
 import kr.mybrary.bookservice.mybook.persistence.MyBookOrderType;
 import kr.mybrary.bookservice.mybook.persistence.ReadStatus;
 import kr.mybrary.bookservice.mybook.presentation.dto.request.MyBookCreateRequest;
 import kr.mybrary.bookservice.mybook.presentation.dto.request.MyBookUpdateRequest;
+import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookDetailResponse;
+import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookElementFromMeaningTagResponse;
+import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookElementResponse;
+import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookReadCompletedStatusResponse;
+import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookRegisteredStatusResponse;
+import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookRegistrationCountResponse;
+import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookUpdateResponse;
+import kr.mybrary.bookservice.mybook.presentation.dto.response.UserInfoWithMyBookSettingForBookResponse;
+import kr.mybrary.bookservice.mybook.presentation.dto.response.UserInfoWithReadCompletedForBookResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,20 +45,23 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class MyBookController {
 
-    private final MyBookService myBookService;
+    private final MyBookReadService myBookReadService;
+    private final MyBookWriteService myBookWriteService;
 
     @PostMapping("/mybooks")
-    public ResponseEntity createMyBook(@RequestHeader("USER-ID") String loginId,
+    public ResponseEntity<SuccessResponse<Void>> createMyBook(
+            @RequestHeader("USER-ID") String loginId,
             @RequestBody MyBookCreateRequest request) {
 
-        myBookService.create(request.toServiceRequest(loginId));
+        myBookWriteService.create(request.toServiceRequest(loginId));
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(SuccessResponse.of(HttpStatus.CREATED.toString(), "내 서재에 도서를 등록했습니다.", null));
     }
 
     @GetMapping("/users/{userId}/mybooks")
-    public ResponseEntity findAllMyBooks(@RequestHeader("USER-ID") String loginId,
+    public ResponseEntity<SuccessResponse<List<MyBookElementResponse>>> findAllMyBooks(
+            @RequestHeader("USER-ID") String loginId,
             @PathVariable("userId") String userId,
             @RequestParam(value = "order", required = false, defaultValue = "none") String order,
             @RequestParam(value = "readStatus", required = false) String readStatus) {
@@ -54,74 +70,102 @@ public class MyBookController {
                 ReadStatus.of(readStatus));
 
         return ResponseEntity.ok(SuccessResponse.of(HttpStatus.OK.toString(), "서재의 도서 목록입니다.",
-                myBookService.findAllMyBooks(request)));
+                myBookReadService.findAllMyBooks(request)));
     }
 
     @GetMapping("/mybooks/{mybookId}")
-    public ResponseEntity findMyBookDetail(@RequestHeader("USER-ID") String loginId,
+    public ResponseEntity<SuccessResponse<MyBookDetailResponse>> findMyBookDetail(
+            @RequestHeader("USER-ID") String loginId,
             @PathVariable("mybookId") Long mybookId) {
 
         MyBookDetailServiceRequest request = MyBookDetailServiceRequest.of(loginId, mybookId);
 
         return ResponseEntity.ok(SuccessResponse.of(HttpStatus.OK.toString(), "마이북 상세보기입니다.",
-                        myBookService.findMyBookDetail(request)));
+                myBookReadService.findMyBookDetail(request)));
     }
 
     @DeleteMapping("/mybooks/{mybookId}")
-    public ResponseEntity deleteMyBook(@RequestHeader("USER-ID") String loginId,
+    public ResponseEntity<SuccessResponse<Void>> deleteMyBook(
+            @RequestHeader("USER-ID") String loginId,
             @PathVariable Long mybookId) {
 
         MyBookDeleteServiceRequest request = MyBookDeleteServiceRequest.of(loginId, mybookId);
 
-        myBookService.deleteMyBook(request);
+        myBookWriteService.deleteMyBook(request);
 
         return ResponseEntity.ok(SuccessResponse.of(HttpStatus.OK.toString(), "내 서재의 도서를 삭제했습니다.", null));
     }
 
     @PutMapping("/mybooks/{mybookId}")
-    public ResponseEntity updateMyBookProperties(@RequestHeader("USER-ID") String loginId,
-            @PathVariable Long mybookId, @RequestBody MyBookUpdateRequest request) {
+    public ResponseEntity<SuccessResponse<MyBookUpdateResponse>> updateMyBookProperties(
+            @RequestHeader("USER-ID") String loginId,
+            @PathVariable Long mybookId,
+            @RequestBody MyBookUpdateRequest request) {
 
         MybookUpdateServiceRequest serviceRequest = request.toServiceRequest(loginId, mybookId);
 
         return ResponseEntity.ok(SuccessResponse.of(HttpStatus.OK.toString(), "내 서재의 마이북 속성을 수정했습니다.",
-                        myBookService.updateMyBookProperties(serviceRequest)));
+                myBookWriteService.updateMyBookProperties(serviceRequest)));
     }
 
     @GetMapping("/mybooks/meaning-tags/{meaningTagQuote}")
-    public ResponseEntity findMyBooksByMeaningTag(@RequestHeader("USER-ID") String loginId,
+    public ResponseEntity<SuccessResponse<List<MyBookElementFromMeaningTagResponse>>> findMyBooksByMeaningTag(
+            @RequestHeader("USER-ID") String loginId,
             @PathVariable String meaningTagQuote) {
 
-        MyBookFindByMeaningTagQuoteServiceRequest request = MyBookFindByMeaningTagQuoteServiceRequest.of(loginId, meaningTagQuote);
+        MyBookFindByMeaningTagQuoteServiceRequest request = MyBookFindByMeaningTagQuoteServiceRequest.of(loginId,
+                meaningTagQuote);
 
         return ResponseEntity.ok(SuccessResponse.of(HttpStatus.OK.toString(), "의미 태그를 통해서 마이북을 조회했습니다.",
-                        myBookService.findByMeaningTagQuote(request)));
+                myBookReadService.findByMeaningTagQuote(request)));
     }
 
     @GetMapping("/mybooks/today-registration-count")
-    public ResponseEntity getTodayRegistrationCount() {
+    public ResponseEntity<SuccessResponse<MyBookRegistrationCountResponse>> getTodayRegistrationCount() {
 
         return ResponseEntity.ok(SuccessResponse.of(HttpStatus.OK.toString(), "오늘의 마이북 등록 수입니다.",
-                        myBookService.getBookRegistrationCountOfToday()));
+                myBookReadService.getBookRegistrationCountOfToday()));
     }
 
     @GetMapping("/books/{isbn13}/mybook-registered-status")
-    public ResponseEntity getMyBookRegisteredStatus(@RequestHeader("USER-ID") String loginId,
+    public ResponseEntity<SuccessResponse<MyBookRegisteredStatusResponse>> getMyBookRegisteredStatus(
+            @RequestHeader("USER-ID") String loginId,
             @PathVariable String isbn13) {
 
         MyBookRegisteredStatusServiceRequest serviceRequest = MyBookRegisteredStatusServiceRequest.of(loginId, isbn13);
 
         return ResponseEntity.ok(SuccessResponse.of(HttpStatus.OK.toString(), "해당 도서의 마이북 등록 상태 여부 입니다.",
-                        myBookService.getMyBookRegisteredStatus(serviceRequest)));
+                myBookReadService.getMyBookRegisteredStatus(serviceRequest)));
     }
 
     @GetMapping("/books/{isbn13}/read-complete-status")
-    public ResponseEntity getReadCompletedStatus(@RequestHeader("USER-ID") String loginId,
+    public ResponseEntity<SuccessResponse<MyBookReadCompletedStatusResponse>> getReadCompletedStatus(
+            @RequestHeader("USER-ID") String loginId,
             @PathVariable String isbn13) {
 
         MyBookReadCompletedStatusServiceRequest serviceRequest = MyBookReadCompletedStatusServiceRequest.of(loginId, isbn13);
 
         return ResponseEntity.ok(SuccessResponse.of(HttpStatus.OK.toString(), "해당 도서 완독 여부 입니다.",
-                        myBookService.getMyBookReadCompletedStatus(serviceRequest)));
+                myBookReadService.getMyBookReadCompletedStatus(serviceRequest)));
+    }
+
+    @GetMapping("/books/{isbn13}/read-complete/userInfos")
+    public ResponseEntity<SuccessResponse<UserInfoWithReadCompletedForBookResponse>> getUserInfoWithReadCompletedForBook(
+            @PathVariable("isbn13") String isbn13) {
+
+        UserInfoWithReadCompletedForBookServiceRequest request = UserInfoWithReadCompletedForBookServiceRequest.of(isbn13);
+
+        return ResponseEntity.ok(SuccessResponse.of(HttpStatus.OK.toString(), "도서를 완독한 유저 목록 조회에 성공했습니다.",
+                myBookReadService.getUserIdWithReadCompletedListByBook(request)));
+    }
+
+    @GetMapping("/books/{isbn13}/mybook/userInfos")
+    public ResponseEntity<SuccessResponse<UserInfoWithMyBookSettingForBookResponse>> getUserInfoWithMyBookSettingForBook(
+            @PathVariable("isbn13") String isbn13) {
+
+        UserInfoWithMyBookSettingForBookServiceRequest request = UserInfoWithMyBookSettingForBookServiceRequest.of(isbn13);
+
+        return ResponseEntity.ok(SuccessResponse.of(HttpStatus.OK.toString(), "도서를 마이북에 등록한 유저 목록 조회에 성공했습니다.",
+                myBookReadService.getUserIdListWithMyBookSettingByBook(request)));
     }
 }

@@ -240,4 +240,37 @@ class BookInterestRepositoryTest {
                 () -> assertThat(result).isTrue()
         );
     }
+
+    @DisplayName("한 도서에 대해서 관심 도서로 설정한 유저의 ID를 조회한다.")
+    @Test
+    void findUserIdsByBook() {
+
+        // given
+        Book book = entityManager.persist(BookFixture.COMMON_BOOK_WITHOUT_RELATION.getBookBuilder().build());
+
+        BookInterest bookInterest_1 = BookInterestFixture.BOOK_INTEREST_WITHOUT_RELATION.getBookInterestBuilder()
+                .book(book)
+                .userId("LOGIN_USER_ID_1")
+                .build();
+
+        BookInterest bookInterest_2 = BookInterestFixture.BOOK_INTEREST_WITHOUT_RELATION.getBookInterestBuilder()
+                .book(book)
+                .userId("LOGIN_USER_ID_2")
+                .build();
+
+        entityManager.persist(bookInterest_1);
+        entityManager.persist(bookInterest_2);
+
+        entityManager.flush();
+        entityManager.clear();
+
+        // when
+        List<String> userIds = bookInterestRepository.findUserIdsByBook(book);
+
+        // then
+        assertAll(
+                () -> assertThat(userIds).hasSize(2),
+                () -> assertThat(userIds).containsExactlyInAnyOrder("LOGIN_USER_ID_1", "LOGIN_USER_ID_2")
+        );
+    }
 }

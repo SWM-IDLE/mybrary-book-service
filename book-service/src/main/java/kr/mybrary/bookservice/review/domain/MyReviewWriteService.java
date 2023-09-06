@@ -1,7 +1,7 @@
 package kr.mybrary.bookservice.review.domain;
 
 import kr.mybrary.bookservice.book.persistence.Book;
-import kr.mybrary.bookservice.mybook.domain.MyBookService;
+import kr.mybrary.bookservice.mybook.domain.MyBookReadService;
 import kr.mybrary.bookservice.mybook.persistence.MyBook;
 import kr.mybrary.bookservice.review.domain.dto.request.MyReviewCreateServiceRequest;
 import kr.mybrary.bookservice.review.domain.dto.request.MyReviewDeleteServiceRequest;
@@ -22,11 +22,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class MyReviewWriteService {
 
     private final MyReviewRepository myReviewRepository;
-    private final MyBookService myBookService;
+    private final MyBookReadService myBookReadService;
 
     public void create(MyReviewCreateServiceRequest request) {
 
-        MyBook myBook = myBookService.findMyBookByIdWithBook(request.getMyBookId());
+        MyBook myBook = myBookReadService.findMyBookByIdWithBook(request.getMyBookId());
         checkIsOwnerSameAsRequester(myBook.getUserId(), request.getLoginId());
         checkMyBookReviewAlreadyRegistered(myBook);
 
