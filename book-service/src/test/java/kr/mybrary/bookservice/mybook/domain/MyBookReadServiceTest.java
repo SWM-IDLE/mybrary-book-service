@@ -25,7 +25,7 @@ import kr.mybrary.bookservice.mybook.domain.dto.request.MyBookFindAllServiceRequ
 import kr.mybrary.bookservice.mybook.domain.dto.request.MyBookFindByMeaningTagQuoteServiceRequest;
 import kr.mybrary.bookservice.mybook.domain.dto.request.MyBookReadCompletedStatusServiceRequest;
 import kr.mybrary.bookservice.mybook.domain.dto.request.MyBookRegisteredStatusServiceRequest;
-import kr.mybrary.bookservice.mybook.domain.dto.request.UserInfoWithMyBookSetForBookServiceRequest;
+import kr.mybrary.bookservice.mybook.domain.dto.request.UserInfoWithMyBookSettingForBookServiceRequest;
 import kr.mybrary.bookservice.mybook.domain.dto.request.UserInfoWithReadCompletedForBookServiceRequest;
 import kr.mybrary.bookservice.mybook.domain.exception.MyBookAccessDeniedException;
 import kr.mybrary.bookservice.mybook.domain.exception.MyBookNotFoundException;
@@ -38,7 +38,7 @@ import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookElementResp
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookReadCompletedStatusResponse;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookRegisteredStatusResponse;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookRegistrationCountResponse;
-import kr.mybrary.bookservice.mybook.presentation.dto.response.UserInfoWithMyBookSetForBookResponse;
+import kr.mybrary.bookservice.mybook.presentation.dto.response.UserInfoWithMyBookSettingForBookResponse;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.UserInfoWithReadCompletedForBookResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -390,7 +390,7 @@ class MyBookReadServiceTest {
     void getMyBookSetUserIdListByBook() {
 
         // given
-        UserInfoWithMyBookSetForBookServiceRequest request = MybookDtoTestData.createUserInfoWithMyBookSetForBookServiceRequest();
+        UserInfoWithMyBookSettingForBookServiceRequest request = MybookDtoTestData.createUserInfoWithMyBookSetForBookServiceRequest();
         Book book = BookFixture.COMMON_BOOK.getBook();
         List<String> userIds = List.of("user1", "user2");
 
@@ -399,7 +399,7 @@ class MyBookReadServiceTest {
         given(userServiceClient.getUsersInfo(userIds)).willReturn(MybookDtoTestData.createUserInfoResponseList(userIds));
 
         // when
-        UserInfoWithMyBookSetForBookResponse response = myBookReadService.getUserIdListWithMyBookSettingByBook(request);
+        UserInfoWithMyBookSettingForBookResponse response = myBookReadService.getUserIdListWithMyBookSettingByBook(request);
 
         // then
         assertAll(

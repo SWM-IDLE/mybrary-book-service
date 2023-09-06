@@ -39,7 +39,7 @@ import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookReadComplet
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookRegisteredStatusResponse;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookRegistrationCountResponse;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookUpdateResponse;
-import kr.mybrary.bookservice.mybook.presentation.dto.response.UserInfoWithMyBookSetForBookResponse;
+import kr.mybrary.bookservice.mybook.presentation.dto.response.UserInfoWithMyBookSettingForBookResponse;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.UserInfoWithReadCompletedForBookResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -573,7 +573,7 @@ class MyBookControllerTest {
     void getUserInfoWithMyBookSettingForBook() throws Exception {
 
         // given
-        UserInfoWithMyBookSetForBookResponse response = MybookDtoTestData.createUserInfoWithMyBookSetForBookResponse();
+        UserInfoWithMyBookSettingForBookResponse response = MybookDtoTestData.createUserInfoWithMyBookSetForBookResponse();
 
         given(myBookReadService.getUserIdListWithMyBookSettingByBook(any())).willReturn(response);
 

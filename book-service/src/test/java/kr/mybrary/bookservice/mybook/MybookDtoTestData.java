@@ -12,7 +12,7 @@ import kr.mybrary.bookservice.mybook.domain.dto.request.MyBookReadCompletedStatu
 import kr.mybrary.bookservice.mybook.domain.dto.request.MyBookRegisteredStatusServiceRequest;
 import kr.mybrary.bookservice.mybook.domain.dto.request.MybookUpdateServiceRequest;
 import kr.mybrary.bookservice.mybook.domain.dto.request.MybookUpdateServiceRequest.MybookUpdateServiceRequestBuilder;
-import kr.mybrary.bookservice.mybook.domain.dto.request.UserInfoWithMyBookSetForBookServiceRequest;
+import kr.mybrary.bookservice.mybook.domain.dto.request.UserInfoWithMyBookSettingForBookServiceRequest;
 import kr.mybrary.bookservice.mybook.domain.dto.request.UserInfoWithReadCompletedForBookServiceRequest;
 import kr.mybrary.bookservice.mybook.persistence.MyBookOrderType;
 import kr.mybrary.bookservice.mybook.persistence.ReadStatus;
@@ -29,7 +29,7 @@ import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookReadComplet
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookRegisteredStatusResponse;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookRegistrationCountResponse;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookUpdateResponse;
-import kr.mybrary.bookservice.mybook.presentation.dto.response.UserInfoWithMyBookSetForBookResponse;
+import kr.mybrary.bookservice.mybook.presentation.dto.response.UserInfoWithMyBookSettingForBookResponse;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.UserInfoWithReadCompletedForBookResponse;
 
 public class MybookDtoTestData {
@@ -258,21 +258,21 @@ public class MybookDtoTestData {
                 .build();
     }
 
-    public static UserInfoWithMyBookSetForBookServiceRequest createUserInfoWithMyBookSetForBookServiceRequest() {
-        return UserInfoWithMyBookSetForBookServiceRequest.builder()
+    public static UserInfoWithMyBookSettingForBookServiceRequest createUserInfoWithMyBookSetForBookServiceRequest() {
+        return UserInfoWithMyBookSettingForBookServiceRequest.builder()
                 .isbn13("1111111111111")
                 .build();
     }
 
-    public static UserInfoWithMyBookSetForBookResponse createUserInfoWithMyBookSetForBookResponse() {
-        return UserInfoWithMyBookSetForBookResponse.builder()
+    public static UserInfoWithMyBookSettingForBookResponse createUserInfoWithMyBookSetForBookResponse() {
+        return UserInfoWithMyBookSettingForBookResponse.builder()
                 .userInfos(List.of(
-                        UserInfoWithMyBookSetForBookResponse.UserInfoElement.builder()
+                        UserInfoWithMyBookSettingForBookResponse.UserInfoElement.builder()
                                 .userId("USER_ID_1")
                                 .nickname("USER_NICKNAME_1")
                                 .profileImageUrl("USER_PICTURE_URL_1")
                                 .build(),
-                        UserInfoWithMyBookSetForBookResponse.UserInfoElement.builder()
+                        UserInfoWithMyBookSettingForBookResponse.UserInfoElement.builder()
                                 .userId("USER_ID_2")
                                 .nickname("USER_NICKNAME_2")
                                 .profileImageUrl("USER_PICTURE_URL_2")

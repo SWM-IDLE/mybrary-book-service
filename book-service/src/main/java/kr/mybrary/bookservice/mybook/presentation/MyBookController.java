@@ -11,7 +11,7 @@ import kr.mybrary.bookservice.mybook.domain.dto.request.MyBookFindByMeaningTagQu
 import kr.mybrary.bookservice.mybook.domain.dto.request.MyBookReadCompletedStatusServiceRequest;
 import kr.mybrary.bookservice.mybook.domain.dto.request.MyBookRegisteredStatusServiceRequest;
 import kr.mybrary.bookservice.mybook.domain.dto.request.MybookUpdateServiceRequest;
-import kr.mybrary.bookservice.mybook.domain.dto.request.UserInfoWithMyBookSetForBookServiceRequest;
+import kr.mybrary.bookservice.mybook.domain.dto.request.UserInfoWithMyBookSettingForBookServiceRequest;
 import kr.mybrary.bookservice.mybook.domain.dto.request.UserInfoWithReadCompletedForBookServiceRequest;
 import kr.mybrary.bookservice.mybook.persistence.MyBookOrderType;
 import kr.mybrary.bookservice.mybook.persistence.ReadStatus;
@@ -24,7 +24,7 @@ import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookReadComplet
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookRegisteredStatusResponse;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookRegistrationCountResponse;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookUpdateResponse;
-import kr.mybrary.bookservice.mybook.presentation.dto.response.UserInfoWithMyBookSetForBookResponse;
+import kr.mybrary.bookservice.mybook.presentation.dto.response.UserInfoWithMyBookSettingForBookResponse;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.UserInfoWithReadCompletedForBookResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -160,10 +160,10 @@ public class MyBookController {
     }
 
     @GetMapping("/books/{isbn13}/mybook/userInfos")
-    public ResponseEntity<SuccessResponse<UserInfoWithMyBookSetForBookResponse>> getUserInfoWithMyBookSettingForBook(
+    public ResponseEntity<SuccessResponse<UserInfoWithMyBookSettingForBookResponse>> getUserInfoWithMyBookSettingForBook(
             @PathVariable("isbn13") String isbn13) {
 
-        UserInfoWithMyBookSetForBookServiceRequest request = UserInfoWithMyBookSetForBookServiceRequest.of(isbn13);
+        UserInfoWithMyBookSettingForBookServiceRequest request = UserInfoWithMyBookSettingForBookServiceRequest.of(isbn13);
 
         return ResponseEntity.ok(SuccessResponse.of(HttpStatus.OK.toString(), "도서를 마이북에 등록한 유저 목록 조회에 성공했습니다.",
                 myBookReadService.getUserIdListWithMyBookSettingByBook(request)));

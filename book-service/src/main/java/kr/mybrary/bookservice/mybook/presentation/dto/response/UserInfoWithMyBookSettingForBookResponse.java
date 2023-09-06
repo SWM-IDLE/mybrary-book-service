@@ -7,7 +7,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class UserInfoWithMyBookSetForBookResponse {
+public class UserInfoWithMyBookSettingForBookResponse {
 
     private List<UserInfoElement> userInfos;
 
@@ -20,11 +20,11 @@ public class UserInfoWithMyBookSetForBookResponse {
         private String profileImageUrl;
     }
 
-    public static UserInfoWithMyBookSetForBookResponse of(UserInfoServiceResponse usersInfo) {
-        return UserInfoWithMyBookSetForBookResponse.builder()
+    public static UserInfoWithMyBookSettingForBookResponse of(UserInfoServiceResponse usersInfo) {
+        return UserInfoWithMyBookSettingForBookResponse.builder()
             .userInfos(usersInfo.getData().getUserInfoElements()
                     .stream()
-                    .map(user -> UserInfoWithMyBookSetForBookResponse.UserInfoElement.builder()
+                    .map(user -> UserInfoWithMyBookSettingForBookResponse.UserInfoElement.builder()
                             .userId(user.getUserId())
                             .nickname(user.getNickname())
                             .profileImageUrl(user.getProfileImageUrl())
