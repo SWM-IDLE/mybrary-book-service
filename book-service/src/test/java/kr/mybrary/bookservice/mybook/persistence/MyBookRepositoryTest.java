@@ -514,4 +514,57 @@ class MyBookRepositoryTest {
                 () -> assertThat(myReviewRepository.findAll()).isEmpty()
         );
     }
+
+    @DisplayName("마이북 조회 시, 도서와 리뷰를 함꼐 조회한다.")
+    @Test
+    void findMyBookWithBookAndReview() {
+
+        // given
+        Book book = bookRepository.save(BookFixture.COMMON_BOOK_WITHOUT_RELATION.getBook());
+        MyBook myBook = myBookRepository.save(MyBookFixture.MY_BOOK_WITHOUT_RELATION.getMyBookBuilder()
+                .book(book).userId("USER_ID_1").build());
+        MyReview myReview = myReviewRepository.save(MyReviewFixture.MY_BOOK_REVIEW_WITHOUT_RELATION.getMyBookReviewBuilder()
+                .book(book).myBook(myBook).build());
+
+        entityManager.flush();
+        entityManager.clear();
+
+        // when
+        Optional<MyBook> foundMyBook = myBookRepository.getMyBookWithBookAndReviewUsingFetchJoin(myBook.getId());
+
+        // then
+        assertAll(
+                () -> {
+                    assertThat(foundMyBook.isPresent()).isTrue();
+                    assertThat(foundMyBook.get().getBook() instanceof HibernateProxy).isFalse();
+                    assertThat(foundMyBook.get().getMyReview() instanceof HibernateProxy).isFalse();
+                }
+        );
+    }
+
+    @DisplayName("리뷰가 존재하지 않는 마이북을 조회시, 리뷰는 null 이다.")
+    @Test
+    void findMyBookNotHavingReviewWithBookAndReviewNull() {
+
+        // given
+        Book book = bookRepository.save(BookFixture.COMMON_BOOK_WITHOUT_RELATION.getBook());
+        MyBook myBook = myBookRepository.save(MyBookFixture.MY_BOOK_WITHOUT_RELATION.getMyBookBuilder()
+                .book(book).userId("USER_ID_1").build());
+
+        entityManager.flush();
+        entityManager.clear();
+
+        // when
+        Optional<MyBook> foundMyBook = myBookRepository.getMyBookWithBookAndReviewUsingFetchJoin(myBook.getId());
+
+        // then
+        assertAll(
+                () -> {
+                    assertThat(foundMyBook.isPresent()).isTrue();
+                    assertThat(foundMyBook.get().getBook() instanceof HibernateProxy).isFalse();
+                    assertThat(foundMyBook.get().getMyReview() instanceof HibernateProxy).isFalse();
+                    assertThat(foundMyBook.get().getMyReview()).isNull();
+                }
+        );
+    }
 }
