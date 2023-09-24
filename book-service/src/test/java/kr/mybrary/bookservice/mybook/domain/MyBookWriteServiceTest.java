@@ -8,6 +8,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -112,6 +113,7 @@ class MyBookWriteServiceTest {
         int holderCount = myBook.getBook().getHolderCount();
 
         given(myBookRepository.findById(any())).willReturn(Optional.of(myBook));
+        doNothing().when(myBookRepository).delete(any());
 
         // when
         myBookWriteService.deleteMyBook(request);
@@ -119,10 +121,8 @@ class MyBookWriteServiceTest {
         // then
         assertAll(
                 () -> verify(myBookRepository).findById(request.getMybookId()),
-                () -> {
-                    assertThat(myBook).isNotNull();
-                    assertThat(myBook.isDeleted()).isTrue();
-                },
+                () -> verify(myBookRepository).delete(myBook),
+                () -> assertThat(myBook).isNotNull(),
                 () -> assertThat(myBook.getBook().getHolderCount()).isEqualTo(holderCount - 1)
         );
     }
@@ -145,7 +145,8 @@ class MyBookWriteServiceTest {
                     assertThat(myBook).isNotNull();
                     assertThat(myBook.isDeleted()).isFalse();
                 },
-                () -> verify(myBookRepository).findById(request.getMybookId())
+                () -> verify(myBookRepository).findById(request.getMybookId()),
+                () -> verify(myBookRepository, never()).delete(any())
         );
     }
 

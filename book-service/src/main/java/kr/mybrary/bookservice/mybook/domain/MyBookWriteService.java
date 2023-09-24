@@ -44,7 +44,7 @@ public class MyBookWriteService {
         }
 
         myBook.getBook().decreaseHolderCount();
-        myBook.deleteMyBook();
+        myBookRepository.delete(myBook);
     }
 
     public MyBookUpdateResponse updateMyBookProperties(MybookUpdateServiceRequest request) {

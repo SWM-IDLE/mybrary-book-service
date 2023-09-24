@@ -1,5 +1,6 @@
 package kr.mybrary.bookservice.mybook.persistence;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -19,6 +20,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 @Entity
@@ -27,13 +29,14 @@ import org.hibernate.annotations.Where;
 @AllArgsConstructor
 @NoArgsConstructor
 @Where(clause = "deleted = false")
+@SQLDelete(sql = "UPDATE my_book SET deleted = true WHERE id = ?")
 public class MyBook extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String userId; // TODO: 타입 미정
+    private String userId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Book book;
@@ -44,7 +47,7 @@ public class MyBook extends BaseEntity {
     @OneToOne(mappedBy = "myBook", fetch = FetchType.LAZY)
     private MyBookMeaningTag myBookMeaningTag;
 
-    @OneToOne(mappedBy = "myBook", fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "myBook", fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.REMOVE)
     private MyReview myReview;
 
     private LocalDateTime startDateOfPossession;
@@ -70,10 +73,6 @@ public class MyBook extends BaseEntity {
 
     public boolean isPrivate() {
         return !this.showable;
-    }
-
-    public void deleteMyBook() {
-        this.deleted = true;
     }
 
     public void updateFromUpdateRequest(MybookUpdateServiceRequest updateRequest) {

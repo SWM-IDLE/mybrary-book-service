@@ -15,6 +15,9 @@ import kr.mybrary.bookservice.book.persistence.repository.BookRepository;
 import kr.mybrary.bookservice.mybook.MyBookFixture;
 import kr.mybrary.bookservice.mybook.persistence.model.MyBookListDisplayElementModel;
 import kr.mybrary.bookservice.mybook.persistence.repository.MyBookRepository;
+import kr.mybrary.bookservice.review.MyReviewFixture;
+import kr.mybrary.bookservice.review.persistence.MyReview;
+import kr.mybrary.bookservice.review.persistence.repository.MyReviewRepository;
 import kr.mybrary.bookservice.tag.MeaningTagFixture;
 import kr.mybrary.bookservice.tag.MyBookMeaningTagFixture;
 import kr.mybrary.bookservice.tag.persistence.MeaningTag;
@@ -44,6 +47,9 @@ class MyBookRepositoryTest {
 
     @Autowired
     MyBookMeaningTagRepository myBookMeaningTagRepository;
+
+    @Autowired
+    MyReviewRepository myReviewRepository;
 
     @DisplayName("마이북을 저장한다.")
     @Test
@@ -481,6 +487,31 @@ class MyBookRepositoryTest {
         assertAll(
                 () -> assertThat(myBookUserIdList).hasSize(3),
                 () -> assertThat(myBookUserIdList).containsExactlyInAnyOrder(myBook_1.getUserId(), myBook_2.getUserId(), myBook_3.getUserId())
+        );
+    }
+
+    @DisplayName("리뷰가 있는 마이북 삭제시, 리뷰도 함께 삭제된다. (soft delete)")
+    @Test
+    void deleteMyBook() {
+
+        // given
+        Book book = bookRepository.save(BookFixture.COMMON_BOOK_WITHOUT_RELATION.getBook());
+        MyBook myBook = myBookRepository.save(MyBookFixture.MY_BOOK_WITHOUT_RELATION.getMyBookBuilder()
+                .book(book).userId("USER_ID_1").build());
+        MyReview myReview = myReviewRepository.save(MyReviewFixture.MY_BOOK_REVIEW_WITHOUT_RELATION.getMyBookReviewBuilder()
+                .book(book).myBook(myBook).build());
+
+        entityManager.flush();
+        entityManager.clear();
+
+        // when
+        myBookRepository.delete(myBook);
+        entityManager.flush();
+
+        // then
+        assertAll(
+                () -> assertThat(myBookRepository.findAll()).isEmpty(),
+                () -> assertThat(myReviewRepository.findAll()).isEmpty()
         );
     }
 }
