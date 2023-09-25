@@ -9,15 +9,14 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public enum MyReviewFixture {
 
-    COMMON_MY_BOOK_REVIEW(1L, null, null, "마이 리뷰 내용입니다.", 4.5, false),
-    MY_BOOK_REVIEW_WITHOUT_RELATION(null, null, null, "마이 리뷰 내용입니다.", 4.5, false);
+    COMMON_MY_BOOK_REVIEW(1L, null, null, "마이 리뷰 내용입니다.", 4.5),
+    MY_BOOK_REVIEW_WITHOUT_RELATION(null, null, null, "마이 리뷰 내용입니다.", 4.5);
 
     private final Long id;
     private final MyBook myBook;
     private final Book book;
     private final String content;
     private final Double starRating;
-    private final boolean deleted;
 
     public MyReview getMyBookReview() {
         return MyReview.builder()
@@ -26,7 +25,6 @@ public enum MyReviewFixture {
                 .book(book)
                 .content(content)
                 .starRating(starRating)
-                .deleted(deleted)
                 .build();
     }
 
@@ -36,7 +34,6 @@ public enum MyReviewFixture {
                 .myBook(myBook)
                 .book(book)
                 .content(content)
-                .starRating(starRating)
-                .deleted(deleted);
+                .starRating(starRating);
     }
 }

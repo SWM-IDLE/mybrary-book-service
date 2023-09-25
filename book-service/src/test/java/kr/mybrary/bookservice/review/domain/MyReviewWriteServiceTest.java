@@ -8,6 +8,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.never;
 import static org.mockito.BDDMockito.times;
 import static org.mockito.BDDMockito.verify;
+import static org.mockito.Mockito.doNothing;
 
 import java.util.Optional;
 import kr.mybrary.bookservice.mybook.MyBookFixture;
@@ -181,16 +182,17 @@ class MyReviewWriteServiceTest {
         Integer originReviewCount = myReview.getBook().getReviewCount();
 
         given(myBookReviewRepository.findByIdWithMyBookUsingFetchJoin(any())).willReturn(Optional.of(myReview));
+        doNothing().when(myBookReviewRepository).delete(myReview);
 
         // when
         myReviewWriteService.delete(request);
 
         // then
         assertAll(
-                () -> assertThat(myReview.isDeleted()).isTrue(),
                 () -> assertThat(myReview.getBook().getStarRating()).isEqualTo(originBookStarRating - originReviewStarRating),
                 () -> assertThat(myReview.getBook().getReviewCount()).isEqualTo(originReviewCount - 1),
-                () -> verify(myBookReviewRepository, times(1)).findByIdWithMyBookUsingFetchJoin(any())
+                () -> verify(myBookReviewRepository, times(1)).findByIdWithMyBookUsingFetchJoin(any()),
+                () -> verify(myBookReviewRepository, times(1)).delete(myReview)
         );
     }
 
@@ -211,7 +213,7 @@ class MyReviewWriteServiceTest {
         assertAll(
                 () -> assertThatThrownBy(() -> myReviewWriteService.delete(request)).isInstanceOf(MyReviewAccessDeniedException.class),
                 () -> verify(myBookReviewRepository, times(1)).findByIdWithMyBookUsingFetchJoin(any()),
-                () -> assertThat(myReview.isDeleted()).isFalse()
+                () -> verify(myBookReviewRepository, never()).delete(myReview)
         );
     }
 }
