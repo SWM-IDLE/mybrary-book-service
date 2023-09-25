@@ -15,6 +15,9 @@ import kr.mybrary.bookservice.book.persistence.repository.BookRepository;
 import kr.mybrary.bookservice.mybook.MyBookFixture;
 import kr.mybrary.bookservice.mybook.persistence.model.MyBookListDisplayElementModel;
 import kr.mybrary.bookservice.mybook.persistence.repository.MyBookRepository;
+import kr.mybrary.bookservice.review.MyReviewFixture;
+import kr.mybrary.bookservice.review.persistence.MyReview;
+import kr.mybrary.bookservice.review.persistence.repository.MyReviewRepository;
 import kr.mybrary.bookservice.tag.MeaningTagFixture;
 import kr.mybrary.bookservice.tag.MyBookMeaningTagFixture;
 import kr.mybrary.bookservice.tag.persistence.MeaningTag;
@@ -44,6 +47,9 @@ class MyBookRepositoryTest {
 
     @Autowired
     MyBookMeaningTagRepository myBookMeaningTagRepository;
+
+    @Autowired
+    MyReviewRepository myReviewRepository;
 
     @DisplayName("마이북을 저장한다.")
     @Test
@@ -112,7 +118,7 @@ class MyBookRepositoryTest {
         List<MyBook> myBooks = myBookRepository.findAllByUserId("LOGIN_USER_ID");
 
         // then
-        assertThat(myBooks.size()).isEqualTo(2);
+        assertThat(myBooks).hasSize(2);
     }
 
     @DisplayName("마이북 ID로 마이북을 조회한다. (삭제된 책은 보여주지 않는다.)")
@@ -189,7 +195,7 @@ class MyBookRepositoryTest {
 
         // then
         assertAll(
-                () -> assertThat(myBooks.size()).isEqualTo(2)
+                () -> assertThat(myBooks).hasSize(2)
         );
     }
 
@@ -321,7 +327,7 @@ class MyBookRepositoryTest {
 
         // then
         assertAll(
-                () -> assertThat(myBookList.size()).isEqualTo(3),
+                () -> assertThat(myBookList).hasSize(3),
                 () -> assertThat(myBookList).extracting("myBookId")
                         .contains(myBook_1.getId(), myBook_2.getId(), myBook_3.getId()),
                 () -> assertThat(myBookList.get(0).getBookAuthors().get(0).getAuthor()).isNotInstanceOf(HibernateProxy.class),
@@ -363,7 +369,7 @@ class MyBookRepositoryTest {
 
         // then
         assertAll(
-                () -> assertThat(myBookList.size()).isEqualTo(2),
+                () -> assertThat(myBookList).hasSize(2),
                 () -> assertThat(myBookList).extracting("myBookId")
                         .contains(myBook_1.getId(), myBook_2.getId())
         );
@@ -424,6 +430,139 @@ class MyBookRepositoryTest {
                     assertThat(foundMyBook.isPresent()).isTrue();
                     assertThat(foundMyBook.get().getId()).isEqualTo(savedMyBook.getId());
                     assertThat(foundMyBook.get().getUserId()).isEqualTo(savedMyBook.getUserId());
+                }
+        );
+    }
+
+    @DisplayName("한 도서를 완독한 유저의 목록을 조회한다.")
+    @Test
+    void getReadCompletedUserIdListByBook() {
+
+        // given
+        Book savedBook = bookRepository.save(BookFixture.COMMON_BOOK_WITHOUT_RELATION.getBook());
+        MyBook myBook_1 = myBookRepository.save(MyBookFixture.MY_BOOK_WITHOUT_RELATION.getMyBookBuilder()
+                .book(savedBook).userId("USER_ID_1").readStatus(ReadStatus.COMPLETED).build());
+        MyBook myBook_2 = myBookRepository.save(MyBookFixture.MY_BOOK_WITHOUT_RELATION.getMyBookBuilder()
+                .book(savedBook).userId("USER_ID_2").readStatus(ReadStatus.TO_READ).build());
+        MyBook myBook_3 = myBookRepository.save(MyBookFixture.MY_BOOK_WITHOUT_RELATION.getMyBookBuilder()
+                .book(savedBook).userId("USER_ID_3").readStatus(ReadStatus.COMPLETED).build());
+        MyBook myBook_4 = myBookRepository.save(MyBookFixture.MY_BOOK_WITHOUT_RELATION.getMyBookBuilder()
+                .book(savedBook).userId("USER_ID_4").showable(false).readStatus(ReadStatus.COMPLETED).build());
+
+        entityManager.flush();
+        entityManager.clear();
+
+        // when
+        List<String> readCompletedUserIdList = myBookRepository.getReadCompletedUserIdListByBook(savedBook);
+
+        // then
+        assertAll(
+                () -> assertThat(readCompletedUserIdList).hasSize(2),
+                () -> assertThat(readCompletedUserIdList).containsExactlyInAnyOrder(myBook_1.getUserId(), myBook_3.getUserId())
+        );
+    }
+
+    @DisplayName("한 도서를 마이북으로 설정한 유저의 목록을 조회한다.")
+    @Test
+    void getMyBookUserIdListByBook() {
+
+        // given
+        Book savedBook = bookRepository.save(BookFixture.COMMON_BOOK_WITHOUT_RELATION.getBook());
+        MyBook myBook_1 = myBookRepository.save(MyBookFixture.MY_BOOK_WITHOUT_RELATION.getMyBookBuilder()
+                .book(savedBook).userId("USER_ID_1").build());
+        MyBook myBook_2 = myBookRepository.save(MyBookFixture.MY_BOOK_WITHOUT_RELATION.getMyBookBuilder()
+                .book(savedBook).userId("USER_ID_2").build());
+        MyBook myBook_3 = myBookRepository.save(MyBookFixture.MY_BOOK_WITHOUT_RELATION.getMyBookBuilder()
+                .book(savedBook).userId("USER_ID_3").build());
+        MyBook myBook_4 = myBookRepository.save(MyBookFixture.MY_BOOK_WITHOUT_RELATION.getMyBookBuilder()
+                .book(savedBook).userId("USER_ID_4").showable(false).build());
+
+        entityManager.flush();
+        entityManager.clear();
+
+        // when
+        List<String> myBookUserIdList = myBookRepository.getMyBookUserIdListByBook(savedBook);
+
+        // then
+        assertAll(
+                () -> assertThat(myBookUserIdList).hasSize(3),
+                () -> assertThat(myBookUserIdList).containsExactlyInAnyOrder(myBook_1.getUserId(), myBook_2.getUserId(), myBook_3.getUserId())
+        );
+    }
+
+    @DisplayName("리뷰가 있는 마이북 삭제시, 리뷰도 함께 삭제된다. (soft delete)")
+    @Test
+    void deleteMyBook() {
+
+        // given
+        Book book = bookRepository.save(BookFixture.COMMON_BOOK_WITHOUT_RELATION.getBook());
+        MyBook myBook = myBookRepository.save(MyBookFixture.MY_BOOK_WITHOUT_RELATION.getMyBookBuilder()
+                .book(book).userId("USER_ID_1").build());
+        MyReview myReview = myReviewRepository.save(MyReviewFixture.MY_BOOK_REVIEW_WITHOUT_RELATION.getMyBookReviewBuilder()
+                .book(book).myBook(myBook).build());
+
+        entityManager.flush();
+        entityManager.clear();
+
+        // when
+        myBookRepository.delete(myBook);
+        entityManager.flush();
+
+        // then
+        assertAll(
+                () -> assertThat(myBookRepository.findAll()).isEmpty(),
+                () -> assertThat(myReviewRepository.findAll()).isEmpty()
+        );
+    }
+
+    @DisplayName("마이북 조회 시, 도서와 리뷰를 함꼐 조회한다.")
+    @Test
+    void findMyBookWithBookAndReview() {
+
+        // given
+        Book book = bookRepository.save(BookFixture.COMMON_BOOK_WITHOUT_RELATION.getBook());
+        MyBook myBook = myBookRepository.save(MyBookFixture.MY_BOOK_WITHOUT_RELATION.getMyBookBuilder()
+                .book(book).userId("USER_ID_1").build());
+        MyReview myReview = myReviewRepository.save(MyReviewFixture.MY_BOOK_REVIEW_WITHOUT_RELATION.getMyBookReviewBuilder()
+                .book(book).myBook(myBook).build());
+
+        entityManager.flush();
+        entityManager.clear();
+
+        // when
+        Optional<MyBook> foundMyBook = myBookRepository.getMyBookWithBookAndReviewUsingFetchJoin(myBook.getId());
+
+        // then
+        assertAll(
+                () -> {
+                    assertThat(foundMyBook).isPresent();
+                    assertThat(foundMyBook.get().getBook()).isNotInstanceOf(HibernateProxy.class);
+                    assertThat(foundMyBook.get().getMyReview()).isNotInstanceOf(HibernateProxy.class);
+                }
+        );
+    }
+
+    @DisplayName("리뷰가 존재하지 않는 마이북을 조회시, 리뷰는 null 이다.")
+    @Test
+    void findMyBookNotHavingReviewWithBookAndReviewNull() {
+
+        // given
+        Book book = bookRepository.save(BookFixture.COMMON_BOOK_WITHOUT_RELATION.getBook());
+        MyBook myBook = myBookRepository.save(MyBookFixture.MY_BOOK_WITHOUT_RELATION.getMyBookBuilder()
+                .book(book).userId("USER_ID_1").build());
+
+        entityManager.flush();
+        entityManager.clear();
+
+        // when
+        Optional<MyBook> foundMyBook = myBookRepository.getMyBookWithBookAndReviewUsingFetchJoin(myBook.getId());
+
+        // then
+        assertAll(
+                () -> {
+                    assertThat(foundMyBook).isPresent();
+                    assertThat(foundMyBook.get().getBook()).isNotInstanceOf(HibernateProxy.class);
+                    assertThat(foundMyBook.get().getMyReview()).isNull();
                 }
         );
     }

@@ -7,6 +7,7 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.Arrays;
 import java.util.List;
+import kr.mybrary.bookservice.book.persistence.Book;
 import kr.mybrary.bookservice.book.persistence.BookInterest;
 import kr.mybrary.bookservice.book.persistence.BookOrderType;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,16 @@ public class BookInterestRepositoryCustomImpl implements BookInterestRepositoryC
                 .join(bookInterest.book, book).fetchJoin()
                 .where(bookInterest.userId.eq(userId))
                 .orderBy(createOrderType(bookOrderType))
+                .fetch();
+    }
+
+    @Override
+    public List<String> findUserIdsByBook(Book book) {
+
+        return queryFactory
+                .select(bookInterest.userId)
+                .from(bookInterest)
+                .where(bookInterest.book.eq(book))
                 .fetch();
     }
 

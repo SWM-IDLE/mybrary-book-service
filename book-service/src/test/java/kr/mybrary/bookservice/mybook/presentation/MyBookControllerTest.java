@@ -28,7 +28,8 @@ import com.epages.restdocs.apispec.SimpleType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import kr.mybrary.bookservice.mybook.MybookDtoTestData;
-import kr.mybrary.bookservice.mybook.domain.MyBookService;
+import kr.mybrary.bookservice.mybook.domain.MyBookReadService;
+import kr.mybrary.bookservice.mybook.domain.MyBookWriteService;
 import kr.mybrary.bookservice.mybook.presentation.dto.request.MyBookCreateRequest;
 import kr.mybrary.bookservice.mybook.presentation.dto.request.MyBookUpdateRequest;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookDetailResponse;
@@ -38,6 +39,8 @@ import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookReadComplet
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookRegisteredStatusResponse;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookRegistrationCountResponse;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookUpdateResponse;
+import kr.mybrary.bookservice.mybook.presentation.dto.response.UserInfoWithMyBookSettingForBookResponse;
+import kr.mybrary.bookservice.mybook.presentation.dto.response.UserInfoWithReadCompletedForBookResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,7 +66,10 @@ class MyBookControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private MyBookService myBookService;
+    private MyBookReadService myBookReadService;
+
+    @MockBean
+    private MyBookWriteService myBookWriteService;
 
     private static final String LOGIN_ID = "LOGIN_USER_ID";
     private static final Long MYBOOK_ID = 1L;
@@ -76,7 +82,7 @@ class MyBookControllerTest {
         MyBookCreateRequest request = MybookDtoTestData.createMyBookCreateRequest();
 
         String requestJson = objectMapper.writeValueAsString(request);
-        given(myBookService.create(any())).willReturn(any());
+        given(myBookWriteService.create(any())).willReturn(any());
 
         // when
         ResultActions actions = mockMvc.perform(post("/api/v1/mybooks")
@@ -122,7 +128,7 @@ class MyBookControllerTest {
         MyBookElementResponse expectedResponse_1 = MybookDtoTestData.createMyBookElementResponse();
         MyBookElementResponse expectedResponse_2 = MybookDtoTestData.createMyBookElementResponse();
 
-        given(myBookService.findAllMyBooks(any())).willReturn(List.of(expectedResponse_1, expectedResponse_2));
+        given(myBookReadService.findAllMyBooks(any())).willReturn(List.of(expectedResponse_1, expectedResponse_2));
 
         // when
         ResultActions actions = mockMvc.perform(get("/api/v1/users/{userId}/mybooks", LOGIN_ID)
@@ -187,7 +193,7 @@ class MyBookControllerTest {
         // given
         MyBookDetailResponse expectedResponse = MybookDtoTestData.createMyBookDetailResponse();
 
-        given(myBookService.findMyBookDetail(any())).willReturn(expectedResponse);
+        given(myBookReadService.findMyBookDetail(any())).willReturn(expectedResponse);
 
         // when
         ResultActions actions = mockMvc.perform(get("/api/v1/mybooks/{mybookId}", MYBOOK_ID)
@@ -290,7 +296,7 @@ class MyBookControllerTest {
 
         MyBookUpdateResponse expectedResponse = MybookDtoTestData.createMyBookUpdateResponse();
 
-        given(myBookService.updateMyBookProperties(any())).willReturn(expectedResponse);
+        given(myBookWriteService.updateMyBookProperties(any())).willReturn(expectedResponse);
 
         // when
         ResultActions actions = mockMvc.perform(put("/api/v1/mybooks/{mybookId}", MYBOOK_ID)
@@ -353,7 +359,7 @@ class MyBookControllerTest {
         MyBookElementFromMeaningTagResponse expectedResponse_1 = MybookDtoTestData.createMyBookElementFromMeaningTagResponse();
         MyBookElementFromMeaningTagResponse expectedResponse_2 = MybookDtoTestData.createMyBookElementFromMeaningTagResponse();
 
-        given(myBookService.findByMeaningTagQuote(any())).willReturn(List.of(expectedResponse_1, expectedResponse_2));
+        given(myBookReadService.findByMeaningTagQuote(any())).willReturn(List.of(expectedResponse_1, expectedResponse_2));
 
         // when
         ResultActions actions = mockMvc.perform(get("/api/v1/mybooks/meaning-tags/{meaningTagQuote}", "의미 태그 문구 예시")
@@ -405,7 +411,7 @@ class MyBookControllerTest {
 
         // given
         MyBookRegistrationCountResponse response = MybookDtoTestData.createMyBookRegistrationCountResponse();
-        given(myBookService.getBookRegistrationCountOfToday()).willReturn(response);
+        given(myBookReadService.getBookRegistrationCountOfToday()).willReturn(response);
 
         // when
         ResultActions actions = mockMvc.perform(get("/api/v1/mybooks/today-registration-count"));
@@ -441,7 +447,7 @@ class MyBookControllerTest {
         MyBookRegisteredStatusResponse response = MybookDtoTestData.createMyBookRegisteredStatusResponse();
         String loginId = "LOGIN_USER_ID";
 
-        given(myBookService.getMyBookRegisteredStatus(any())).willReturn(response);
+        given(myBookReadService.getMyBookRegisteredStatus(any())).willReturn(response);
 
         // when
         ResultActions actions = mockMvc.perform(get("/api/v1/books/{isbn13}/mybook-registered-status", "9788932917245")
@@ -485,7 +491,7 @@ class MyBookControllerTest {
         MyBookReadCompletedStatusResponse response = MybookDtoTestData.createMyBookReadCompletedStatusResponse();
         String loginId = "LOGIN_USER_ID";
 
-        given(myBookService.getMyBookReadCompletedStatus(any())).willReturn(response);
+        given(myBookReadService.getMyBookReadCompletedStatus(any())).willReturn(response);
 
         // when
         ResultActions actions = mockMvc.perform(get("/api/v1/books/{isbn13}/read-complete-status", "9788932917245")
@@ -518,6 +524,88 @@ class MyBookControllerTest {
                                                 fieldWithPath("status").type(STRING).description("응답 상태"),
                                                 fieldWithPath("message").type(STRING).description("응답 메시지"),
                                                 fieldWithPath("data.completed").type(SimpleType.BOOLEAN).description("도서 완독 여부")
+                                        ).build())));
+    }
+
+    @DisplayName("한 도서에 대해서 완독한 유저의 정보를 조회한다.")
+    @Test
+    void getUserInfoWithReadCompletedForBook() throws Exception {
+
+        // given
+        UserInfoWithReadCompletedForBookResponse response = MybookDtoTestData.createUserInfoWithReadCompletedForBookResponse();
+
+        given(myBookReadService.getUserIdWithReadCompletedListByBook(any())).willReturn(response);
+
+        // when
+        ResultActions actions = mockMvc.perform(get("/api/v1/books/{isbn13}/read-complete/userInfos", "9788932917245"));
+
+        // then
+        actions
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("200 OK"))
+                .andExpect(jsonPath("$.message").value("도서를 완독한 유저 목록 조회에 성공했습니다."))
+                .andExpect(jsonPath("$.data").isNotEmpty());
+
+        // document
+        actions
+                .andDo(document("get-userInfos-with-read-completed-for-book",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        resource(
+                                ResourceSnippetParameters.builder()
+                                        .tag("mybook")
+                                        .summary("한 도서에 대해서 완독한 유저의 정보를 조회한다.")
+                                        .pathParameters(
+                                                parameterWithName("isbn13").type(SimpleType.STRING).description("도서 ISBN13")
+                                        )
+                                        .responseSchema(Schema.schema("get_userInfos_with_read_completed_for_book_response_body"))
+                                        .responseFields(
+                                                fieldWithPath("status").type(STRING).description("응답 상태"),
+                                                fieldWithPath("message").type(STRING).description("응답 메시지"),
+                                                fieldWithPath("data.userInfos[0].userId").type(STRING).description("유저 ID"),
+                                                fieldWithPath("data.userInfos[0].nickname").type(STRING).description("유저 닉네임"),
+                                                fieldWithPath("data.userInfos[0].profileImageUrl").type(STRING).description("유저 프로필 이미지 URL")
+                                        ).build())));
+    }
+
+    @DisplayName("한 도서에 대해서 마이북으로 설정한 유저의 정보를 조회한다.")
+    @Test
+    void getUserInfoWithMyBookSettingForBook() throws Exception {
+
+        // given
+        UserInfoWithMyBookSettingForBookResponse response = MybookDtoTestData.createUserInfoWithMyBookSetForBookResponse();
+
+        given(myBookReadService.getUserIdListWithMyBookSettingByBook(any())).willReturn(response);
+
+        // when
+        ResultActions actions = mockMvc.perform(get("/api/v1/books/{isbn13}/mybook/userInfos", "9788932917245"));
+
+        // then
+        actions
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("200 OK"))
+                .andExpect(jsonPath("$.message").value("도서를 마이북에 등록한 유저 목록 조회에 성공했습니다."))
+                .andExpect(jsonPath("$.data").isNotEmpty());
+
+        // document
+        actions
+                .andDo(document("get-userInfos-with-mybook-setting-for-book",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        resource(
+                                ResourceSnippetParameters.builder()
+                                        .tag("mybook")
+                                        .summary("한 도서에 대해서 마이북으로 설정한 유저의 정보를 조회한다.")
+                                        .pathParameters(
+                                                parameterWithName("isbn13").type(SimpleType.STRING).description("도서 ISBN13")
+                                        )
+                                        .responseSchema(Schema.schema("get_userInfos_with_mybook_setting_for_book_response_body"))
+                                        .responseFields(
+                                                fieldWithPath("status").type(STRING).description("응답 상태"),
+                                                fieldWithPath("message").type(STRING).description("응답 메시지"),
+                                                fieldWithPath("data.userInfos[0].userId").type(STRING).description("유저 ID"),
+                                                fieldWithPath("data.userInfos[0].nickname").type(STRING).description("유저 닉네임"),
+                                                fieldWithPath("data.userInfos[0].profileImageUrl").type(STRING).description("유저 프로필 이미지 URL")
                                         ).build())));
     }
 }

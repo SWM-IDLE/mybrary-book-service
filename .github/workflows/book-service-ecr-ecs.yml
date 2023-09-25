@@ -5,12 +5,7 @@ on:
     branches:
       - master
     paths:
-      - 'backend/book-service/**'
-  pull_request:
-    branches:
-      - master
-    paths:
-      - 'backend/book-service/**'
+      - 'book-service/**'
 
 jobs:
   deploy:
@@ -28,7 +23,7 @@ jobs:
       - name: Setup Application Test Yaml
         uses: microsoft/variable-substitution@v1
         with:
-          files: backend/book-service/src/main/resources/application-test.yml
+          files: book-service/src/main/resources/application-test.yml
         env:
           aladin.api.key: ${{ secrets.ALADIN_API_KEY }}
           kakao.api.key: ${{ secrets.KAKAO_API_KEY }}
@@ -36,24 +31,24 @@ jobs:
       - name: Setup Bootstrap Yaml For Test
         uses: microsoft/variable-substitution@v1
         with:
-          files: backend/book-service/src/main/resources/bootstrap.yml
+          files: book-service/src/main/resources/bootstrap.yml
         env:
           spring.profiles.active: test
 
       - name: Test with Gradle
-        working-directory: backend/book-service
+        working-directory: book-service
         run: |
           ./gradlew test
 
       - name: Setup Bootstrap Yaml For Build
         uses: microsoft/variable-substitution@v1
         with:
-          files: backend/book-service/src/main/resources/bootstrap.yml
+          files: book-service/src/main/resources/bootstrap.yml
         env:
           spring.profiles.active: prod
 
       - name: Build with Gradle
-        working-directory: backend/book-service
+        working-directory: book-service
         run: |
           ./gradlew clean build -x test
 
@@ -74,8 +69,26 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: ${{ secrets.ECR_BOOK_SERVICE_REPOSITORY }}
           IMAGE_TAG: ${{ github.sha }}
-        working-directory: backend/book-service
+        working-directory: book-service
         run: |
           docker build --platform amd64 -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+      - name: Fill in the new image ID in the Amazon ECS task definition
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-definition.json
+          container-name: bookService
+          image: ${{ steps.build-image.outputs.image }}
+
+      - name: Deploy Amazon ECS task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: bookService-EcsService
+          cluster: MybraryCluster
+          codedeploy-deployment-group: DgpECS-MybraryCluster-bookService-EcsService
+          codedeploy-appspec: appspec.yaml
+          wait-for-service-stability: true

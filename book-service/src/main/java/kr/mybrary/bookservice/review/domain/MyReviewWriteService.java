@@ -1,7 +1,7 @@
 package kr.mybrary.bookservice.review.domain;
 
 import kr.mybrary.bookservice.book.persistence.Book;
-import kr.mybrary.bookservice.mybook.domain.MyBookService;
+import kr.mybrary.bookservice.mybook.domain.MyBookReadService;
 import kr.mybrary.bookservice.mybook.persistence.MyBook;
 import kr.mybrary.bookservice.review.domain.dto.request.MyReviewCreateServiceRequest;
 import kr.mybrary.bookservice.review.domain.dto.request.MyReviewDeleteServiceRequest;
@@ -22,11 +22,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class MyReviewWriteService {
 
     private final MyReviewRepository myReviewRepository;
-    private final MyBookService myBookService;
+    private final MyBookReadService myBookReadService;
 
     public void create(MyReviewCreateServiceRequest request) {
 
-        MyBook myBook = myBookService.findMyBookByIdWithBook(request.getMyBookId());
+        MyBook myBook = myBookReadService.findMyBookByIdWithBook(request.getMyBookId());
         checkIsOwnerSameAsRequester(myBook.getUserId(), request.getLoginId());
         checkMyBookReviewAlreadyRegistered(myBook);
 
@@ -56,7 +56,7 @@ public class MyReviewWriteService {
         checkIsOwnerSameAsRequester(myReview.getMyBook().getUserId(), request.getLoginId());
 
         removeBookReviewCountAndStarRating(myReview.getBook(), myReview.getStarRating());
-        myReview.delete();
+        myReviewRepository.delete(myReview);
     }
 
     private MyReview getMyReviewById(Long myReviewId) {
@@ -84,7 +84,7 @@ public class MyReviewWriteService {
         book.updateWhenUpdateReview(originStarRating, newStarRating);
     }
 
-    private static void removeBookReviewCountAndStarRating(Book book, Double originStarRating) {
+    private void removeBookReviewCountAndStarRating(Book book, Double originStarRating) {
         book.updateWhenDeleteReview(originStarRating);
     }
 }

@@ -17,14 +17,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Where;
 
 @Entity
 @Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Where(clause = "deleted = false")
 public class MyReview extends BaseEntity {
 
     @Id
@@ -41,7 +39,6 @@ public class MyReview extends BaseEntity {
     private String content;
 
     private Double starRating;
-    private boolean deleted;
 
     public static MyReview of(MyBook myBook, MyReviewCreateServiceRequest request) {
         return MyReview.builder()
@@ -55,9 +52,5 @@ public class MyReview extends BaseEntity {
     public void update (MyReviewUpdateServiceRequest request) {
         this.content = request.getContent();
         this.starRating = request.getStarRating();
-    }
-
-    public void delete() {
-        this.deleted = true;
     }
 }

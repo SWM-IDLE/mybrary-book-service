@@ -35,6 +35,7 @@ import kr.mybrary.bookservice.book.presentation.dto.request.BookCreateRequest;
 import kr.mybrary.bookservice.book.presentation.dto.response.BookInterestElementResponse;
 import kr.mybrary.bookservice.book.presentation.dto.response.BookInterestHandleResponse;
 import kr.mybrary.bookservice.book.presentation.dto.response.BookInterestStatusResponse;
+import kr.mybrary.bookservice.book.presentation.dto.response.UserInfoWithInterestForBookResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -407,6 +408,47 @@ class BookControllerTest {
                                                 fieldWithPath("status").type(STRING).description("응답 상태"),
                                                 fieldWithPath("message").type(STRING).description("응답 메시지"),
                                                 fieldWithPath("data.interested").type(BOOLEAN).description("관심 도서 설정 여부")
+                                        ).build())));
+    }
+
+    @DisplayName("해당 도서를 관심 도서로 등록한 사용자의 정보를 조회한다.")
+    @Test
+    void getUserInfoWithInterestForBook() throws Exception {
+
+        // given
+        UserInfoWithInterestForBookResponse response = BookDtoTestData.createUserInfoWithInterestForBookResponse();
+
+        given(bookInterestService.getUserInfoWithInterestForBook(any())).willReturn(response);
+
+        // when
+        ResultActions actions = mockMvc.perform(get("/api/v1/books/{isbn13}/interest/userInfos", "9788932917245"));
+
+        // then
+        actions
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("200 OK"))
+                .andExpect(jsonPath("$.message").value("관심 도서를 등록한 유저 목록 조회에 성공했습니다."))
+                .andExpect(jsonPath("$.data").isNotEmpty());
+
+        // document
+        actions
+                .andDo(document("get-userInfos-with-interest-for-book",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        resource(
+                                ResourceSnippetParameters.builder()
+                                        .tag("interest")
+                                        .summary("해당 도서를 관심 도서로 등록한 사용자의 정보를 조회한다.")
+                                        .pathParameters(
+                                                parameterWithName("isbn13").type(SimpleType.STRING).description("도서 ISBN13")
+                                        )
+                                        .responseSchema(Schema.schema("get_interest_status_response_body"))
+                                        .responseFields(
+                                                fieldWithPath("status").type(STRING).description("응답 상태"),
+                                                fieldWithPath("message").type(STRING).description("응답 메시지"),
+                                                fieldWithPath("data.userInfos[0].userId").type(STRING).description("유저 ID"),
+                                                fieldWithPath("data.userInfos[0].nickname").type(STRING).description("유저 닉네임"),
+                                                fieldWithPath("data.userInfos[0].profileImageUrl").type(STRING).description("유저 프로필 이미지 URL")
                                         ).build())));
     }
 }
