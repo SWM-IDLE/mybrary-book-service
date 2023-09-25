@@ -125,11 +125,11 @@ public class Book extends BaseEntity {
         this.interestCount--;
     }
 
-    private void increaseReadCount() {
+    public void increaseReadCount() {
         this.readCount++;
     }
 
-    private void decreaseReadCount() {
+    public void decreaseReadCount() {
         this.readCount--;
     }
 

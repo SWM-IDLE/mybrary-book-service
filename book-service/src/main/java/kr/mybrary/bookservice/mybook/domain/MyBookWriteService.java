@@ -9,6 +9,7 @@ import kr.mybrary.bookservice.mybook.domain.exception.MyBookAccessDeniedExceptio
 import kr.mybrary.bookservice.mybook.domain.exception.MyBookAlreadyExistsException;
 import kr.mybrary.bookservice.mybook.domain.exception.MyBookNotFoundException;
 import kr.mybrary.bookservice.mybook.persistence.MyBook;
+import kr.mybrary.bookservice.mybook.persistence.ReadStatus;
 import kr.mybrary.bookservice.mybook.persistence.repository.MyBookRepository;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookUpdateResponse;
 import kr.mybrary.bookservice.tag.domain.MeaningTagService;
@@ -37,13 +38,14 @@ public class MyBookWriteService {
 
     public void deleteMyBook(MyBookDeleteServiceRequest request) {
 
-        MyBook myBook = findMyBookById(request.getMybookId());
+        MyBook myBook = myBookRepository.getMyBookWithBookAndReviewUsingFetchJoin(request.getMybookId())
+                .orElseThrow(MyBookNotFoundException::new);
 
         if (isOwnerSameAsRequester(myBook.getUserId(), request.getLoginId())) {
             throw new MyBookAccessDeniedException();
         }
 
-        myBook.getBook().decreaseHolderCount();
+        adjustBookPropertyWhenMyBookDeleted(myBook);
         myBookRepository.delete(myBook);
     }
 
@@ -73,5 +75,28 @@ public class MyBookWriteService {
 
     private MyBook findMyBookById(Long myBookId) {
         return myBookRepository.findById(myBookId).orElseThrow(MyBookNotFoundException::new);
+    }
+
+    private void adjustBookPropertyWhenMyBookDeleted(MyBook myBook) {
+
+        decreaseBookHolderCount(myBook);
+        decreaseReadCountWhenReadCompletedMyBookDeleted(myBook);
+        adjustBookReviewPropertyWhenMyBookDeleted(myBook);
+    }
+
+    private void decreaseBookHolderCount(MyBook myBook) {
+        myBook.getBook().decreaseHolderCount();
+    }
+
+    private void decreaseReadCountWhenReadCompletedMyBookDeleted(MyBook myBook) {
+        if (myBook.getReadStatus() == ReadStatus.COMPLETED) {
+            myBook.getBook().decreaseReadCount();
+        }
+    }
+
+    private void adjustBookReviewPropertyWhenMyBookDeleted(MyBook myBook) {
+        if (myBook.getMyReview() != null) {
+            myBook.getBook().updateWhenDeleteReview(myBook.getMyReview().getStarRating());
+        }
     }
 }

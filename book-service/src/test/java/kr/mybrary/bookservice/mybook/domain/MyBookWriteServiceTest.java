@@ -28,6 +28,8 @@ import kr.mybrary.bookservice.mybook.persistence.MyBook;
 import kr.mybrary.bookservice.mybook.persistence.ReadStatus;
 import kr.mybrary.bookservice.mybook.persistence.repository.MyBookRepository;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookUpdateResponse;
+import kr.mybrary.bookservice.review.MyReviewFixture;
+import kr.mybrary.bookservice.review.persistence.MyReview;
 import kr.mybrary.bookservice.tag.domain.MeaningTagService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -112,7 +114,7 @@ class MyBookWriteServiceTest {
 
         int holderCount = myBook.getBook().getHolderCount();
 
-        given(myBookRepository.findById(any())).willReturn(Optional.of(myBook));
+        given(myBookRepository.getMyBookWithBookAndReviewUsingFetchJoin(any())).willReturn(Optional.of(myBook));
         doNothing().when(myBookRepository).delete(any());
 
         // when
@@ -120,10 +122,69 @@ class MyBookWriteServiceTest {
 
         // then
         assertAll(
-                () -> verify(myBookRepository).findById(request.getMybookId()),
+                () -> verify(myBookRepository).getMyBookWithBookAndReviewUsingFetchJoin(request.getMybookId()),
                 () -> verify(myBookRepository).delete(myBook),
                 () -> assertThat(myBook).isNotNull(),
                 () -> assertThat(myBook.getBook().getHolderCount()).isEqualTo(holderCount - 1)
+        );
+    }
+
+    @DisplayName("리뷰가 있는 마이북을 삭제한다.")
+    @Test
+    void deleteMyBookWithReview() {
+
+        //given
+        MyBookDeleteServiceRequest request = MyBookDeleteServiceRequest.of(LOGIN_ID, 1L);
+        MyReview myReview = MyReviewFixture.COMMON_MY_BOOK_REVIEW.getMyBookReview();
+        MyBook myBook = MyBookFixture.COMMON_LOGIN_USER_MYBOOK.getMyBookBuilder().myReview(myReview).build();
+
+        int originHolderCount = myBook.getBook().getHolderCount();
+        int originReviewCount = myBook.getBook().getReviewCount();
+        Double originReviewStarRating = myBook.getBook().getStarRating();
+
+        Double reviewStarRating = myReview.getStarRating();
+
+        given(myBookRepository.getMyBookWithBookAndReviewUsingFetchJoin(any())).willReturn(Optional.of(myBook));
+        doNothing().when(myBookRepository).delete(any());
+
+        // when
+        myBookWriteService.deleteMyBook(request);
+
+        // then
+        assertAll(
+                () -> verify(myBookRepository).getMyBookWithBookAndReviewUsingFetchJoin(request.getMybookId()),
+                () -> verify(myBookRepository).delete(myBook),
+                () -> assertThat(myBook).isNotNull(),
+                () -> assertThat(myBook.getBook().getHolderCount()).isEqualTo(originHolderCount - 1),
+                () -> assertThat(myBook.getBook().getReviewCount()).isEqualTo(originReviewCount - 1),
+                () -> assertThat(myBook.getBook().getStarRating()).isEqualTo(originReviewStarRating - reviewStarRating)
+        );
+    }
+
+    @DisplayName("완독한 마이북을 삭제한다.")
+    @Test
+    void deleteReadCompletedMyBook() {
+
+        //given
+        MyBookDeleteServiceRequest request = MyBookDeleteServiceRequest.of(LOGIN_ID, 1L);
+        MyBook myBook = MyBookFixture.COMMON_LOGIN_USER_MYBOOK.getMyBookBuilder().readStatus(ReadStatus.COMPLETED).build();
+
+        int originHolderCount = myBook.getBook().getHolderCount();
+        int originReadCount = myBook.getBook().getReadCount();
+
+        given(myBookRepository.getMyBookWithBookAndReviewUsingFetchJoin(any())).willReturn(Optional.of(myBook));
+        doNothing().when(myBookRepository).delete(any());
+
+        // when
+        myBookWriteService.deleteMyBook(request);
+
+        // then
+        assertAll(
+                () -> verify(myBookRepository).getMyBookWithBookAndReviewUsingFetchJoin(request.getMybookId()),
+                () -> verify(myBookRepository).delete(myBook),
+                () -> assertThat(myBook).isNotNull(),
+                () -> assertThat(myBook.getBook().getHolderCount()).isEqualTo(originHolderCount - 1),
+                () -> assertThat(myBook.getBook().getReadCount()).isEqualTo(originReadCount - 1)
         );
     }
 
@@ -135,7 +196,7 @@ class MyBookWriteServiceTest {
         MyBookDeleteServiceRequest request = MyBookDeleteServiceRequest.of(LOGIN_ID, 1L);
         MyBook myBook = MyBookFixture.COMMON_OTHER_USER_MYBOOK.getMyBook();
 
-        given(myBookRepository.findById(any())).willReturn(Optional.ofNullable(myBook));
+        given(myBookRepository.getMyBookWithBookAndReviewUsingFetchJoin(any())).willReturn(Optional.ofNullable(myBook));
 
         // when, then
         assertAll(
@@ -145,7 +206,7 @@ class MyBookWriteServiceTest {
                     assertThat(myBook).isNotNull();
                     assertThat(myBook.isDeleted()).isFalse();
                 },
-                () -> verify(myBookRepository).findById(request.getMybookId()),
+                () -> verify(myBookRepository).getMyBookWithBookAndReviewUsingFetchJoin(request.getMybookId()),
                 () -> verify(myBookRepository, never()).delete(any())
         );
     }
