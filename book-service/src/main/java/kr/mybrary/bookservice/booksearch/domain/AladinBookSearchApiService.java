@@ -107,7 +107,7 @@ public class AladinBookSearchApiService implements PlatformBookSearchApiService 
 
     @Override
     @Retry(name = RETRY_CONFIG, fallbackMethod = "searchBookDetailWithISBNFallback")
-    @CircuitBreaker(name = CIRCUIT_BREAKER_CONFIG, fallbackMethod = "searchWithKeywordFallback")
+    @CircuitBreaker(name = CIRCUIT_BREAKER_CONFIG, fallbackMethod = "searchBookDetailWithISBNFallback")
     public BookSearchDetailResponse searchBookDetailWithISBN(BookSearchServiceRequest request) {
 
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(BOOK_DETAIL_SEARCH_URL)
@@ -135,7 +135,7 @@ public class AladinBookSearchApiService implements PlatformBookSearchApiService 
     @Override
     @Cacheable(cacheNames = "bookListByCategory", key = "#request.type + '_' + #request.categoryId + '_' + #request.page", cacheManager = "cacheManager")
     @Retry(name = RETRY_CONFIG, fallbackMethod = "searchBookListByCategoryFallback")
-    @CircuitBreaker(name = CIRCUIT_BREAKER_CONFIG, fallbackMethod = "searchWithKeywordFallback")
+    @CircuitBreaker(name = CIRCUIT_BREAKER_CONFIG, fallbackMethod = "searchBookListByCategoryFallback")
     public BookListByCategorySearchResultResponse searchBookListByCategory(BookListByCategorySearchServiceRequest request) {
 
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(BOOK_LIST_BY_CATEGORY_SEARCH_URL)
