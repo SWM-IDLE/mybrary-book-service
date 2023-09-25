@@ -136,7 +136,7 @@ class AladinBookSearchApiServiceTest {
 
         // then
         assertAll(
-                () -> assertThat(bookSearchResultResponse.getBookSearchResult().size()).isLessThanOrEqualTo(10),
+                () -> assertThat(bookSearchResultResponse.getBookSearchResult()).hasSizeLessThanOrEqualTo(10),
                 () -> assertThat(bookSearchResultResponse.getNextRequestUrl()).isEqualTo(expectNextRequestUrl),
                 () -> verify(bookSearchRankingService, times(1)).increaseSearchRankingScore(any())
         );

@@ -535,9 +535,9 @@ class MyBookRepositoryTest {
         // then
         assertAll(
                 () -> {
-                    assertThat(foundMyBook.isPresent()).isTrue();
-                    assertThat(foundMyBook.get().getBook() instanceof HibernateProxy).isFalse();
-                    assertThat(foundMyBook.get().getMyReview() instanceof HibernateProxy).isFalse();
+                    assertThat(foundMyBook).isPresent();
+                    assertThat(foundMyBook.get().getBook()).isNotInstanceOf(HibernateProxy.class);
+                    assertThat(foundMyBook.get().getMyReview()).isNotInstanceOf(HibernateProxy.class);
                 }
         );
     }
@@ -560,9 +560,9 @@ class MyBookRepositoryTest {
         // then
         assertAll(
                 () -> {
-                    assertThat(foundMyBook.isPresent()).isTrue();
-                    assertThat(foundMyBook.get().getBook() instanceof HibernateProxy).isFalse();
-                    assertThat(foundMyBook.get().getMyReview() instanceof HibernateProxy).isFalse();
+                    assertThat(foundMyBook).isPresent();
+                    assertThat(foundMyBook.get().getBook()).isNotInstanceOf(HibernateProxy.class);
+                    assertThat(foundMyBook.get().getMyReview()).isNotInstanceOf(HibernateProxy.class);
                     assertThat(foundMyBook.get().getMyReview()).isNull();
                 }
         );
