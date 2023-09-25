@@ -562,7 +562,6 @@ class MyBookRepositoryTest {
                 () -> {
                     assertThat(foundMyBook).isPresent();
                     assertThat(foundMyBook.get().getBook()).isNotInstanceOf(HibernateProxy.class);
-                    assertThat(foundMyBook.get().getMyReview()).isNotInstanceOf(HibernateProxy.class);
                     assertThat(foundMyBook.get().getMyReview()).isNull();
                 }
         );
