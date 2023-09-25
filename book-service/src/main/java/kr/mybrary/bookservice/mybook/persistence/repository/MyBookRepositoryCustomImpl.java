@@ -12,8 +12,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import kr.mybrary.bookservice.book.persistence.Book;
 import kr.mybrary.bookservice.book.persistence.bookInfo.BookAuthor;
+import kr.mybrary.bookservice.mybook.persistence.MyBook;
 import kr.mybrary.bookservice.mybook.persistence.MyBookOrderType;
 import kr.mybrary.bookservice.mybook.persistence.ReadStatus;
 import kr.mybrary.bookservice.mybook.persistence.model.MyBookListDisplayElementModel;
@@ -92,6 +94,16 @@ public class MyBookRepositoryCustomImpl implements MyBookRepositoryCustom {
                 .where(myBook.book.eq(book),
                         myBook.showable.eq(true))
                 .fetch();
+    }
+
+    @Override
+    public Optional<MyBook> getMyBookWithBookAndReviewUsingFetchJoin(Long mybookId) {
+        return Optional.ofNullable(queryFactory.select(myBook)
+                .from(myBook)
+                .join(myBook.book).fetchJoin()
+                .leftJoin(myBook.myReview).fetchJoin()
+                .where(myBook.id.eq(mybookId))
+                .fetchOne());
     }
 
     private BooleanExpression eqReadStatus(ReadStatus readStatus) {

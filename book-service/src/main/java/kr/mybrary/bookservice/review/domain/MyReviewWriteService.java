@@ -56,7 +56,7 @@ public class MyReviewWriteService {
         checkIsOwnerSameAsRequester(myReview.getMyBook().getUserId(), request.getLoginId());
 
         removeBookReviewCountAndStarRating(myReview.getBook(), myReview.getStarRating());
-        myReview.delete();
+        myReviewRepository.delete(myReview);
     }
 
     private MyReview getMyReviewById(Long myReviewId) {
@@ -84,7 +84,7 @@ public class MyReviewWriteService {
         book.updateWhenUpdateReview(originStarRating, newStarRating);
     }
 
-    private static void removeBookReviewCountAndStarRating(Book book, Double originStarRating) {
+    private void removeBookReviewCountAndStarRating(Book book, Double originStarRating) {
         book.updateWhenDeleteReview(originStarRating);
     }
 }

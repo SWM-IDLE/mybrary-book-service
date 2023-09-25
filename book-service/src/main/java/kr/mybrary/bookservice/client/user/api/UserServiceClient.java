@@ -11,7 +11,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-@FeignClient(name = "user-service")
+@FeignClient(name = "userClient")
 public interface UserServiceClient {
 
     String DEFAULT_PROFILE_IMAGE_URL = "https://mybrary-user-service-resized.s3.ap-northeast-2.amazonaws.com/tiny-profile/profileImage/default.jpg";
