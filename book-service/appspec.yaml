@@ -1,0 +1,10 @@
+version: 0.0
+Resources:
+  - TargetService:
+      Type: AWS::ECS::Service
+      Properties:
+        TaskDefinition: taskDefinition
+        LoadBalancerInfo:
+          ContainerName: bookService	
+          ContainerPort: 80
+        PlatformVersion: "LATEST"
