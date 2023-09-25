@@ -3,7 +3,7 @@
     "containerDefinitions": [
         {
             "name": "bookService",
-            "image": "133172301128.dkr.ecr.ap-northeast-2.amazonaws.com/book-service:image",
+            "image": "133172301128.dkr.ecr.ap-northeast-2.amazonaws.com/book-service",
             "cpu": 1024,
             "portMappings": [
                 {
