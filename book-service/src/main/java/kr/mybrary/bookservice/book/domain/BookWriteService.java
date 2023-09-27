@@ -15,6 +15,9 @@ import kr.mybrary.bookservice.book.persistence.repository.TranslatorRepository;
 import kr.mybrary.bookservice.book.persistence.bookInfo.BookTranslator;
 import kr.mybrary.bookservice.book.persistence.bookInfo.Translator;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -22,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
+@Slf4j
 @RequiredArgsConstructor
 public class BookWriteService {
 
@@ -31,6 +35,7 @@ public class BookWriteService {
     private final BookCategoryRepository bookCategoryRepository;
 
     @Async
+    @Retryable(exclude = {BookAlreadyExistsException.class}, maxAttemptsExpression = "${retry.bookSave.maxAttempts}", backoff = @Backoff(delayExpression = "${retry.bookSave.maxDelay}"))
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void create(BookCreateServiceRequest request) {
 
@@ -52,6 +57,7 @@ public class BookWriteService {
         book.assignCategory(getBookCategory(request.getCategoryId(), request.getCategory()));
 
         bookRepository.save(book);
+        log.info("New Book Saved : {}, {}", book.getTitle(), book.getIsbn13());
     }
 
     private void checkBookAlreadyRegistered(BookCreateServiceRequest request) {

@@ -58,3 +58,8 @@ management:
 logging:
   level:
     root: info
+
+retry:
+  bookSave:
+    maxAttempts: 5
+    maxDelay : 1000
