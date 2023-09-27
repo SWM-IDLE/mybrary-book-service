@@ -4,18 +4,18 @@ import java.util.List;
 import java.util.Objects;
 import kr.mybrary.bookservice.booksearch.domain.dto.BookSearchDtoMapper;
 import kr.mybrary.bookservice.booksearch.domain.dto.request.BookListByCategorySearchServiceRequest;
-import kr.mybrary.bookservice.booksearch.presentation.dto.response.BookSearchResultResponseElement;
+import kr.mybrary.bookservice.booksearch.domain.dto.request.BookSearchServiceRequest;
 import kr.mybrary.bookservice.booksearch.domain.dto.response.kakaoapi.KakaoBookSearchResponse;
 import kr.mybrary.bookservice.booksearch.domain.dto.response.kakaoapi.KakaoBookSearchResponse.Meta;
 import kr.mybrary.bookservice.booksearch.domain.exception.BookSearchResultNotFoundException;
-import kr.mybrary.bookservice.booksearch.domain.dto.request.BookSearchServiceRequest;
 import kr.mybrary.bookservice.booksearch.domain.exception.UnsupportedSearchAPIException;
 import kr.mybrary.bookservice.booksearch.presentation.dto.response.BookListByCategorySearchResultResponse;
 import kr.mybrary.bookservice.booksearch.presentation.dto.response.BookSearchDetailResponse;
 import kr.mybrary.bookservice.booksearch.presentation.dto.response.BookSearchResultResponse;
+import kr.mybrary.bookservice.booksearch.presentation.dto.response.BookSearchResultResponseElement;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -26,6 +26,7 @@ import org.springframework.web.client.RestTemplate;
 
 @Service
 @Qualifier("kakao")
+@RequiredArgsConstructor
 public class KakaoBookSearchApiService implements PlatformBookSearchApiService {
 
 
@@ -40,14 +41,6 @@ public class KakaoBookSearchApiService implements PlatformBookSearchApiService {
 
     private final RestTemplate restTemplate;
     private final BookSearchRankingService bookSearchRankingService;
-
-    public KakaoBookSearchApiService(
-            RestTemplateBuilder restTemplateBuilder,
-            BookSearchRankingService bookSearchRankingService) {
-
-        this.restTemplate = restTemplateBuilder.build();
-        this.bookSearchRankingService = bookSearchRankingService;
-    }
 
     @Override
     public BookSearchResultResponse searchWithKeyword(BookSearchServiceRequest request) {

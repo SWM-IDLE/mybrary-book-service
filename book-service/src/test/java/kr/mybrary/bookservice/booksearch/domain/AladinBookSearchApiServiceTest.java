@@ -7,10 +7,12 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.never;
 import static org.mockito.BDDMockito.times;
 import static org.mockito.BDDMockito.verify;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import kr.mybrary.bookservice.booksearch.BookSearchDtoTestData;
@@ -27,8 +29,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.client.MockRestServiceServer;
@@ -47,20 +49,17 @@ class AladinBookSearchApiServiceTest {
     private static final String BOOK_LIST_BY_CATEGORY_SEARCH_URL = "http://www.aladin.co.kr/ttb/api/ItemList.aspx";
     private static final String JSON_FILE_PATH = "src/test/resources/aladinapi/";
 
-    @Autowired
-    private AladinBookSearchApiService aladinBookSearchApiService;
-
-    @Autowired
-    private RestTemplateBuilder restTemplateBuilder;
-
     @MockBean
     private BookSearchRankingService bookSearchRankingService;
 
+    @Autowired
+    private RestTemplate restTemplate;
+    private AladinBookSearchApiService aladinBookSearchApiService;
     private MockRestServiceServer mockServer;
 
     @BeforeEach
     public void setup() {
-        RestTemplate restTemplate = restTemplateBuilder.build();
+        aladinBookSearchApiService = new AladinBookSearchApiService(restTemplate, bookSearchRankingService);
         mockServer = MockRestServiceServer.createServer(restTemplate);
     }
 
@@ -75,16 +74,16 @@ class AladinBookSearchApiServiceTest {
 
         mockServer
                 .expect(requestTo(BOOK_SEARCH_URL
-                        + "?query=Docker&MaxResults=20&start=1&output=js&Version=20131101&Sort=accuracy&TTBKey="
-                        + API_KEY))
+                        + "?TTBKey&Output=js&Version=20131101&Query=Docker&Start=1&MaxResults=20&Cover=MidBig&Sort=accuracy"))
                 .andRespond(withSuccess(expectResult, MediaType.APPLICATION_JSON));
 
         // when
         BookSearchResultResponse bookSearchResultResponse = aladinBookSearchApiService.searchWithKeyword(request);
 
         // then
+        mockServer.verify();
         assertAll(
-                () -> assertThat(bookSearchResultResponse.getBookSearchResult().size()).isEqualTo(20),
+                () -> assertThat(bookSearchResultResponse.getBookSearchResult().size()).isEqualTo(10),
                 () -> assertThat(bookSearchResultResponse.getNextRequestUrl()).isEqualTo(expectNextRequestUrl),
                 () -> verify(bookSearchRankingService, times(1)).increaseSearchRankingScore(request.getKeyword())
         );
@@ -101,14 +100,14 @@ class AladinBookSearchApiServiceTest {
 
         mockServer
                 .expect(requestTo(BOOK_SEARCH_URL
-                        + "?query=Docker&MaxResults=20&start=2&output=js&Version=20131101&Sort=accuracy&TTBKey="
-                        + API_KEY))
+                        + "?TTBKey&Output=js&Version=20131101&Query=Docker&Start=2&MaxResults=20&Cover=MidBig&Sort=accuracy"))
                 .andRespond(withSuccess(expectResult, MediaType.APPLICATION_JSON));
 
         // when
         BookSearchResultResponse bookSearchResultResponse = aladinBookSearchApiService.searchWithKeyword(request);
 
         // then
+        mockServer.verify();
         assertAll(
                 () -> assertThat(bookSearchResultResponse.getBookSearchResult().size()).isLessThan(20),
                 () -> assertThat(bookSearchResultResponse.getNextRequestUrl()).isEqualTo(expectNextRequestUrl),
@@ -118,7 +117,7 @@ class AladinBookSearchApiServiceTest {
 
     @DisplayName("알라딘 도서 조회시, isbn13이 비어있으면 조회 목록에서 제외한다.")
     @Test
-    void excludeResponseWhenISBN13IsBlank() throws IOException {
+    void excludeResponseWhenISBN13IsBlank() throws IOException, URISyntaxException {
 
         // given
         BookSearchServiceRequest request = BookSearchServiceRequest.of("알라", "accuracy", 10);
@@ -126,17 +125,18 @@ class AladinBookSearchApiServiceTest {
         String expectNextRequestUrl = "";
 
         mockServer
-                .expect(requestTo(BOOK_SEARCH_URL
-                        + "?query=알라&MaxResults=20&start=10&output=js&Version=20131101&Sort=accuracy&TTBKey="
-                        + API_KEY))
+                .expect(requestTo(BOOK_SEARCH_URL +
+                        "?TTBKey&Output=js&Version=20131101&Query=%EC%95%8C%EB%9D%BC&Start=10&MaxResults=20&Cover=MidBig&Sort=accuracy"))
+                .andExpect(method(HttpMethod.GET))
                 .andRespond(withSuccess(expectResult, MediaType.APPLICATION_JSON));
 
         // when
         BookSearchResultResponse bookSearchResultResponse = aladinBookSearchApiService.searchWithKeyword(request);
 
         // then
+        mockServer.verify();
         assertAll(
-                () -> assertThat(bookSearchResultResponse.getBookSearchResult()).hasSizeLessThanOrEqualTo(10),
+                () -> assertThat(bookSearchResultResponse.getBookSearchResult()).hasSize(10),
                 () -> assertThat(bookSearchResultResponse.getNextRequestUrl()).isEqualTo(expectNextRequestUrl),
                 () -> verify(bookSearchRankingService, times(1)).increaseSearchRankingScore(any())
         );
@@ -153,14 +153,14 @@ class AladinBookSearchApiServiceTest {
 
         mockServer
                 .expect(requestTo(BOOK_SEARCH_URL
-                        + "?query=알라&MaxResults=20&start=10&output=js&Version=20131101&Sort=accuracy&TTBKey="
-                        + API_KEY))
+                        + "?TTBKey&Output=js&Version=20131101&Query=%EC%95%8C%EB%9D%BC&Start=10&MaxResults=20&Cover=MidBig&Sort=accuracy"))
                 .andRespond(withSuccess(expectResult, MediaType.APPLICATION_JSON));
 
         // when
         BookSearchResultResponse bookSearchResultResponse = aladinBookSearchApiService.searchWithKeyword(request);
 
         // then
+        mockServer.verify();
         assertAll(
                 () -> assertThat(bookSearchResultResponse.getBookSearchResult().size()).isLessThan(20),
                 () -> assertThat(bookSearchResultResponse.getNextRequestUrl()).isEqualTo(expectNextRequestUrl),
@@ -178,14 +178,14 @@ class AladinBookSearchApiServiceTest {
 
         mockServer
                 .expect(requestTo(BOOK_SEARCH_URL
-                        + "?query=JPA알라&MaxResults=20&start=1&output=js&Version=20131101&Sort=accuracy&TTBKey="
-                        + API_KEY))
+                        + "?TTBKey&Output=js&Version=20131101&Query=JPA%EC%95%8C%EB%9D%BC&Start=1&MaxResults=20&Cover=MidBig&Sort=accuracy"))
                 .andRespond(withSuccess(expectResult, MediaType.APPLICATION_JSON));
 
         // when
         BookSearchResultResponse response = aladinBookSearchApiService.searchWithKeyword(request);
 
         // then
+        mockServer.verify();
         assertAll(
                 () -> assertThat(response.getBookSearchResult()).isEmpty(),
                 () -> assertThat(response.getNextRequestUrl()).isEqualTo(""),
@@ -203,14 +203,14 @@ class AladinBookSearchApiServiceTest {
 
         mockServer
                 .expect(requestTo(BOOK_DETAIL_SEARCH_URL
-                        + "?itemIdType=ISBN13&ItemId=9788965402602&output=js&Version=20131101&OptResult=packing,ratingInfo,authors,fulldescription,Toc&ttbkey="
-                        + API_KEY))
+                        + "?TTBKey&Output=js&Version=20131101&ItemId=9788965402602&Cover=Big&ItemIdType=ISBN13&OptResult=packing,ratingInfo,authors,fulldescription,Toc"))
                 .andRespond(withSuccess(expectResult, MediaType.APPLICATION_JSON));
 
         // when
         BookSearchDetailResponse bookSearchDetailResponse = aladinBookSearchApiService.searchBookDetailWithISBN(request);
 
         // then
+        mockServer.verify();
         assertAll(
                 () -> assertThat(bookSearchDetailResponse.getIsbn13()).isEqualTo("9788965402602"),
                 () -> assertThat(bookSearchDetailResponse.getIsbn10()).isEqualTo("8965402603")
@@ -227,14 +227,13 @@ class AladinBookSearchApiServiceTest {
 
         mockServer
                 .expect(requestTo(BOOK_DETAIL_SEARCH_URL
-                        + "?cover=big&itemIdType=ISBN13&ItemId=978898078297011&output=js&Version=20131101&OptResult=packing,ratingInfo,authors,fulldescription,Toc&ttbkey="
-                        + API_KEY))
+                        + "?TTBKey&Output=js&Version=20131101&ItemId=978898078297011&Cover=Big&ItemIdType=ISBN13&OptResult=packing,ratingInfo,authors,fulldescription,Toc"))
                 .andRespond(withSuccess(expectResult, MediaType.APPLICATION_JSON));
 
         // when, then
         assertThatThrownBy(() -> aladinBookSearchApiService.searchBookDetailWithISBN(request))
                 .isInstanceOf(BookSearchResultNotFoundException.class);
-
+        mockServer.verify();
     }
 
     @DisplayName("카테고리에 따른 알라딘 도서 리스트를 조회한다.")
@@ -247,14 +246,14 @@ class AladinBookSearchApiServiceTest {
 
         mockServer
                 .expect(requestTo(BOOK_LIST_BY_CATEGORY_SEARCH_URL
-                        + "?QueryType=bestseller&MaxResults=10&Start=1&Output=js&Version=20131101&Cover=Big&CategoryId=0&SearchTarget=BOOK&TTBKey="
-                        + API_KEY))
+                        + "?TTBKey&QueryType=bestseller&MaxResults=10&Start=1&Output=js&Version=20131101&CategoryId=0&SearchTarget=BOOK&Cover=Big"))
                 .andRespond(withSuccess(expectResult, MediaType.APPLICATION_JSON));
 
         // when
         BookListByCategorySearchResultResponse response = aladinBookSearchApiService.searchBookListByCategory(request);
 
         // then
+        mockServer.verify();
         assertAll(
                 () -> assertThat(response.getBooks().size()).isLessThan(11)
         );
