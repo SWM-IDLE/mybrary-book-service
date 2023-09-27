@@ -17,10 +17,10 @@ import kr.mybrary.bookservice.booksearch.presentation.dto.response.BookListByCat
 import kr.mybrary.bookservice.booksearch.presentation.dto.response.BookSearchDetailResponse;
 import kr.mybrary.bookservice.booksearch.presentation.dto.response.BookSearchResultResponse;
 import kr.mybrary.bookservice.booksearch.presentation.dto.response.BookSearchResultResponseElement;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpMethod;
@@ -33,6 +33,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Qualifier("aladin")
 @Primary
 @Slf4j
+@RequiredArgsConstructor
 public class AladinBookSearchApiService implements PlatformBookSearchApiService {
 
     @Value("${aladin.api.key}")
@@ -49,14 +50,6 @@ public class AladinBookSearchApiService implements PlatformBookSearchApiService 
 
     private final RestTemplate restTemplate;
     private final BookSearchRankingService bookSearchRankingService;
-
-    public AladinBookSearchApiService(
-            RestTemplateBuilder restTemplateBuilder,
-            BookSearchRankingService bookSearchRankingService) {
-
-        this.restTemplate = restTemplateBuilder.build();
-        this.bookSearchRankingService = bookSearchRankingService;
-    }
 
     private static final String BOOK_SEARCH_URL = "http://www.aladin.co.kr/ttb/api/ItemSearch.aspx";
     private static final String BOOK_DETAIL_SEARCH_URL = "http://www.aladin.co.kr/ttb/api/ItemLookUp.aspx";
