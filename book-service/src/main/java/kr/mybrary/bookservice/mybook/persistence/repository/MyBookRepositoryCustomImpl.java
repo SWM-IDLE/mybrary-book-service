@@ -1,5 +1,6 @@
 package kr.mybrary.bookservice.mybook.persistence.repository;
 
+import static kr.mybrary.bookservice.book.persistence.QBook.book;
 import static kr.mybrary.bookservice.book.persistence.bookInfo.QAuthor.author;
 import static kr.mybrary.bookservice.book.persistence.bookInfo.QBookAuthor.bookAuthor;
 import static kr.mybrary.bookservice.mybook.persistence.QMyBook.myBook;
@@ -19,6 +20,7 @@ import kr.mybrary.bookservice.mybook.persistence.MyBook;
 import kr.mybrary.bookservice.mybook.persistence.MyBookOrderType;
 import kr.mybrary.bookservice.mybook.persistence.ReadStatus;
 import kr.mybrary.bookservice.mybook.persistence.model.MyBookListDisplayElementModel;
+import kr.mybrary.bookservice.mybook.persistence.model.MyBookRegisteredListByDateModel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -104,6 +106,22 @@ public class MyBookRepositoryCustomImpl implements MyBookRepositoryCustom {
                 .leftJoin(myBook.myReview).fetchJoin()
                 .where(myBook.id.eq(mybookId))
                 .fetchOne());
+    }
+
+    @Override
+    public List<MyBookRegisteredListByDateModel> getMyBookRegisteredListBetweenDate(LocalDate start, LocalDate end) {
+        return queryFactory.select(Projections.fields(MyBookRegisteredListByDateModel.class,
+                    myBook.userId.as("userId"),
+                    myBook.createdAt.as("registeredAt"),
+                    myBook.book.title.as("title"),
+                    myBook.book.isbn13.as("isbn13"),
+                    myBook.book.thumbnailUrl.as("thumbnailUrl"))
+                )
+                .from(myBook)
+                .join(myBook.book, book)
+                .where(myBook.createdAt.between(start.atStartOfDay(), end.atTime(23, 59, 59, 999_999_999)))
+                .orderBy(myBook.createdAt.desc())
+                .fetch();
     }
 
     private BooleanExpression eqReadStatus(ReadStatus readStatus) {
