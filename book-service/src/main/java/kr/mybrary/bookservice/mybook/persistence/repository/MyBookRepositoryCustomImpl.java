@@ -75,7 +75,7 @@ public class MyBookRepositoryCustomImpl implements MyBookRepositoryCustom {
 
         return queryFactory.select(myBook.count())
                 .from(myBook)
-                .where(myBook.createdAt.between(start, end))
+                .where(myBook.createdAt.between(start, end), myBook.showable.eq(true))
                 .fetchOne();
     }
 
@@ -119,7 +119,8 @@ public class MyBookRepositoryCustomImpl implements MyBookRepositoryCustom {
                 )
                 .from(myBook)
                 .join(myBook.book, book)
-                .where(myBook.createdAt.between(start.atStartOfDay(), end.atTime(23, 59, 59, 999_999_999)))
+                .where(myBook.createdAt.between(start.atStartOfDay(), end.atTime(23, 59, 59, 999_999_999)),
+                        myBook.showable.eq(true))
                 .orderBy(myBook.createdAt.desc())
                 .fetch();
     }
