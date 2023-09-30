@@ -1,5 +1,6 @@
 package kr.mybrary.bookservice.global.util;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -19,5 +20,13 @@ public class DateUtils {
         }
 
         return localDateTime.format(DateTimeFormatter.ofPattern("yyyy.MM.dd"));
+    }
+
+    public static String toHyphenYYYYMMDD(LocalDate localDate) {
+        if (localDate == null) {
+            return "0000-00-00";
+        }
+
+        return localDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
     }
 }

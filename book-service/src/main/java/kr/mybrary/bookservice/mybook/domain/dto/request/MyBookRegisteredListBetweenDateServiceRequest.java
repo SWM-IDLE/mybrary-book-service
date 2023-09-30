@@ -10,4 +10,11 @@ public class MyBookRegisteredListBetweenDateServiceRequest {
 
     private LocalDate start;
     private LocalDate end;
+
+    public static MyBookRegisteredListBetweenDateServiceRequest of(LocalDate start, LocalDate end) {
+        return MyBookRegisteredListBetweenDateServiceRequest.builder()
+                .start(start)
+                .end(end)
+                .build();
+    }
 }

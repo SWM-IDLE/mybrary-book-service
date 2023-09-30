@@ -29,12 +29,12 @@ import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookElementFrom
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookElementResponse;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookElementResponse.BookElementResponse;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookReadCompletedStatusResponse;
+import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookRegisteredListBetweenDateResponse;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookRegisteredStatusResponse;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookRegistrationCountResponse;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookUpdateResponse;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.UserInfoWithMyBookSettingForBookResponse;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.UserInfoWithReadCompletedForBookResponse;
-import org.hibernate.sql.ast.tree.expression.Star;
 
 public class MybookDtoTestData {
 
@@ -315,6 +315,41 @@ public class MybookDtoTestData {
         return MyBookRegisteredListBetweenDateServiceRequest.builder()
                 .start(start)
                 .end(end)
+                .build();
+    }
+
+    public static MyBookRegisteredListBetweenDateResponse createMyBookRegisteredListBetweenDateResponse() {
+        return MyBookRegisteredListBetweenDateResponse.builder()
+                .totalCount(3)
+                .myBookRegisteredList(List.of(
+                        MyBookRegisteredListBetweenDateResponse.MyBookElement.builder()
+                                .userId("USER_ID_1")
+                                .nickname("USER_NICKNAME_1")
+                                .profileImageUrl("USER_PICTURE_URL_1")
+                                .title("TITLE_1")
+                                .thumbnailUrl("THUMBNAIL_URL_1")
+                                .isbn13("ISBN13_1")
+                                .registeredAt(LocalDateTime.of(2021, 1, 1, 0, 0, 0))
+                                .build(),
+                        MyBookRegisteredListBetweenDateResponse.MyBookElement.builder()
+                                .userId("USER_ID_2")
+                                .nickname("USER_NICKNAME_2")
+                                .profileImageUrl("USER_PICTURE_URL_2")
+                                .title("TITLE_2")
+                                .thumbnailUrl("THUMBNAIL_URL_2")
+                                .isbn13("ISBN13_2")
+                                .registeredAt(LocalDateTime.of(2021, 1, 1, 0, 0, 0))
+                                .build(),
+                        MyBookRegisteredListBetweenDateResponse.MyBookElement.builder()
+                                .userId("USER_ID_3")
+                                .nickname("USER_NICKNAME_3")
+                                .profileImageUrl("USER_PICTURE_URL_3")
+                                .title("TITLE_3")
+                                .thumbnailUrl("THUMBNAIL_URL_3")
+                                .isbn13("ISBN13_3")
+                                .registeredAt(LocalDateTime.of(2021, 1, 1, 0, 0, 0))
+                                .build()
+                ))
                 .build();
     }
 }
