@@ -568,7 +568,7 @@ class MyBookRepositoryTest {
         );
     }
 
-    @DisplayName("주어진 기간 내에 등록된 마이북 정볼르 조회한다.")
+    @DisplayName("주어진 기간 내에 등록된 마이북 정보를 조회한다.")
     @Test
     void getMyBookRegisteredListBetweenDate() {
 

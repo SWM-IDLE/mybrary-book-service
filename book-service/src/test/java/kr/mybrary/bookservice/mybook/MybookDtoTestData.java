@@ -1,5 +1,6 @@
 package kr.mybrary.bookservice.mybook;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import kr.mybrary.bookservice.book.persistence.bookInfo.Author;
@@ -9,6 +10,7 @@ import kr.mybrary.bookservice.client.user.dto.response.UserInfoServiceResponse.U
 import kr.mybrary.bookservice.mybook.domain.dto.request.MyBookCreateServiceRequest;
 import kr.mybrary.bookservice.mybook.domain.dto.request.MyBookFindAllServiceRequest;
 import kr.mybrary.bookservice.mybook.domain.dto.request.MyBookReadCompletedStatusServiceRequest;
+import kr.mybrary.bookservice.mybook.domain.dto.request.MyBookRegisteredListBetweenDateServiceRequest;
 import kr.mybrary.bookservice.mybook.domain.dto.request.MyBookRegisteredStatusServiceRequest;
 import kr.mybrary.bookservice.mybook.domain.dto.request.MybookUpdateServiceRequest;
 import kr.mybrary.bookservice.mybook.domain.dto.request.MybookUpdateServiceRequest.MybookUpdateServiceRequestBuilder;
@@ -18,6 +20,7 @@ import kr.mybrary.bookservice.mybook.persistence.MyBookOrderType;
 import kr.mybrary.bookservice.mybook.persistence.ReadStatus;
 import kr.mybrary.bookservice.mybook.persistence.model.MyBookListDisplayElementModel;
 import kr.mybrary.bookservice.mybook.persistence.model.MyBookListDisplayElementModel.MyBookListDisplayElementModelBuilder;
+import kr.mybrary.bookservice.mybook.persistence.model.MyBookRegisteredListByDateModel;
 import kr.mybrary.bookservice.mybook.presentation.dto.request.MyBookCreateRequest;
 import kr.mybrary.bookservice.mybook.presentation.dto.request.MyBookUpdateRequest;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookDetailResponse;
@@ -31,6 +34,7 @@ import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookRegistratio
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookUpdateResponse;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.UserInfoWithMyBookSettingForBookResponse;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.UserInfoWithReadCompletedForBookResponse;
+import org.hibernate.sql.ast.tree.expression.Star;
 
 public class MybookDtoTestData {
 
@@ -277,6 +281,40 @@ public class MybookDtoTestData {
                                 .nickname("USER_NICKNAME_2")
                                 .profileImageUrl("USER_PICTURE_URL_2")
                                 .build()))
+                .build();
+    }
+
+    public static List<MyBookRegisteredListByDateModel> createMyBookRegisteredListByDateModelList(LocalDateTime registeredAt) {
+
+        return List.of(
+                MyBookRegisteredListByDateModel.builder()
+                        .userId("USER_ID_1")
+                        .title("TITLE_1")
+                        .thumbnailUrl("THUMBNAIL_URL_1")
+                        .isbn13("ISBN13_1")
+                        .registeredAt(registeredAt)
+                        .build(),
+                MyBookRegisteredListByDateModel.builder()
+                        .userId("USER_ID_2")
+                        .title("TITLE_2")
+                        .thumbnailUrl("THUMBNAIL_URL_2")
+                        .isbn13("ISBN13_2")
+                        .registeredAt(registeredAt)
+                        .build(),
+                MyBookRegisteredListByDateModel.builder()
+                        .userId("USER_ID_3")
+                        .title("TITLE_3")
+                        .thumbnailUrl("THUMBNAIL_URL_3")
+                        .isbn13("ISBN13_3")
+                        .registeredAt(registeredAt)
+                        .build()
+        );
+    }
+
+    public static MyBookRegisteredListBetweenDateServiceRequest createMyBookRegisteredListBetweenDateServiceRequest(LocalDate start, LocalDate end) {
+        return MyBookRegisteredListBetweenDateServiceRequest.builder()
+                .start(start)
+                .end(end)
                 .build();
     }
 }
