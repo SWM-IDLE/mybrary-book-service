@@ -12,6 +12,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import kr.mybrary.bookservice.book.BookFixture;
@@ -24,6 +25,7 @@ import kr.mybrary.bookservice.mybook.domain.dto.request.MyBookDetailServiceReque
 import kr.mybrary.bookservice.mybook.domain.dto.request.MyBookFindAllServiceRequest;
 import kr.mybrary.bookservice.mybook.domain.dto.request.MyBookFindByMeaningTagQuoteServiceRequest;
 import kr.mybrary.bookservice.mybook.domain.dto.request.MyBookReadCompletedStatusServiceRequest;
+import kr.mybrary.bookservice.mybook.domain.dto.request.MyBookRegisteredListBetweenDateServiceRequest;
 import kr.mybrary.bookservice.mybook.domain.dto.request.MyBookRegisteredStatusServiceRequest;
 import kr.mybrary.bookservice.mybook.domain.dto.request.UserInfoWithMyBookSettingForBookServiceRequest;
 import kr.mybrary.bookservice.mybook.domain.dto.request.UserInfoWithReadCompletedForBookServiceRequest;
@@ -31,11 +33,13 @@ import kr.mybrary.bookservice.mybook.domain.exception.MyBookAccessDeniedExceptio
 import kr.mybrary.bookservice.mybook.domain.exception.MyBookNotFoundException;
 import kr.mybrary.bookservice.mybook.persistence.MyBook;
 import kr.mybrary.bookservice.mybook.persistence.ReadStatus;
+import kr.mybrary.bookservice.mybook.persistence.model.MyBookRegisteredListByDateModel;
 import kr.mybrary.bookservice.mybook.persistence.repository.MyBookRepository;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookDetailResponse;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookElementFromMeaningTagResponse;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookElementResponse;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookReadCompletedStatusResponse;
+import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookRegisteredListBetweenDateResponse;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookRegisteredStatusResponse;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookRegistrationCountResponse;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.UserInfoWithMyBookSettingForBookResponse;
@@ -407,6 +411,40 @@ class MyBookReadServiceTest {
                 () -> assertThat(response.getUserInfos()).extracting("userId").containsExactlyInAnyOrder("user1", "user2"),
                 () -> verify(bookReadService, times(1)).getRegisteredBookByISBN13(anyString()),
                 () -> verify(myBookRepository, times(1)).getMyBookUserIdListByBook(any()),
+                () -> verify(userServiceClient, times(1)).getUsersInfo(any())
+        );
+    }
+
+    @DisplayName("주어진 기간 내에 등록된 마이북 정보를 조회한다.")
+    @Test
+    void getMyBookRegisteredListBetweenDate() {
+
+        // given
+        LocalDate startDate = LocalDate.of(2021, 1, 1);
+        LocalDate endDate = LocalDate.of(2021, 1, 1);
+
+        MyBookRegisteredListBetweenDateServiceRequest request =
+                MybookDtoTestData.createMyBookRegisteredListBetweenDateServiceRequest(startDate, endDate);
+
+        List<MyBookRegisteredListByDateModel> registeredDate =
+                MybookDtoTestData.createMyBookRegisteredListByDateModelList(LocalDateTime.of(2021, 1, 1, 11, 11, 11));
+
+        given(myBookRepository.getMyBookRegisteredListBetweenDate(startDate, endDate)).willReturn(registeredDate);
+        given(userServiceClient.getUsersInfo(any())).willReturn(MybookDtoTestData.createUserInfoResponseList(
+                List.of("USER_ID_1", "USER_ID_2", "USER_ID_3")));
+
+        // when
+        MyBookRegisteredListBetweenDateResponse response =
+                myBookReadService.getMyBookRegisteredListBetweenDate(request);
+
+        // then
+        assertAll(
+                () -> assertThat(response.getMyBookRegisteredList()).hasSize(3),
+                () -> assertThat(response.getMyBookRegisteredList()).extracting("nickname")
+                        .containsExactlyInAnyOrder("USER_NICKNAME_USER_ID_1", "USER_NICKNAME_USER_ID_2", "USER_NICKNAME_USER_ID_3"),
+                () -> assertThat(response.getMyBookRegisteredList()).extracting("title")
+                        .containsExactlyInAnyOrder("TITLE_1", "TITLE_2", "TITLE_3"),
+                () -> verify(myBookRepository, times(1)).getMyBookRegisteredListBetweenDate(any(), any()),
                 () -> verify(userServiceClient, times(1)).getUsersInfo(any())
         );
     }

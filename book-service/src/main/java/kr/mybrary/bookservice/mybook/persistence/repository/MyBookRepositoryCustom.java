@@ -8,6 +8,7 @@ import kr.mybrary.bookservice.mybook.persistence.MyBook;
 import kr.mybrary.bookservice.mybook.persistence.MyBookOrderType;
 import kr.mybrary.bookservice.mybook.persistence.ReadStatus;
 import kr.mybrary.bookservice.mybook.persistence.model.MyBookListDisplayElementModel;
+import kr.mybrary.bookservice.mybook.persistence.model.MyBookRegisteredListByDateModel;
 
 public interface MyBookRepositoryCustom {
 
@@ -20,4 +21,6 @@ public interface MyBookRepositoryCustom {
     List<String> getMyBookUserIdListByBook(Book book);
 
     Optional<MyBook> getMyBookWithBookAndReviewUsingFetchJoin(Long mybookId);
+
+    List<MyBookRegisteredListByDateModel> getMyBookRegisteredListBetweenDate(LocalDate start, LocalDate end);
 }

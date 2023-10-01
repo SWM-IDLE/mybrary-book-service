@@ -1,5 +1,6 @@
 package kr.mybrary.bookservice.mybook.presentation;
 
+import java.time.LocalDate;
 import java.util.List;
 import kr.mybrary.bookservice.global.dto.response.SuccessResponse;
 import kr.mybrary.bookservice.mybook.domain.MyBookReadService;
@@ -9,6 +10,7 @@ import kr.mybrary.bookservice.mybook.domain.dto.request.MyBookDetailServiceReque
 import kr.mybrary.bookservice.mybook.domain.dto.request.MyBookFindAllServiceRequest;
 import kr.mybrary.bookservice.mybook.domain.dto.request.MyBookFindByMeaningTagQuoteServiceRequest;
 import kr.mybrary.bookservice.mybook.domain.dto.request.MyBookReadCompletedStatusServiceRequest;
+import kr.mybrary.bookservice.mybook.domain.dto.request.MyBookRegisteredListBetweenDateServiceRequest;
 import kr.mybrary.bookservice.mybook.domain.dto.request.MyBookRegisteredStatusServiceRequest;
 import kr.mybrary.bookservice.mybook.domain.dto.request.MybookUpdateServiceRequest;
 import kr.mybrary.bookservice.mybook.domain.dto.request.UserInfoWithMyBookSettingForBookServiceRequest;
@@ -21,12 +23,14 @@ import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookDetailRespo
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookElementFromMeaningTagResponse;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookElementResponse;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookReadCompletedStatusResponse;
+import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookRegisteredListBetweenDateResponse;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookRegisteredStatusResponse;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookRegistrationCountResponse;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookUpdateResponse;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.UserInfoWithMyBookSettingForBookResponse;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.UserInfoWithReadCompletedForBookResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -167,5 +171,18 @@ public class MyBookController {
 
         return ResponseEntity.ok(SuccessResponse.of(HttpStatus.OK.toString(), "도서를 마이북에 등록한 유저 목록 조회에 성공했습니다.",
                 myBookReadService.getUserIdListWithMyBookSettingByBook(request)));
+    }
+
+    @GetMapping("/mybooks")
+    public ResponseEntity<SuccessResponse<MyBookRegisteredListBetweenDateResponse>> getMyBookRegisteredListBetweenDate(
+            @RequestParam(value = "start", required = false, defaultValue = "#{T(java.time.LocalDate).now()}") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate start,
+            @RequestParam(value = "end", required = false, defaultValue = "#{T(java.time.LocalDate).now()}") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate end) {
+
+        MyBookRegisteredListBetweenDateServiceRequest request =
+                MyBookRegisteredListBetweenDateServiceRequest.of(start, end);
+
+        return ResponseEntity.ok(SuccessResponse.of(HttpStatus.OK.toString(),
+                String.format("%s ~ %s 동안 등록된 마이북 목록입니다.", start.toString(), end.toString()),
+                myBookReadService.getMyBookRegisteredListBetweenDate(request)));
     }
 }

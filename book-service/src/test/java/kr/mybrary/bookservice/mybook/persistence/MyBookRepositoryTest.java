@@ -14,6 +14,7 @@ import kr.mybrary.bookservice.book.persistence.bookInfo.BookAuthor;
 import kr.mybrary.bookservice.book.persistence.repository.BookRepository;
 import kr.mybrary.bookservice.mybook.MyBookFixture;
 import kr.mybrary.bookservice.mybook.persistence.model.MyBookListDisplayElementModel;
+import kr.mybrary.bookservice.mybook.persistence.model.MyBookRegisteredListByDateModel;
 import kr.mybrary.bookservice.mybook.persistence.repository.MyBookRepository;
 import kr.mybrary.bookservice.review.MyReviewFixture;
 import kr.mybrary.bookservice.review.persistence.MyReview;
@@ -565,5 +566,40 @@ class MyBookRepositoryTest {
                     assertThat(foundMyBook.get().getMyReview()).isNull();
                 }
         );
+    }
+
+    @DisplayName("주어진 기간 내에 등록된 마이북 정보를 조회한다.")
+    @Test
+    void getMyBookRegisteredListBetweenDate() {
+
+            // given
+            Book savedBook_1 = bookRepository.save(BookFixture.COMMON_BOOK_WITHOUT_RELATION.getBookBuilder()
+                    .title("title_1").isbn10("isbn10_1").isbn13("isbn13_1").thumbnailUrl("thumbnailUrl_1").build());
+            Book savedBook_2 = bookRepository.save(BookFixture.COMMON_BOOK_WITHOUT_RELATION.getBookBuilder()
+                    .title("title_2").isbn10("isbn10_2").isbn13("isbn13_2").thumbnailUrl("thumbnailUrl_2").build());
+            Book savedBook_3 = bookRepository.save(BookFixture.COMMON_BOOK_WITHOUT_RELATION.getBookBuilder()
+                    .title("title_3").isbn10("isbn10_3").isbn13("isbn13_3").thumbnailUrl("thumbnailUrl_3").build());
+
+            MyBook myBook_1 = myBookRepository.save(MyBookFixture.MY_BOOK_WITHOUT_RELATION.getMyBookBuilder()
+                    .book(savedBook_1).userId("USER_ID_1").build());
+            MyBook myBook_2 = myBookRepository.save(MyBookFixture.MY_BOOK_WITHOUT_RELATION.getMyBookBuilder()
+                    .book(savedBook_2).userId("USER_ID_2").build());
+            MyBook myBook_3 = myBookRepository.save(MyBookFixture.MY_BOOK_WITHOUT_RELATION.getMyBookBuilder()
+                    .book(savedBook_3).userId("USER_ID_3").build());
+
+            entityManager.flush();
+            entityManager.clear();
+
+            // when
+            List<MyBookRegisteredListByDateModel> myBookList = myBookRepository.getMyBookRegisteredListBetweenDate(LocalDate.now(), LocalDate.now());
+
+            // then
+            assertAll(
+                    () -> assertThat(myBookList).hasSize(3),
+                    () -> assertThat(myBookList).extracting("isbn13")
+                            .contains(savedBook_1.getIsbn13(), savedBook_2.getIsbn13(), savedBook_3.getIsbn13()),
+                    () -> assertThat(myBookList).extracting("userId")
+                            .contains(myBook_1.getUserId(), myBook_2.getUserId(), myBook_3.getUserId())
+            );
     }
 }

@@ -26,7 +26,9 @@ import com.epages.restdocs.apispec.ResourceSnippetParameters;
 import com.epages.restdocs.apispec.Schema;
 import com.epages.restdocs.apispec.SimpleType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.LocalDate;
 import java.util.List;
+import kr.mybrary.bookservice.global.util.DateUtils;
 import kr.mybrary.bookservice.mybook.MybookDtoTestData;
 import kr.mybrary.bookservice.mybook.domain.MyBookReadService;
 import kr.mybrary.bookservice.mybook.domain.MyBookWriteService;
@@ -36,6 +38,7 @@ import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookDetailRespo
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookElementFromMeaningTagResponse;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookElementResponse;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookReadCompletedStatusResponse;
+import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookRegisteredListBetweenDateResponse;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookRegisteredStatusResponse;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookRegistrationCountResponse;
 import kr.mybrary.bookservice.mybook.presentation.dto.response.MyBookUpdateResponse;
@@ -607,5 +610,75 @@ class MyBookControllerTest {
                                                 fieldWithPath("data.userInfos[0].nickname").type(STRING).description("유저 닉네임"),
                                                 fieldWithPath("data.userInfos[0].profileImageUrl").type(STRING).description("유저 프로필 이미지 URL")
                                         ).build())));
+    }
+
+    @DisplayName("특정 기간동안 등록된 마이북을 조회한다.")
+    @Test
+    void getMyBookRegisteredListBetweenDate() throws Exception {
+
+        // given
+        MyBookRegisteredListBetweenDateResponse response = MybookDtoTestData.createMyBookRegisteredListBetweenDateResponse();
+
+        given(myBookReadService.getMyBookRegisteredListBetweenDate(any())).willReturn(response);
+
+        // when
+        ResultActions actions = mockMvc.perform(get("/api/v1/mybooks")
+                .param("start", "2021-01-01")
+                .param("end", "2021-01-01"));
+
+        // then
+        actions
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$.status").value("200 OK"))
+                .andExpect(jsonPath("$.message").value("2021-01-01 ~ 2021-01-01 동안 등록된 마이북 목록입니다."))
+                .andExpect(jsonPath("$.data").isNotEmpty());
+
+        // document
+        actions.andDo(document("get-mybooks-registered-list-between-date",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                resource(
+                        ResourceSnippetParameters.builder()
+                                .tag("mybook")
+                                .summary("특정 기간동안 등록된 마이북을 조회한다.")
+                                .description("쿼리 파라미터 startDate, endDate를 통해 조회 기간을 지정할 수 있다. 조회기간은 \"yyyy-MM-dd\" 형식이다."
+                                        + "특정 기간이 아닌 오늘 등록된 마이북 조회시 startDate, endDate 파라미터를 생략할 수 있다.")
+                                .queryParameters(
+                                        parameterWithName("start").type(SimpleType.STRING).description("조회 기간 시작일"),
+                                        parameterWithName("end").type(SimpleType.STRING).description("조회 기간 종료일")
+                                )
+                                .responseSchema(Schema.schema("find_mybooks_registered_between_date_response_body"))
+                                .responseFields(
+                                        fieldWithPath("status").type(STRING).description("응답 상태"),
+                                        fieldWithPath("message").type(STRING).description("응답 메시지"),
+                                        fieldWithPath("data.totalCount").type(NUMBER).description("조회된 마이북 총 개수"),
+                                        fieldWithPath("data.myBookRegisteredList[0].userId").type(STRING).description("유저 ID"),
+                                        fieldWithPath("data.myBookRegisteredList[0].nickname").type(STRING).description("유저 닉네임"),
+                                        fieldWithPath("data.myBookRegisteredList[0].profileImageUrl").type(STRING).description("유저 프로필 URL"),
+                                        fieldWithPath("data.myBookRegisteredList[0].title").type(STRING).description("도서 제목"),
+                                        fieldWithPath("data.myBookRegisteredList[0].thumbnailUrl").type(STRING).description("도서 썸네일 URL"),
+                                        fieldWithPath("data.myBookRegisteredList[0].isbn13").type(STRING).description("도서 isbn13"),
+                                        fieldWithPath("data.myBookRegisteredList[0].registeredAt").type(STRING).description("마이북 등록일")
+                                ).build())));
+    }
+
+    @DisplayName("특정 기간동안 등록된 마이북을 조회시, 파라미터 생략시 오늘 날짜가 전달된다.")
+    @Test
+    void getMyBookRegisteredListToday() throws Exception {
+
+        // given
+        MyBookRegisteredListBetweenDateResponse response = MybookDtoTestData.createMyBookRegisteredListBetweenDateResponse();
+        String today = DateUtils.toHyphenYYYYMMDD(LocalDate.now());
+        given(myBookReadService.getMyBookRegisteredListBetweenDate(any())).willReturn(response);
+
+        // when
+        ResultActions actions = mockMvc.perform(get("/api/v1/mybooks"));
+
+        // then
+        actions
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$.status").value("200 OK"))
+                .andExpect(jsonPath("$.message").value(String.format("%s ~ %s 동안 등록된 마이북 목록입니다.", today, today)))
+                .andExpect(jsonPath("$.data").isNotEmpty());
     }
 }
