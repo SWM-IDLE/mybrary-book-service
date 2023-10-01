@@ -4,14 +4,15 @@ import java.util.List;
 import kr.mybrary.bookservice.booksearch.domain.dto.request.BookListByCategorySearchServiceRequest;
 import kr.mybrary.bookservice.booksearch.domain.dto.response.aladinapi.AladinBookListByCategorySearchResponse;
 import kr.mybrary.bookservice.booksearch.domain.dto.response.aladinapi.AladinBookListByCategorySearchResponse.Item;
-import kr.mybrary.bookservice.booksearch.presentation.dto.response.BookListByCategoryResponseElement;
-import kr.mybrary.bookservice.booksearch.presentation.dto.response.BookSearchRankingResponse;
-import kr.mybrary.bookservice.booksearch.presentation.dto.response.BookSearchResultResponseElement;
 import kr.mybrary.bookservice.booksearch.domain.dto.response.aladinapi.AladinBookSearchDetailResponse;
 import kr.mybrary.bookservice.booksearch.domain.dto.response.aladinapi.AladinBookSearchResponse;
 import kr.mybrary.bookservice.booksearch.domain.dto.response.kakaoapi.KakaoBookSearchResponse;
+import kr.mybrary.bookservice.booksearch.presentation.dto.response.BookListByCategoryResponseElement;
 import kr.mybrary.bookservice.booksearch.presentation.dto.response.BookListByCategorySearchResultResponse;
+import kr.mybrary.bookservice.booksearch.presentation.dto.response.BookListByCategorySearchResultWithBookInfoResponse;
 import kr.mybrary.bookservice.booksearch.presentation.dto.response.BookSearchDetailResponse;
+import kr.mybrary.bookservice.booksearch.presentation.dto.response.BookSearchRankingResponse;
+import kr.mybrary.bookservice.booksearch.presentation.dto.response.BookSearchResultResponseElement;
 
 public class BookSearchDtoTestData {
 
@@ -263,5 +264,25 @@ public class BookSearchDtoTestData {
                 .cover("https://sample-cover.com")
                 .customerReviewRank(8)
                 .build();
+    }
+
+    public static BookListByCategorySearchResultWithBookInfoResponse createBookListByCategorySearchResultWithBookInfoResponse() {
+        return BookListByCategorySearchResultWithBookInfoResponse.builder()
+                .books(List.of(
+                        BookListByCategorySearchResultWithBookInfoResponse.Element.builder()
+                            .title("title_1")
+                            .isbn13("isbn13_1")
+                            .authors("authors_1")
+                            .thumbnailUrl("thumbnail_url_1")
+                            .aladinStarRating(4.0)
+                            .build(),
+                        BookListByCategorySearchResultWithBookInfoResponse.Element.builder()
+                            .title("title_2")
+                            .isbn13("isbn13_2")
+                            .authors("authors_2, authors_3")
+                            .thumbnailUrl("thumbnail_url_2")
+                            .aladinStarRating(3.5)
+                            .build())
+                ).build();
     }
 }

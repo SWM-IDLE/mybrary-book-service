@@ -54,7 +54,7 @@ public class BookSearchController {
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(SuccessResponse.of(HttpStatus.OK.toString(), "카테고리별 도서 리스트 조회에 성공했습니다.",
-                        bookService.searchBookListByCategory(request)));
+                        bookService.searchBookListByCategoryWithBookInfo(request)));
     }
 
     @GetMapping("/recommendations/{type}/categories/{categoryId}")
