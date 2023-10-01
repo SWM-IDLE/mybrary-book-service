@@ -2,6 +2,8 @@ package kr.mybrary.bookservice.booksearch;
 
 import java.util.List;
 import kr.mybrary.bookservice.booksearch.domain.dto.request.BookListByCategorySearchServiceRequest;
+import kr.mybrary.bookservice.booksearch.domain.dto.response.aladinapi.AladinBookListByCategorySearchResponse;
+import kr.mybrary.bookservice.booksearch.domain.dto.response.aladinapi.AladinBookListByCategorySearchResponse.Item;
 import kr.mybrary.bookservice.booksearch.presentation.dto.response.BookListByCategoryResponseElement;
 import kr.mybrary.bookservice.booksearch.presentation.dto.response.BookSearchRankingResponse;
 import kr.mybrary.bookservice.booksearch.presentation.dto.response.BookSearchResultResponseElement;
@@ -249,6 +251,17 @@ public class BookSearchDtoTestData {
                                 .keyword("감동")
                                 .score(3.0)
                                 .build()))
+                .build();
+    }
+
+    public static AladinBookListByCategorySearchResponse.Item createAladinBookListByCategorySearchResponseItem() {
+        return Item.builder()
+                .title("Sample Book Title - Sub Title")
+                .link("https://sample-link.com")
+                .author("John Doe 1, John Doe 2 (지은이)")
+                .isbn13("9781234567890")
+                .cover("https://sample-cover.com")
+                .customerReviewRank(8)
                 .build();
     }
 }
