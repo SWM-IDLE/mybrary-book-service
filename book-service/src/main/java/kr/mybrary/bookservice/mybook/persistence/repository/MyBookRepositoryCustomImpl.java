@@ -11,6 +11,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -71,7 +72,7 @@ public class MyBookRepositoryCustomImpl implements MyBookRepositoryCustom {
     @Override
     public Long getBookRegistrationCountOfDay(LocalDate date) {
         LocalDateTime start = date.atStartOfDay();
-        LocalDateTime end = date.atTime(23, 59, 59, 999_999_999);
+        LocalDateTime end = date.atTime(LocalTime.MAX);
 
         return queryFactory.select(myBook.count())
                 .from(myBook)
@@ -119,7 +120,7 @@ public class MyBookRepositoryCustomImpl implements MyBookRepositoryCustom {
                 )
                 .from(myBook)
                 .join(myBook.book, book)
-                .where(myBook.createdAt.between(start.atStartOfDay(), end.atTime(23, 59, 59, 999_999_999)),
+                .where(myBook.createdAt.between(start.atStartOfDay(), end.atTime(LocalTime.MAX)),
                         myBook.showable.eq(true))
                 .orderBy(myBook.createdAt.desc())
                 .fetch();
@@ -138,7 +139,7 @@ public class MyBookRepositoryCustomImpl implements MyBookRepositoryCustom {
         return Arrays.stream(MyBookOrderType.values())
                 .filter(orderType -> orderType == myBookOrderType)
                 .findFirst()
-                .orElseGet(() -> MyBookOrderType.NONE)
+                .orElse(MyBookOrderType.NONE)
                 .getOrderSpecifier();
     }
 
