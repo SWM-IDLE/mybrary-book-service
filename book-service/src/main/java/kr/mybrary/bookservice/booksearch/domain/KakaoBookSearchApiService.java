@@ -10,6 +10,7 @@ import kr.mybrary.bookservice.booksearch.domain.dto.response.kakaoapi.KakaoBookS
 import kr.mybrary.bookservice.booksearch.domain.exception.BookSearchResultNotFoundException;
 import kr.mybrary.bookservice.booksearch.domain.exception.UnsupportedSearchAPIException;
 import kr.mybrary.bookservice.booksearch.presentation.dto.response.BookListByCategorySearchResultResponse;
+import kr.mybrary.bookservice.booksearch.presentation.dto.response.BookListByCategorySearchResultWithBookInfoResponse;
 import kr.mybrary.bookservice.booksearch.presentation.dto.response.BookSearchDetailResponse;
 import kr.mybrary.bookservice.booksearch.presentation.dto.response.BookSearchResultResponse;
 import kr.mybrary.bookservice.booksearch.presentation.dto.response.BookSearchResultResponseElement;
@@ -80,6 +81,12 @@ public class KakaoBookSearchApiService implements PlatformBookSearchApiService {
 
     @Override
     public BookListByCategorySearchResultResponse searchBookListByCategory(BookListByCategorySearchServiceRequest request) {
+        throw new UnsupportedSearchAPIException();
+    }
+
+    @Override
+    public BookListByCategorySearchResultWithBookInfoResponse searchBookListByCategoryWithBookInfo(
+            BookListByCategorySearchServiceRequest request) {
         throw new UnsupportedSearchAPIException();
     }
 

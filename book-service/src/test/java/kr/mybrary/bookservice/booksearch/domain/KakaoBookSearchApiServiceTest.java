@@ -193,6 +193,18 @@ class KakaoBookSearchApiServiceTest {
                 UnsupportedSearchAPIException.class);
         mockServer.verify();
     }
+    @DisplayName("지원되지 않는 플랫폼에서 도서 분야별 리스트 조회시 예외가 발생한다. 2")
+    @Test
+    void occurExceptionWhenSearchBookListWithBookInfoByField() {
+
+        // given
+        BookListByCategorySearchServiceRequest request = BookSearchDtoTestData.createBookListSearchServiceRequest();
+
+        // given, when
+        assertThatThrownBy(() -> kakaoBookSearchApiService.searchBookListByCategoryWithBookInfo(request)).isInstanceOf(
+                UnsupportedSearchAPIException.class);
+        mockServer.verify();
+    }
 
     private String readJsonFile(String fileName) throws IOException {
         return new String(Files.readAllBytes(Paths.get(JSON_FILE_PATH + fileName)));
