@@ -25,4 +25,10 @@ public class BookListByCategorySearchResultWithBookInfoResponse {
         private String authors;
         private Double aladinStarRating;
     }
+
+    public static BookListByCategorySearchResultWithBookInfoResponse of(List<Element> bookListByCategorySearchResultElement) {
+        return BookListByCategorySearchResultWithBookInfoResponse.builder()
+                .books(bookListByCategorySearchResultElement)
+                .build();
+    }
 }
