@@ -4,6 +4,11 @@ import kr.mybrary.bookservice.booksearch.domain.BookSearchRankingService;
 import kr.mybrary.bookservice.booksearch.domain.PlatformBookSearchApiService;
 import kr.mybrary.bookservice.booksearch.domain.dto.request.BookListByCategorySearchServiceRequest;
 import kr.mybrary.bookservice.booksearch.domain.dto.request.BookSearchServiceRequest;
+import kr.mybrary.bookservice.booksearch.presentation.dto.response.BookListByCategorySearchResultResponse;
+import kr.mybrary.bookservice.booksearch.presentation.dto.response.BookListByCategorySearchResultWithBookInfoResponse;
+import kr.mybrary.bookservice.booksearch.presentation.dto.response.BookSearchDetailResponse;
+import kr.mybrary.bookservice.booksearch.presentation.dto.response.BookSearchRankingResponse;
+import kr.mybrary.bookservice.booksearch.presentation.dto.response.BookSearchResultResponse;
 import kr.mybrary.bookservice.global.dto.response.FeignClientResponse;
 import kr.mybrary.bookservice.global.dto.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +29,7 @@ public class BookSearchController {
     private final BookSearchRankingService bookSearchRankingService;
 
     @GetMapping("/search")
-    public ResponseEntity searchWithKeyword(
+    public ResponseEntity<SuccessResponse<BookSearchResultResponse>> searchWithKeyword(
             @RequestParam(value = "keyword") String keyword,
             @RequestParam(value = "sort", required = false, defaultValue = "accuracy") String sort,
             @RequestParam(value = "page", required = false, defaultValue = "1") int page) {
@@ -36,7 +41,7 @@ public class BookSearchController {
     }
 
     @GetMapping("/search/detail")
-    public ResponseEntity searchBookDetailWithISBN(@RequestParam("isbn") String isbn) {
+    public ResponseEntity<SuccessResponse<BookSearchDetailResponse>> searchBookDetailWithISBN(@RequestParam("isbn") String isbn) {
 
         BookSearchServiceRequest request = BookSearchServiceRequest.of(isbn);
 
@@ -45,7 +50,7 @@ public class BookSearchController {
     }
 
     @GetMapping("/recommendations")
-    public ResponseEntity getBookRecommendations(
+    public ResponseEntity<SuccessResponse<BookListByCategorySearchResultWithBookInfoResponse>> getBookRecommendations(
             @RequestParam(value = "type") String type,
             @RequestParam(value = "categoryId", required = false, defaultValue = "0") int categoryId,
             @RequestParam(value = "page", required = false, defaultValue = "1") int page) {
@@ -58,7 +63,7 @@ public class BookSearchController {
     }
 
     @GetMapping("/recommendations/{type}/categories/{categoryId}")
-    public ResponseEntity getBookRecommendationsCalledByFeignClient(
+    public ResponseEntity<FeignClientResponse<BookListByCategorySearchResultResponse>> getBookRecommendationsCalledByFeignClient(
             @PathVariable String type,
             @PathVariable int categoryId,
             @RequestParam(value = "page", required = false, defaultValue = "1") int page) {
@@ -70,7 +75,7 @@ public class BookSearchController {
     }
 
     @GetMapping("/search/ranking")
-    public ResponseEntity searchRanking() {
+    public ResponseEntity<SuccessResponse<BookSearchRankingResponse>> searchRanking() {
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(SuccessResponse.of(HttpStatus.OK.toString(), "도서 검색 랭킹 조회에 성공했습니다.",
