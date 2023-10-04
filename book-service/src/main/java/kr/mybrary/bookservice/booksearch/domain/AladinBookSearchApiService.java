@@ -14,6 +14,7 @@ import kr.mybrary.bookservice.booksearch.domain.exception.AladinApiUnavailableEx
 import kr.mybrary.bookservice.booksearch.domain.exception.BookSearchResultNotFoundException;
 import kr.mybrary.bookservice.booksearch.presentation.dto.response.BookListByCategoryResponseElement;
 import kr.mybrary.bookservice.booksearch.presentation.dto.response.BookListByCategorySearchResultResponse;
+import kr.mybrary.bookservice.booksearch.presentation.dto.response.BookListByCategorySearchResultWithBookInfoResponse;
 import kr.mybrary.bookservice.booksearch.presentation.dto.response.BookSearchDetailResponse;
 import kr.mybrary.bookservice.booksearch.presentation.dto.response.BookSearchResultResponse;
 import kr.mybrary.bookservice.booksearch.presentation.dto.response.BookSearchResultResponseElement;
@@ -39,11 +40,11 @@ public class AladinBookSearchApiService implements PlatformBookSearchApiService 
     @Value("${aladin.api.key}")
     private String API_KEY;
 
-    private static final String REQUEST_OUTPUT = "js";
-    private static final String REQUEST_VERSION = "20131101";
+    private static final String REQUEST_OUTPUT_JS = "js";
+    private static final String REQUEST_VERSION_20131101 = "20131101";
     private static final String REQUEST_MAX_RESULTS_10 = "10";
     private static final String REQUEST_MAX_RESULTS_20 = "20";
-    private static final String REQUEST_COVER_SIZE = "Big";
+    private static final String REQUEST_COVER_BIG_SIZE = "Big";
     private static final String REQUEST_COVER_MID_BIG_SIZE = "MidBig";
     private static final String CIRCUIT_BREAKER_CONFIG = "aladinAPICircuitBreakerConfig";
     private static final String RETRY_CONFIG = "aladinAPIRetryConfig";
@@ -64,8 +65,8 @@ public class AladinBookSearchApiService implements PlatformBookSearchApiService 
 
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(BOOK_SEARCH_URL)
                 .queryParam("TTBKey", API_KEY)
-                .queryParam("Output", REQUEST_OUTPUT)
-                .queryParam("Version", REQUEST_VERSION)
+                .queryParam("Output", REQUEST_OUTPUT_JS)
+                .queryParam("Version", REQUEST_VERSION_20131101)
                 .queryParam("Query", request.getKeyword())
                 .queryParam("Start", String.valueOf(request.getPage()))
                 .queryParam("MaxResults", REQUEST_MAX_RESULTS_20)
@@ -105,10 +106,10 @@ public class AladinBookSearchApiService implements PlatformBookSearchApiService 
 
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(BOOK_DETAIL_SEARCH_URL)
                 .queryParam("TTBKey", API_KEY)
-                .queryParam("Output", REQUEST_OUTPUT)
-                .queryParam("Version", REQUEST_VERSION)
+                .queryParam("Output", REQUEST_OUTPUT_JS)
+                .queryParam("Version", REQUEST_VERSION_20131101)
                 .queryParam("ItemId", request.getKeyword())
-                .queryParam("Cover", REQUEST_COVER_SIZE)
+                .queryParam("Cover", REQUEST_COVER_BIG_SIZE)
                 .queryParam("ItemIdType", "ISBN13")
                 .queryParam("OptResult", "packing,ratingInfo,authors,fulldescription,Toc");
 
@@ -136,11 +137,11 @@ public class AladinBookSearchApiService implements PlatformBookSearchApiService 
                 .queryParam("QueryType", request.getType())
                 .queryParam("MaxResults", REQUEST_MAX_RESULTS_10)
                 .queryParam("Start", String.valueOf(request.getPage()))
-                .queryParam("Output", REQUEST_OUTPUT)
-                .queryParam("Version", REQUEST_VERSION)
+                .queryParam("Output", REQUEST_OUTPUT_JS)
+                .queryParam("Version", REQUEST_VERSION_20131101)
                 .queryParam("CategoryId", String.valueOf(request.getCategoryId()))
                 .queryParam("SearchTarget", "BOOK")
-                .queryParam("Cover", REQUEST_COVER_SIZE);
+                .queryParam("Cover", REQUEST_COVER_BIG_SIZE);
 
         ResponseEntity<AladinBookListByCategorySearchResponse> searchResponse = restTemplate.exchange(
                 uriBuilder.build(false).toUriString(),
@@ -159,6 +160,42 @@ public class AladinBookSearchApiService implements PlatformBookSearchApiService 
                 .toList();
 
         return BookListByCategorySearchResultResponse.of(bookSearchResultServiceResponses);
+    }
+
+    @Override
+    @Cacheable(cacheNames = "bookListByCategoryWithBookInfo", key = "#request.type + '_' + #request.categoryId + '_' + #request.page", cacheManager = "cacheManager")
+    @Retry(name = RETRY_CONFIG, fallbackMethod = "searchBookListByCategoryFallback")
+    @CircuitBreaker(name = CIRCUIT_BREAKER_CONFIG, fallbackMethod = "searchBookListByCategoryFallback")
+    public BookListByCategorySearchResultWithBookInfoResponse searchBookListByCategoryWithBookInfo(
+            BookListByCategorySearchServiceRequest request) {
+
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(BOOK_LIST_BY_CATEGORY_SEARCH_URL)
+                .queryParam("TTBKey", API_KEY)
+                .queryParam("QueryType", request.getType())
+                .queryParam("MaxResults", REQUEST_MAX_RESULTS_10)
+                .queryParam("Start", String.valueOf(request.getPage()))
+                .queryParam("Output", REQUEST_OUTPUT_JS)
+                .queryParam("Version", REQUEST_VERSION_20131101)
+                .queryParam("CategoryId", String.valueOf(request.getCategoryId()))
+                .queryParam("SearchTarget", "BOOK")
+                .queryParam("Cover", REQUEST_COVER_BIG_SIZE);
+
+        ResponseEntity<AladinBookListByCategorySearchResponse> searchResponse = restTemplate.exchange(
+                uriBuilder.build(false).toUriString(),
+                HttpMethod.GET,
+                null,
+                AladinBookListByCategorySearchResponse.class);
+
+        AladinBookListByCategorySearchResponse response = Objects.requireNonNull(searchResponse.getBody());
+
+        checkIfSearchResultExists(response.getTotalResults());
+
+        List<BookListByCategorySearchResultWithBookInfoResponse.Element> elements = response.getItem().stream()
+                .filter(book -> hasISBN13(book.getIsbn13()))
+                .map(BookSearchDtoMapper.INSTANCE::aladinBookListByCategorySearchResponseToResponseWithBookInfo)
+                .toList();
+
+        return BookListByCategorySearchResultWithBookInfoResponse.of(elements);
     }
 
     private BookSearchResultResponse searchWithKeywordFallback(BookSearchServiceRequest request, Exception ex) {

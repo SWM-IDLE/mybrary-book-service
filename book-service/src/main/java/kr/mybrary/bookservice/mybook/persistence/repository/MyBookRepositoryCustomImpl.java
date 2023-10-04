@@ -1,5 +1,6 @@
 package kr.mybrary.bookservice.mybook.persistence.repository;
 
+import static kr.mybrary.bookservice.book.persistence.QBook.book;
 import static kr.mybrary.bookservice.book.persistence.bookInfo.QAuthor.author;
 import static kr.mybrary.bookservice.book.persistence.bookInfo.QBookAuthor.bookAuthor;
 import static kr.mybrary.bookservice.mybook.persistence.QMyBook.myBook;
@@ -10,6 +11,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +21,7 @@ import kr.mybrary.bookservice.mybook.persistence.MyBook;
 import kr.mybrary.bookservice.mybook.persistence.MyBookOrderType;
 import kr.mybrary.bookservice.mybook.persistence.ReadStatus;
 import kr.mybrary.bookservice.mybook.persistence.model.MyBookListDisplayElementModel;
+import kr.mybrary.bookservice.mybook.persistence.model.MyBookRegisteredListByDateModel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -69,11 +72,11 @@ public class MyBookRepositoryCustomImpl implements MyBookRepositoryCustom {
     @Override
     public Long getBookRegistrationCountOfDay(LocalDate date) {
         LocalDateTime start = date.atStartOfDay();
-        LocalDateTime end = date.atTime(23, 59, 59, 999_999_999);
+        LocalDateTime end = date.atTime(LocalTime.MAX);
 
         return queryFactory.select(myBook.count())
                 .from(myBook)
-                .where(myBook.createdAt.between(start, end))
+                .where(myBook.createdAt.between(start, end), myBook.showable.eq(true))
                 .fetchOne();
     }
 
@@ -106,6 +109,23 @@ public class MyBookRepositoryCustomImpl implements MyBookRepositoryCustom {
                 .fetchOne());
     }
 
+    @Override
+    public List<MyBookRegisteredListByDateModel> getMyBookRegisteredListBetweenDate(LocalDate start, LocalDate end) {
+        return queryFactory.select(Projections.fields(MyBookRegisteredListByDateModel.class,
+                    myBook.userId.as("userId"),
+                    myBook.createdAt.as("registeredAt"),
+                    myBook.book.title.as("title"),
+                    myBook.book.isbn13.as("isbn13"),
+                    myBook.book.thumbnailUrl.as("thumbnailUrl"))
+                )
+                .from(myBook)
+                .join(myBook.book, book)
+                .where(myBook.createdAt.between(start.atStartOfDay(), end.atTime(LocalTime.MAX)),
+                        myBook.showable.eq(true))
+                .orderBy(myBook.createdAt.desc())
+                .fetch();
+    }
+
     private BooleanExpression eqReadStatus(ReadStatus readStatus) {
 
         if (readStatus == null) {
@@ -119,7 +139,7 @@ public class MyBookRepositoryCustomImpl implements MyBookRepositoryCustom {
         return Arrays.stream(MyBookOrderType.values())
                 .filter(orderType -> orderType == myBookOrderType)
                 .findFirst()
-                .orElseGet(() -> MyBookOrderType.NONE)
+                .orElse(MyBookOrderType.NONE)
                 .getOrderSpecifier();
     }
 

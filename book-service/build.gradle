@@ -46,7 +46,8 @@ dependencies {
 	implementation 'org.springframework.cloud:spring-cloud-starter-bootstrap'
 	implementation 'org.springframework.cloud:spring-cloud-starter-bus-amqp'
 	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
-
+	implementation 'io.micrometer:micrometer-registry-prometheus'
+	
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'

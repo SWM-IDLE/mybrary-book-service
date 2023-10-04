@@ -1,20 +1,24 @@
 package kr.mybrary.bookservice.booksearch.domain;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
 import kr.mybrary.bookservice.booksearch.BookSearchDtoTestData;
-import kr.mybrary.bookservice.booksearch.presentation.dto.response.BookSearchResultResponseElement;
 import kr.mybrary.bookservice.booksearch.domain.dto.BookSearchDtoMapper;
+import kr.mybrary.bookservice.booksearch.domain.dto.response.aladinapi.AladinBookListByCategorySearchResponse;
 import kr.mybrary.bookservice.booksearch.domain.dto.response.aladinapi.AladinBookSearchDetailResponse;
 import kr.mybrary.bookservice.booksearch.domain.dto.response.aladinapi.AladinBookSearchResponse;
 import kr.mybrary.bookservice.booksearch.domain.dto.response.aladinapi.AladinBookSearchResponse.Item;
 import kr.mybrary.bookservice.booksearch.domain.dto.response.kakaoapi.KakaoBookSearchResponse;
 import kr.mybrary.bookservice.booksearch.domain.dto.response.kakaoapi.KakaoBookSearchResponse.Document;
+import kr.mybrary.bookservice.booksearch.presentation.dto.response.BookListByCategorySearchResultWithBookInfoResponse;
 import kr.mybrary.bookservice.booksearch.presentation.dto.response.BookSearchDetailResponse;
 import kr.mybrary.bookservice.booksearch.presentation.dto.response.BookSearchDetailResponse.Author;
 import kr.mybrary.bookservice.booksearch.presentation.dto.response.BookSearchDetailResponse.Translator;
+import kr.mybrary.bookservice.booksearch.presentation.dto.response.BookSearchResultResponseElement;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -289,4 +293,48 @@ class BookSearchDtoMapperTest {
                 () -> assertThat(dto.getInterestCount()).isEqualTo(0)
         );
     }
+
+    @DisplayName("알라딘의 author 응답값에서 지은이 이름만 가져온다.")
+    @Test
+    void getAuthorNames() {
+
+        // given
+        String givenAuthor_1 = "지 은 이 1 (지은이), 옮긴이1 (옮긴이)";
+        String givenAuthor_2 = "지은이1, 지은이2 (지은이)";
+        String givenAuthor_3 = "지은이1";
+
+        // when
+        String authorNames_1 = BookSearchDtoMapper.getAuthorNames(givenAuthor_1);
+        String authorNames_2 = BookSearchDtoMapper.getAuthorNames(givenAuthor_2);
+        String authorNames_3 = BookSearchDtoMapper.getAuthorNames(givenAuthor_3);
+
+        // then
+        assertAll(
+                () -> assertThat(authorNames_1).isEqualTo("지 은 이 1"),
+                () -> assertThat(authorNames_2).isEqualTo("지은이1, 지은이2"),
+                () -> assertThat(authorNames_3).isEqualTo("지은이1")
+        );
+    }
+
+    @DisplayName("알라딘 카테고리 조회 결과를 BookListByCategorySearchResultWithBookInfoResponse.Element 로 매핑한다.")
+    @Test
+    void aladinBookListByCategorySearchResponseToResponseWithBookInfo() {
+
+        // given
+        AladinBookListByCategorySearchResponse.Item response = BookSearchDtoTestData.createAladinBookListByCategorySearchResponseItem();
+
+        // when
+        BookListByCategorySearchResultWithBookInfoResponse.Element dto =
+                BookSearchDtoMapper.INSTANCE.aladinBookListByCategorySearchResponseToResponseWithBookInfo(response);
+
+        // then
+        assertAll(
+                () -> assertThat(dto.getThumbnailUrl()).isEqualTo(response.getCover()),
+                () -> assertThat(dto.getIsbn13()).isEqualTo(response.getIsbn13()),
+                () -> assertThat(dto.getTitle()).isEqualTo(response.getTitle()),
+                () -> assertThat(dto.getAuthors()).isEqualTo(BookSearchDtoMapper.getAuthorNames(response.getAuthor())),
+                () -> assertThat(dto.getAladinStarRating()).isEqualTo(response.getCustomerReviewRank() / 2.0)
+        );
+    }
+
 }
