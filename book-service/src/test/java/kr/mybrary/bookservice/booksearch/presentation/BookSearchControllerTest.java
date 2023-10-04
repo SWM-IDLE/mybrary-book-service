@@ -25,6 +25,7 @@ import kr.mybrary.bookservice.booksearch.domain.AladinBookSearchApiService;
 import kr.mybrary.bookservice.booksearch.domain.BookSearchRankingService;
 import kr.mybrary.bookservice.booksearch.domain.dto.request.BookListByCategorySearchServiceRequest;
 import kr.mybrary.bookservice.booksearch.presentation.dto.response.BookListByCategorySearchResultResponse;
+import kr.mybrary.bookservice.booksearch.presentation.dto.response.BookListByCategorySearchResultWithBookInfoResponse;
 import kr.mybrary.bookservice.booksearch.presentation.dto.response.BookSearchDetailResponse;
 import kr.mybrary.bookservice.booksearch.presentation.dto.response.BookSearchRankingResponse;
 import kr.mybrary.bookservice.booksearch.presentation.dto.response.BookSearchResultResponse;
@@ -223,9 +224,9 @@ class BookSearchControllerTest {
     void getBookRecommendations() throws Exception {
 
         // given
-        BookListByCategorySearchResultResponse response = BookSearchDtoTestData.createBookListSearchResultResponse();
+        BookListByCategorySearchResultWithBookInfoResponse response = BookSearchDtoTestData.createBookListByCategorySearchResultWithBookInfoResponse();
         BookListByCategorySearchServiceRequest request = BookSearchDtoTestData.createBookListSearchServiceRequest();
-        given(aladinBookSearchApiService.searchBookListByCategory(any())).willReturn(response);
+        given(aladinBookSearchApiService.searchBookListByCategoryWithBookInfo(any())).willReturn(response);
 
         // when
         ResultActions actions = mockMvc.perform(get("/api/v1/books/recommendations")
@@ -259,7 +260,10 @@ class BookSearchControllerTest {
                                                 fieldWithPath("status").type(STRING).description("응답 상태"),
                                                 fieldWithPath("message").type(STRING).description("응답 메시지"),
                                                 fieldWithPath("data.books[].isbn13").type(STRING).description("도서 ISBN13"),
-                                                fieldWithPath("data.books[].thumbnailUrl").type(STRING).description("도서 썸네일 URL")
+                                                fieldWithPath("data.books[].thumbnailUrl").type(STRING).description("도서 썸네일 URL"),
+                                                fieldWithPath("data.books[].title").type(STRING).description("도서 제목"),
+                                                fieldWithPath("data.books[].authors").type(STRING).description("도서 저자"),
+                                                fieldWithPath("data.books[].aladinStarRating").type(NUMBER).description("도서 별점")
                                         ).build())));
     }
 

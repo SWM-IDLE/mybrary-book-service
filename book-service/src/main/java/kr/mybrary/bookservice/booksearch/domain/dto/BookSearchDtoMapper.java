@@ -1,15 +1,16 @@
 package kr.mybrary.bookservice.booksearch.domain.dto;
 
 import java.util.List;
-import kr.mybrary.bookservice.booksearch.presentation.dto.response.BookListByCategoryResponseElement;
-import kr.mybrary.bookservice.booksearch.presentation.dto.response.BookSearchResultResponseElement;
 import kr.mybrary.bookservice.booksearch.domain.dto.response.aladinapi.AladinBookListByCategorySearchResponse;
 import kr.mybrary.bookservice.booksearch.domain.dto.response.aladinapi.AladinBookSearchDetailResponse;
 import kr.mybrary.bookservice.booksearch.domain.dto.response.aladinapi.AladinBookSearchResponse;
 import kr.mybrary.bookservice.booksearch.domain.dto.response.kakaoapi.KakaoBookSearchResponse;
+import kr.mybrary.bookservice.booksearch.presentation.dto.response.BookListByCategoryResponseElement;
+import kr.mybrary.bookservice.booksearch.presentation.dto.response.BookListByCategorySearchResultWithBookInfoResponse;
 import kr.mybrary.bookservice.booksearch.presentation.dto.response.BookSearchDetailResponse;
 import kr.mybrary.bookservice.booksearch.presentation.dto.response.BookSearchDetailResponse.Author;
 import kr.mybrary.bookservice.booksearch.presentation.dto.response.BookSearchDetailResponse.Translator;
+import kr.mybrary.bookservice.booksearch.presentation.dto.response.BookSearchResultResponseElement;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -87,11 +88,16 @@ public interface BookSearchDtoMapper {
     @Mapping(target = "interestCount", constant = "0")
     BookSearchDetailResponse aladinSearchResponseToDetailResponse(AladinBookSearchDetailResponse.Item aladinBookSearchResponse);
 
-
     @Mapping(target = "thumbnailUrl", source = "cover")
     BookListByCategoryResponseElement aladinBookListByCategorySearchResponseToServiceResponse(
             AladinBookListByCategorySearchResponse.Item aladinBookListByCategorySearchResponse);
 
+    @Mapping(target = "thumbnailUrl", source = "cover")
+    @Mapping(target = "title", source = "title")
+    @Mapping(target = "authors", source = "author", qualifiedByName = "getAuthorNames")
+    @Mapping(target = "aladinStarRating", expression = "java(aladinBookListByCategorySearchResponse.getCustomerReviewRank() / 2.0)")
+    BookListByCategorySearchResultWithBookInfoResponse.Element aladinBookListByCategorySearchResponseToResponseWithBookInfo(
+            AladinBookListByCategorySearchResponse.Item aladinBookListByCategorySearchResponse);
 
     @Named("getISBN10")
     static String getISBN10(String isbn) {
@@ -119,6 +125,11 @@ public interface BookSearchDtoMapper {
                         .authorId(0)
                         .build())
                 .toList();
+    }
+
+    @Named("getAuthorNames")
+    static String getAuthorNames(String author) {
+        return author.replaceAll(" \\(지은이\\).*", "");
     }
 
     @Named("mappingTranslatorNames")

@@ -22,7 +22,7 @@ public interface UserServiceClient {
     @CircuitBreaker(name = "userServiceCircuitBreakerConfig", fallbackMethod = "getUsersInfoFallback")
     UserInfoServiceResponse getUsersInfo(@RequestParam("userId") List<String> userIds);
 
-    default UserInfoServiceResponse getUsersInfoFallback(List<String> userIds) {
+    default UserInfoServiceResponse getUsersInfoFallback(List<String> userIds, Exception ex) {
         return UserInfoServiceResponse.builder()
                 .data(makeTemporaryResponse(userIds))
                 .build();
@@ -42,6 +42,10 @@ public interface UserServiceClient {
 
     @NotNull
     private String makeTemporaryNickname(String userId) {
+        if (userId.length() < 5) {
+            return "user_" + userId.toLowerCase();
+        }
+
         return "user_" + userId.substring(0, 5).toLowerCase();
     }
 }

@@ -45,7 +45,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: refresh,health,beans
+        include: refresh,health,beans,metrics,prometheus
 
 logging:
   level:
@@ -55,3 +55,8 @@ retry:
   bookSave:
     maxAttempts: 5
     maxDelay : 1000
+
+server:
+  tomcat:
+    mbeanregistry:
+      enabled: true
