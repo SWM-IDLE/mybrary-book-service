@@ -1,5 +1,6 @@
 package kr.mybrary.bookservice.booksearch.presentation.dto.response;
 
+import java.io.Serializable;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,14 +9,14 @@ import lombok.Getter;
 @Getter
 @Builder
 @AllArgsConstructor
-public class BookListByCategorySearchResultWithBookInfoResponse {
+public class BookListByCategorySearchResultWithBookInfoResponse implements Serializable {
 
     private List<Element> books;
 
     @Getter
     @Builder
     @AllArgsConstructor
-    public static class Element {
+    public static class Element implements Serializable {
         private String thumbnailUrl;
         private String isbn13;
         private String title;

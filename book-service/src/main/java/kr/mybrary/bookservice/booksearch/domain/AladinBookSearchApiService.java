@@ -164,8 +164,8 @@ public class AladinBookSearchApiService implements PlatformBookSearchApiService 
 
     @Override
     @Cacheable(cacheNames = "bookListByCategoryWithBookInfo", key = "#request.type + '_' + #request.categoryId + '_' + #request.page", cacheManager = "cacheManager")
-    @Retry(name = RETRY_CONFIG, fallbackMethod = "searchBookListByCategoryFallback")
-    @CircuitBreaker(name = CIRCUIT_BREAKER_CONFIG, fallbackMethod = "searchBookListByCategoryFallback")
+    @Retry(name = RETRY_CONFIG, fallbackMethod = "searchBookListByCategoryWithBookInfoFallback")
+    @CircuitBreaker(name = CIRCUIT_BREAKER_CONFIG, fallbackMethod = "searchBookListByCategoryWithBookInfoFallback")
     public BookListByCategorySearchResultWithBookInfoResponse searchBookListByCategoryWithBookInfo(
             BookListByCategorySearchServiceRequest request) {
 
@@ -212,6 +212,14 @@ public class AladinBookSearchApiService implements PlatformBookSearchApiService 
 
     private BookListByCategorySearchResultResponse searchBookListByCategoryFallback(BookListByCategorySearchServiceRequest request, Exception ex) {
         log.info("fallback, the request is searchBookListByCategory with '{}' categoryId", request.getCategoryId());
+        log.info("exception message is {}", ex.getMessage());
+        throw new AladinApiUnavailableException();
+    }
+
+    private BookListByCategorySearchResultWithBookInfoResponse searchBookListByCategoryWithBookInfoFallback(
+            BookListByCategorySearchServiceRequest request, Exception ex) {
+
+        log.info("fallback, the request is searchBookListByCategoryWithBookInfo with '{}' categoryId", request.getCategoryId());
         log.info("exception message is {}", ex.getMessage());
         throw new AladinApiUnavailableException();
     }
