@@ -84,6 +84,11 @@
         "cpuArchitecture": "X86_64",
         "operatingSystemFamily": "LINUX"
     },
+    "serviceRegistries": [
+        {
+            "registryArn": "arn:aws:servicediscovery:ap-northeast-2:133172301128:namespace/ns-ntxns7edxn5msrkp"
+        }
+    ],
     "registeredAt": "2023-09-14T06:34:42.490Z",
     "registeredBy": "arn:aws:iam::133172301128:user/soma1415",
     "tags": [
