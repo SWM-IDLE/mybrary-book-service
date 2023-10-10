@@ -32,4 +32,10 @@ public class RecommendationTarget {
     private String targetName;
 
     private boolean deleted;
+
+    public static RecommendationTarget of(String targetName) {
+        return RecommendationTarget.builder()
+                .targetName(targetName)
+                .build();
+    }
 }

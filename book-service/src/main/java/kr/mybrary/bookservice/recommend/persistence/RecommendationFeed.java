@@ -1,5 +1,6 @@
 package kr.mybrary.bookservice.recommend.persistence;
 
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -7,6 +8,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
 import kr.mybrary.bookservice.mybook.persistence.MyBook;
+import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedCreateServiceRequest;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -30,7 +32,19 @@ public class RecommendationFeed {
     @OneToOne(fetch = FetchType.LAZY)
     private MyBook myBook;
 
+    @Embedded
+    private RecommendationTargets recommendationTargets;
+
     private String userId;
     private String content;
     private boolean deleted;
+
+    public static RecommendationFeed of(RecommendationFeedCreateServiceRequest request, MyBook myBook, RecommendationTargets recommendationTargets) {
+        return RecommendationFeed.builder()
+                .myBook(myBook)
+                .userId(request.getUserId())
+                .content(request.getContent())
+                .recommendationTargets(recommendationTargets)
+                .build();
+    }
 }
