@@ -6,11 +6,13 @@ import jakarta.persistence.OneToMany;
 import java.util.List;
 import kr.mybrary.bookservice.recommend.domain.exception.RecommendationTargetDuplicateException;
 import kr.mybrary.bookservice.recommend.domain.exception.RecommendationTargetSizeExceededException;
+import kr.mybrary.bookservice.recommend.domain.exception.RecommendationTargetSizeLackException;
 
 @Embeddable
 public class RecommendationTargets {
 
     private static final int TARGET_MAX_SIZE = 5;
+    private static final int TARGET_MIN_SIZE = 1;
 
     @OneToMany(
             mappedBy = "recommendationFeed",
@@ -23,7 +25,8 @@ public class RecommendationTargets {
     }
 
     public RecommendationTargets(List<RecommendationTarget> feedRecommendationTargets) {
-        validateSize(feedRecommendationTargets);
+        validateMaxSize(feedRecommendationTargets);
+        validateMinSize(feedRecommendationTargets);
         validateDuplicate(feedRecommendationTargets);
         this.feedRecommendationTargets = feedRecommendationTargets;
     }
@@ -32,9 +35,15 @@ public class RecommendationTargets {
         return feedRecommendationTargets.size();
     }
 
-    private void validateSize(List<RecommendationTarget> feedRecommendationTargets) {
+    private void validateMaxSize(List<RecommendationTarget> feedRecommendationTargets) {
         if (feedRecommendationTargets.size() > TARGET_MAX_SIZE) {
             throw new RecommendationTargetSizeExceededException();
+        }
+    }
+
+    private void validateMinSize(List<RecommendationTarget> feedRecommendationTargets) {
+        if (feedRecommendationTargets.size() < TARGET_MIN_SIZE) {
+            throw new RecommendationTargetSizeLackException();
         }
     }
 

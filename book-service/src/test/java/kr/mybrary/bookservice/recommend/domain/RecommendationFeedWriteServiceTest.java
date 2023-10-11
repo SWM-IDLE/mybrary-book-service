@@ -15,6 +15,7 @@ import kr.mybrary.bookservice.recommend.RecommendationFeedDtoTestData;
 import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedCreateServiceRequest;
 import kr.mybrary.bookservice.recommend.domain.exception.RecommendationTargetDuplicateException;
 import kr.mybrary.bookservice.recommend.domain.exception.RecommendationTargetSizeExceededException;
+import kr.mybrary.bookservice.recommend.domain.exception.RecommendationTargetSizeLackException;
 import kr.mybrary.bookservice.recommend.persistence.repository.RecommendationFeedRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -74,6 +75,26 @@ class RecommendationFeedWriteServiceTest {
         assertAll(
                 () -> assertThatThrownBy(() -> recommendationFeedWriteService.create(request))
                         .isInstanceOf(RecommendationTargetSizeExceededException.class),
+                () -> verify(myBookReadService, times(1)).findMyBookById(any())
+        );
+    }
+
+    @DisplayName("추천 피드의 타겟이 1개 미만이라면, 예외가 발생한다.")
+    @Test
+    void occurExceptionWhenRecommendationTargetLessThan1() {
+
+        // given
+        RecommendationFeedCreateServiceRequest request = RecommendationFeedDtoTestData.createRecommendationFeedCreateServiceRequestBuilder()
+                .recommendationTargetNames(List.of())
+                .build();
+
+        MyBook myBook = MyBookFixture.COMMON_LOGIN_USER_MYBOOK.getMyBook();
+        given(myBookReadService.findMyBookById(any())).willReturn(myBook);
+
+        // when, then
+        assertAll(
+                () -> assertThatThrownBy(() -> recommendationFeedWriteService.create(request))
+                        .isInstanceOf(RecommendationTargetSizeLackException.class),
                 () -> verify(myBookReadService, times(1)).findMyBookById(any())
         );
     }
