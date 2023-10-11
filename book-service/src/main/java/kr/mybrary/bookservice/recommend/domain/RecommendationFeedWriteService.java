@@ -4,6 +4,7 @@ import java.util.List;
 import kr.mybrary.bookservice.mybook.domain.MyBookReadService;
 import kr.mybrary.bookservice.mybook.persistence.MyBook;
 import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedCreateServiceRequest;
+import kr.mybrary.bookservice.recommend.domain.exception.RecommendationFeedAlreadyExistException;
 import kr.mybrary.bookservice.recommend.persistence.RecommendationFeed;
 import kr.mybrary.bookservice.recommend.persistence.RecommendationTarget;
 import kr.mybrary.bookservice.recommend.persistence.RecommendationTargets;
@@ -21,11 +22,19 @@ public class RecommendationFeedWriteService {
     private final MyBookReadService myBookReadService;
     
     public void create(RecommendationFeedCreateServiceRequest request) {
+        checkExistRecommendationFeed(request.getMyBookId());
+
         MyBook myBook = myBookReadService.findMyBookById(request.getMyBookId());
         RecommendationTargets recommendationTargets = new RecommendationTargets(createRecommendationTargets(request));
 
         RecommendationFeed recommendationFeed = RecommendationFeed.of(request, myBook, recommendationTargets);
         recommendationFeedRepository.save(recommendationFeed);
+    }
+
+    private void checkExistRecommendationFeed(Long myBookId) {
+        if (recommendationFeedRepository.existsByMyBookId(myBookId)) {
+            throw new RecommendationFeedAlreadyExistException();
+        }
     }
 
     private List<RecommendationTarget> createRecommendationTargets(RecommendationFeedCreateServiceRequest request) {

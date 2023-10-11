@@ -6,6 +6,7 @@ import static org.mockito.BDDMockito.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.times;
 import static org.mockito.BDDMockito.verify;
+import static org.mockito.Mockito.never;
 
 import java.util.List;
 import kr.mybrary.bookservice.mybook.MyBookFixture;
@@ -13,6 +14,7 @@ import kr.mybrary.bookservice.mybook.domain.MyBookReadService;
 import kr.mybrary.bookservice.mybook.persistence.MyBook;
 import kr.mybrary.bookservice.recommend.RecommendationFeedDtoTestData;
 import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedCreateServiceRequest;
+import kr.mybrary.bookservice.recommend.domain.exception.RecommendationFeedAlreadyExistException;
 import kr.mybrary.bookservice.recommend.domain.exception.RecommendationTargetDuplicateException;
 import kr.mybrary.bookservice.recommend.domain.exception.RecommendationTargetSizeExceededException;
 import kr.mybrary.bookservice.recommend.domain.exception.RecommendationTargetSizeLackException;
@@ -116,6 +118,26 @@ class RecommendationFeedWriteServiceTest {
                 () -> assertThatThrownBy(() -> recommendationFeedWriteService.create(request))
                         .isInstanceOf(RecommendationTargetDuplicateException.class),
                 () -> verify(myBookReadService, times(1)).findMyBookById(any())
+        );
+    }
+
+    @DisplayName("한 마이북에 대해서 이미 추천 피드가 존재할 때, 추천 피드를 생성하면 예외가 발생한다")
+    @Test
+    void occurExceptionWhenRecommendationFeedAlreadyExist() {
+
+        // given
+        RecommendationFeedCreateServiceRequest request = RecommendationFeedDtoTestData.createRecommendationFeedCreateServiceRequestBuilder()
+                .recommendationTargetNames(List.of("Target_1", "Target_1", "Target_3", "Target_4"))
+                .build();
+
+        given(recommendationFeedRepository.existsByMyBookId(any())).willReturn(true);
+
+        // when, then
+        assertAll(
+                () -> assertThatThrownBy(() -> recommendationFeedWriteService.create(request))
+                        .isInstanceOf(RecommendationFeedAlreadyExistException.class),
+                () -> verify(myBookReadService, never()).findMyBookById(any()),
+                () -> verify(recommendationFeedRepository, never()).save(any())
         );
     }
 }
