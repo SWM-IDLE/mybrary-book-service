@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.List;
+import java.util.stream.IntStream;
 import kr.mybrary.bookservice.PersistenceTest;
 import kr.mybrary.bookservice.book.BookFixture;
 import kr.mybrary.bookservice.book.persistence.Book;
@@ -100,53 +101,113 @@ class RecommendationFeedRepositoryTest {
         assertThat(isExist).isTrue();
     }
 
-    @DisplayName("모든 추천 피드를 조회한다.")
+    @DisplayName("1번째부터 10번째의 추천 피드를 조회한다. paging 처리")
     @Test
-    void getRecommendationFeedViewAll() {
+    void getRecentRecommendationFeedView() {
 
         // given
         Author author_1 = entityManager.persist(Author.builder().aid(11).name("테스트 저자 1").build());
         Author author_2 = entityManager.persist(Author.builder().aid(12).name("테스트 저자 2").build());
+        Author author_3 = entityManager.persist(Author.builder().aid(13).name("테스트 저자 3").build());
 
         Book book = entityManager.persist(BookFixture.COMMON_BOOK_WITHOUT_RELATION.getBook());
         entityManager.persist(BookAuthor.builder().book(book).author(author_1).build());
         entityManager.persist(BookAuthor.builder().book(book).author(author_2).build());
+        entityManager.persist(BookAuthor.builder().book(book).author(author_3).build());
 
-        MyBook myBook = entityManager.persist(MyBookFixture.MY_BOOK_WITHOUT_RELATION.getMyBookWithBook(book));
+        IntStream.range(1, 21)
+                .forEach(i -> {
+                    MyBook myBook = entityManager.persist(MyBookFixture.MY_BOOK_WITHOUT_RELATION.getMyBookWithBook(book));
 
-        RecommendationFeed recommendationFeed = recommendationFeedRepository.save(RecommendationFeed.builder()
-                .userId("LOGIN_USER_ID")
-                .myBook(myBook)
-                .content("NEW CONTENT")
-                .build());
+                    RecommendationFeed recommendationFeed = recommendationFeedRepository.save(RecommendationFeed.builder()
+                            .userId("LOGIN_USER_ID_" + i)
+                            .myBook(myBook)
+                            .content("NEW_CONTENT_" + i)
+                            .build());
 
-        entityManager.persist(RecommendationTarget.builder()
-                .recommendationFeed(recommendationFeed)
-                .targetName("TARGET_NAME_1")
-                .build());
-
-        entityManager.persist(RecommendationTarget.builder()
-                .recommendationFeed(recommendationFeed)
-                .targetName("TARGET_NAME_2")
-                .build());
-
-        entityManager.persist(RecommendationTarget.builder()
-                .recommendationFeed(recommendationFeed)
-                .targetName("TARGET_NAME_3")
-                .build());
+                    entityManager.persist(RecommendationTarget.builder()
+                            .recommendationFeed(recommendationFeed)
+                            .targetName("TARGET_NAME_" + i)
+                            .build());
+                });
 
         entityManager.flush();
         entityManager.clear();
 
         // when
-        List<RecommendationFeedViewAllModel> recommendationFeedViewAll = recommendationFeedRepository.getRecommendationFeedViewAll();
+        List<RecommendationFeedViewAllModel> recommendationFeedViewAll =
+                recommendationFeedRepository.getRecommendationFeedViewAll(null, 10);
 
         // then
         assertAll(
-                () -> assertThat(recommendationFeedViewAll.size()).isEqualTo(1),
-                () -> assertThat(recommendationFeedViewAll.get(0).getRecommendationTargets()).hasSize(3),
-                () -> assertThat(recommendationFeedViewAll.get(0).getBookAuthors()).hasSize(2),
-                () -> assertThat(recommendationFeedViewAll.get(0).getContent()).isEqualTo("NEW CONTENT")
+                () -> assertThat(recommendationFeedViewAll.size()).isEqualTo(10),
+                () -> assertThat(recommendationFeedViewAll.get(0).getRecommendationTargets()).hasSize(1),
+                () -> assertThat(recommendationFeedViewAll.get(0).getContent()).isEqualTo("NEW_CONTENT_20"),
+                () -> assertThat(recommendationFeedViewAll.get(0).getRecommendationTargets()).extracting("targetName")
+                        .containsExactly("TARGET_NAME_20"),
+                () -> assertThat(recommendationFeedViewAll.get(0).getBookAuthors()).extracting("name")
+                        .containsExactly("테스트 저자 1", "테스트 저자 2", "테스트 저자 3"),
+                () -> assertThat(recommendationFeedViewAll.get(9).getRecommendationTargets()).hasSize(1),
+                () -> assertThat(recommendationFeedViewAll.get(9).getContent()).isEqualTo("NEW_CONTENT_11"),
+                () -> assertThat(recommendationFeedViewAll.get(9).getRecommendationTargets()).extracting("targetName")
+                        .containsExactly("TARGET_NAME_11"),
+                () -> assertThat(recommendationFeedViewAll.get(9).getBookAuthors()).extracting("name")
+                        .containsExactly("테스트 저자 1", "테스트 저자 2", "테스트 저자 3")
+        );
+    }
+
+    @DisplayName("11번째부터 20번째의 추천 피드를 조회한다. paging 처리")
+    @Test
+    void getRecommendationFeedViewOf10to20() {
+
+        // given
+        Author author_1 = entityManager.persist(Author.builder().aid(11).name("테스트 저자 1").build());
+        Author author_2 = entityManager.persist(Author.builder().aid(12).name("테스트 저자 2").build());
+        Author author_3 = entityManager.persist(Author.builder().aid(13).name("테스트 저자 3").build());
+
+        Book book = entityManager.persist(BookFixture.COMMON_BOOK_WITHOUT_RELATION.getBook());
+        entityManager.persist(BookAuthor.builder().book(book).author(author_1).build());
+        entityManager.persist(BookAuthor.builder().book(book).author(author_2).build());
+        entityManager.persist(BookAuthor.builder().book(book).author(author_3).build());
+
+        IntStream.range(1, 21)
+                .forEach(i -> {
+                    MyBook myBook = entityManager.persist(MyBookFixture.MY_BOOK_WITHOUT_RELATION.getMyBookWithBook(book));
+
+                    RecommendationFeed recommendationFeed = recommendationFeedRepository.save(RecommendationFeed.builder()
+                            .userId("LOGIN_USER_ID_" + i)
+                            .myBook(myBook)
+                            .content("NEW_CONTENT_" + i)
+                            .build());
+
+                    entityManager.persist(RecommendationTarget.builder()
+                            .recommendationFeed(recommendationFeed)
+                            .targetName("TARGET_NAME_" + i)
+                            .build());
+                });
+
+        entityManager.flush();
+        entityManager.clear();
+
+        // when
+        List<RecommendationFeedViewAllModel> recommendationFeedViewAll =
+                recommendationFeedRepository.getRecommendationFeedViewAll(11L, 10);
+
+        // then
+        assertAll(
+                () -> assertThat(recommendationFeedViewAll.size()).isEqualTo(10),
+                () -> assertThat(recommendationFeedViewAll.get(0).getRecommendationTargets()).hasSize(1),
+                () -> assertThat(recommendationFeedViewAll.get(0).getContent()).isEqualTo("NEW_CONTENT_10"),
+                () -> assertThat(recommendationFeedViewAll.get(0).getRecommendationTargets()).extracting("targetName")
+                        .containsExactly("TARGET_NAME_10"),
+                () -> assertThat(recommendationFeedViewAll.get(0).getBookAuthors()).extracting("name")
+                        .containsExactly("테스트 저자 1", "테스트 저자 2", "테스트 저자 3"),
+                () -> assertThat(recommendationFeedViewAll.get(9).getRecommendationTargets()).hasSize(1),
+                () -> assertThat(recommendationFeedViewAll.get(9).getContent()).isEqualTo("NEW_CONTENT_1"),
+                () -> assertThat(recommendationFeedViewAll.get(9).getRecommendationTargets()).extracting("targetName")
+                        .containsExactly("TARGET_NAME_1"),
+                () -> assertThat(recommendationFeedViewAll.get(9).getBookAuthors()).extracting("name")
+                        .containsExactly("테스트 저자 1", "테스트 저자 2", "테스트 저자 3")
         );
     }
 }

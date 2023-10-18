@@ -5,6 +5,6 @@ import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedView
 
 public interface RecommendationFeedRepositoryCustom {
 
-    List<RecommendationFeedViewAllModel> getRecommendationFeedViewAll();
+    List<RecommendationFeedViewAllModel> getRecommendationFeedViewAll(Long RecommendationFeedId, int pageSize);
 
 }

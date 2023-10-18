@@ -1,6 +1,6 @@
 package kr.mybrary.bookservice.recommend.persistence.model;
 
-import java.util.Set;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -14,11 +14,12 @@ import lombok.NoArgsConstructor;
 public class RecommendationFeedViewAllModel {
 
     private String content;
-    private Set<RecommendationTargetModel> recommendationTargets;
-    private Set<BookAuthorModel> bookAuthors;
+    private List<RecommendationTargetModel> recommendationTargets;
+    private List<BookAuthorModel> bookAuthors;
 
     private String userId;
 
+    private Long recommendationFeedId;
     private Long myBookId;
     private Long bookId;
     private String title;
@@ -26,6 +27,14 @@ public class RecommendationFeedViewAllModel {
     private String isbn13;
     private Integer holderCount;
     private Integer interestCount;
+
+    public void setRecommendationTargets(List<RecommendationTargetModel> recommendationTargetModels) {
+        this.recommendationTargets = recommendationTargetModels;
+    }
+
+    public void setBookAuthors(List<BookAuthorModel> bookAuthorModels) {
+        this.bookAuthors = bookAuthorModels;
+    }
 
     @Getter
     @Builder
