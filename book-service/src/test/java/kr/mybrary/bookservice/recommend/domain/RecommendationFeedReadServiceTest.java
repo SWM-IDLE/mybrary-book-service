@@ -46,7 +46,7 @@ class RecommendationFeedReadServiceTest {
         given(userServiceClient.getUsersInfo(any())).willReturn(userInfoServiceResponse);
 
         // when
-        RecommendationFeedViewAllResponse response = recommendationFeedReadService.findAll(request);
+        RecommendationFeedViewAllResponse response = recommendationFeedReadService.findRecommendationFeedWithNoOffsetPaging(request);
 
         // then
         assertAll(

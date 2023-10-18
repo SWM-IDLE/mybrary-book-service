@@ -9,4 +9,12 @@ public class RecommendationFeedGetWithPagingServiceRequest {
 
     private Long recommendationFeedId;
     private int pageSize;
+
+    public static RecommendationFeedGetWithPagingServiceRequest of(Long recommendationFeedId, int pageSize) {
+
+        return RecommendationFeedGetWithPagingServiceRequest.builder()
+                .recommendationFeedId(recommendationFeedId)
+                .pageSize(pageSize)
+                .build();
+    }
 }

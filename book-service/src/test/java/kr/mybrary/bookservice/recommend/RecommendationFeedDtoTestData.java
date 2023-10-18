@@ -1,5 +1,6 @@
 package kr.mybrary.bookservice.recommend;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 import kr.mybrary.bookservice.client.user.dto.response.UserInfoServiceResponse;
@@ -9,6 +10,8 @@ import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedCre
 import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedGetWithPagingServiceRequest;
 import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedViewAllModel;
 import kr.mybrary.bookservice.recommend.presentation.dto.request.RecommendationFeedCreateRequest;
+import kr.mybrary.bookservice.recommend.presentation.dto.response.RecommendationFeedViewAllResponse;
+import kr.mybrary.bookservice.recommend.presentation.dto.response.RecommendationFeedViewAllResponse.RecommendationFeedElement;
 
 public class RecommendationFeedDtoTestData {
 
@@ -87,5 +90,32 @@ public class RecommendationFeedDtoTestData {
                                                     .build()))
                             .build())
                     .toList();
+    }
+
+    public static RecommendationFeedViewAllResponse createRecommendationFeedViewAllResponse() {
+
+        List<RecommendationFeedElement> recommendationFeedElements = new ArrayList<>();
+
+        IntStream.range(1, 11)
+                .forEach(i -> recommendationFeedElements.add(RecommendationFeedElement.builder()
+                        .content("CONTENT_" + i)
+                        .recommendationTargetNames(List.of("TARGET_NAME_" + i, "TARGET_NAME_" + (i + 1)))
+                        .userId("USER_ID_" + i)
+                        .nickname("USER_NICKNAME_" + i)
+                        .profileImageUrl("USER_PICTURE_URL_" + i)
+                        .myBookId((long) i)
+                        .bookId((long) i)
+                        .title("TITLE_" + i)
+                        .thumbnailUrl("THUMBNAIL_URL_" + i)
+                        .isbn13("ISBN13_" + i)
+                        .authors(List.of("AUTHOR_NAME_" + i, "AUTHOR_NAME_" + (i + 1)))
+                        .holderCount(i)
+                        .interestCount(i)
+                        .build()));
+
+        return RecommendationFeedViewAllResponse.builder()
+                .recommendationFeeds(recommendationFeedElements)
+                .lastRecommendationFeedId(10L)
+                .build();
     }
 }

@@ -24,7 +24,7 @@ public class RecommendationFeedReadService {
     private final RecommendationFeedRepository recommendationFeedRepository;
     private final UserServiceClient userServiceClient;
 
-    public RecommendationFeedViewAllResponse findAll(RecommendationFeedGetWithPagingServiceRequest request) {
+    public RecommendationFeedViewAllResponse findRecommendationFeedWithNoOffsetPaging(RecommendationFeedGetWithPagingServiceRequest request) {
 
         List<RecommendationFeedViewAllModel> recommendationFeeds =
                 recommendationFeedRepository.getRecommendationFeedViewAll(request.getRecommendationFeedId(), request.getPageSize());
