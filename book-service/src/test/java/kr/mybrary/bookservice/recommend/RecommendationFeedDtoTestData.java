@@ -1,12 +1,12 @@
 package kr.mybrary.bookservice.recommend;
 
 import java.util.List;
-import java.util.Set;
 import java.util.stream.IntStream;
 import kr.mybrary.bookservice.client.user.dto.response.UserInfoServiceResponse;
 import kr.mybrary.bookservice.client.user.dto.response.UserInfoServiceResponse.UserInfo;
 import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedCreateServiceRequest;
 import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedCreateServiceRequest.RecommendationFeedCreateServiceRequestBuilder;
+import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedGetWithPagingServiceRequest;
 import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedViewAllModel;
 import kr.mybrary.bookservice.recommend.presentation.dto.request.RecommendationFeedCreateRequest;
 
@@ -28,9 +28,16 @@ public class RecommendationFeedDtoTestData {
                 .build();
     }
 
+    public static RecommendationFeedGetWithPagingServiceRequest createRecommendationFeedGetWithPagingServiceRequest() {
+        return RecommendationFeedGetWithPagingServiceRequest.builder()
+                .recommendationFeedId(1L)
+                .pageSize(10)
+                .build();
+    }
+
     public static UserInfoServiceResponse createUserInfoResponseList() {
 
-        List<UserInfo> list = IntStream.range(1, 6)
+        List<UserInfo> list = IntStream.range(1, 11)
                 .mapToObj(i -> UserInfo.builder()
                         .userId("USER_ID_" + i)
                         .nickname("USER_NICKNAME_" + i)
@@ -47,8 +54,9 @@ public class RecommendationFeedDtoTestData {
 
     public static List<RecommendationFeedViewAllModel> createRecommendationFeedViewAllModelList() {
 
-            return IntStream.range(1, 6)
+            return IntStream.range(1, 11)
                     .mapToObj(i -> RecommendationFeedViewAllModel.builder()
+                            .recommendationFeedId((long) i)
                             .content("CONTENT_" + i)
                             .userId("USER_ID_" + i)
                             .myBookId((long) i)
@@ -58,7 +66,7 @@ public class RecommendationFeedDtoTestData {
                             .isbn13("ISBN13_" + i)
                             .holderCount(i)
                             .interestCount(i)
-                            .recommendationTargets(Set.of(
+                            .recommendationTargets(List.of(
                                     RecommendationFeedViewAllModel.RecommendationTargetModel.builder()
                                             .targetId((long) i)
                                             .targetName("TARGET_NAME_" + i)
@@ -66,7 +74,7 @@ public class RecommendationFeedDtoTestData {
                                     RecommendationFeedViewAllModel.RecommendationTargetModel.builder()
                                             .targetId((long) i + 1)
                                             .targetName("TARGET_NAME_" + (i + 1)).build()))
-                            .bookAuthors(Set.of(
+                            .bookAuthors(List.of(
                                     RecommendationFeedViewAllModel.BookAuthorModel.builder()
                                                     .authorId((long) i)
                                                     .aid(i)

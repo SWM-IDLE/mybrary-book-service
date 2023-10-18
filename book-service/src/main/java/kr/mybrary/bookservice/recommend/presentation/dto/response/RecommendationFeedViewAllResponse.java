@@ -8,6 +8,7 @@ import lombok.Getter;
 @Builder
 public class RecommendationFeedViewAllResponse {
 
+    private Long lastRecommendationFeedId;
     private List<RecommendationFeedElement> recommendationFeeds;
 
     @Getter
@@ -31,9 +32,10 @@ public class RecommendationFeedViewAllResponse {
         private Integer interestCount;
     }
 
-    public static RecommendationFeedViewAllResponse of(List<RecommendationFeedElement> recommendationFeeds) {
+    public static RecommendationFeedViewAllResponse of(List<RecommendationFeedElement> recommendationFeeds, Long lastRecommendationFeedId) {
         return RecommendationFeedViewAllResponse.builder()
                 .recommendationFeeds(recommendationFeeds)
+                .lastRecommendationFeedId(lastRecommendationFeedId)
                 .build();
     }
 }

@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import kr.mybrary.bookservice.client.user.api.UserServiceClient;
 import kr.mybrary.bookservice.client.user.dto.response.UserInfoServiceResponse;
 import kr.mybrary.bookservice.client.user.dto.response.UserInfoServiceResponse.UserInfo;
+import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedGetWithPagingServiceRequest;
 import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedViewAllModel;
 import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedViewAllModel.RecommendationTargetModel;
 import kr.mybrary.bookservice.recommend.persistence.repository.RecommendationFeedRepository;
@@ -23,16 +24,17 @@ public class RecommendationFeedReadService {
     private final RecommendationFeedRepository recommendationFeedRepository;
     private final UserServiceClient userServiceClient;
 
-    public RecommendationFeedViewAllResponse findAll() {
+    public RecommendationFeedViewAllResponse findAll(RecommendationFeedGetWithPagingServiceRequest request) {
 
-        List<RecommendationFeedViewAllModel> recommendationFeeds = recommendationFeedRepository.getRecommendationFeedViewAll();
+        List<RecommendationFeedViewAllModel> recommendationFeeds =
+                recommendationFeedRepository.getRecommendationFeedViewAll(request.getRecommendationFeedId(), request.getPageSize());
+        Long lastRecommendationFeedId = recommendationFeeds.get(recommendationFeeds.size() - 1).getRecommendationFeedId();
+
         UserInfoServiceResponse usersInfo = userServiceClient.getUsersInfo(getUserIdFromRecommendationFeed(recommendationFeeds));
-
         Map<String, UserInfo> userInfoMap = createUserInfoMapFromResponse(usersInfo.getData().getUserInfoElements());
 
         List<RecommendationFeedElement> recommendationFeedElements = createRecommendationFeedElements(recommendationFeeds, userInfoMap);
-
-        return RecommendationFeedViewAllResponse.of(recommendationFeedElements);
+        return RecommendationFeedViewAllResponse.of(recommendationFeedElements, lastRecommendationFeedId);
     }
 
     private List<RecommendationFeedElement> createRecommendationFeedElements(
