@@ -127,10 +127,11 @@ class RecommendationFeedWriteServiceTest {
 
         // given
         RecommendationFeedCreateServiceRequest request = RecommendationFeedDtoTestData.createRecommendationFeedCreateServiceRequestBuilder()
+                .myBookId(1L)
                 .recommendationTargetNames(List.of("Target_1", "Target_1", "Target_3", "Target_4"))
                 .build();
 
-        given(recommendationFeedRepository.existsByMyBookId(any())).willReturn(true);
+        given(recommendationFeedRepository.existsByMyBookId(1L)).willReturn(true);
 
         // when, then
         assertAll(

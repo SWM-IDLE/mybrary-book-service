@@ -189,9 +189,13 @@ class RecommendationFeedRepositoryTest {
         entityManager.flush();
         entityManager.clear();
 
+        List<RecommendationFeedViewAllModel> previousRecommendationFeedViewAll =
+                recommendationFeedRepository.getRecommendationFeedViewAll(null, 10);
+        Long lastPreviousRecommendationFeedId = previousRecommendationFeedViewAll.get(9).getRecommendationFeedId();
+
         // when
         List<RecommendationFeedViewAllModel> recommendationFeedViewAll =
-                recommendationFeedRepository.getRecommendationFeedViewAll(11L, 10);
+                recommendationFeedRepository.getRecommendationFeedViewAll(lastPreviousRecommendationFeedId, 10);
 
         // then
         assertAll(
