@@ -7,6 +7,7 @@ import kr.mybrary.bookservice.client.user.dto.response.UserInfoServiceResponse;
 import kr.mybrary.bookservice.client.user.dto.response.UserInfoServiceResponse.UserInfo;
 import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedCreateServiceRequest;
 import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedCreateServiceRequest.RecommendationFeedCreateServiceRequestBuilder;
+import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedDeleteServiceRequest;
 import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedGetWithPagingServiceRequest;
 import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedViewAllModel;
 import kr.mybrary.bookservice.recommend.presentation.dto.request.RecommendationFeedCreateRequest;
@@ -116,6 +117,14 @@ public class RecommendationFeedDtoTestData {
         return RecommendationFeedViewAllResponse.builder()
                 .recommendationFeeds(recommendationFeedElements)
                 .lastRecommendationFeedId(10L)
+                .build();
+    }
+
+    public static RecommendationFeedDeleteServiceRequest createRecommendationFeedDeleteServiceRequest() {
+
+        return RecommendationFeedDeleteServiceRequest.builder()
+                .recommendationFeedId(1L)
+                .loginId("LOGIN_USER_ID")
                 .build();
     }
 }

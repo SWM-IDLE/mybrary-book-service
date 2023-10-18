@@ -6,18 +6,24 @@ import static org.mockito.BDDMockito.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.times;
 import static org.mockito.BDDMockito.verify;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
 
 import java.util.List;
+import java.util.Optional;
 import kr.mybrary.bookservice.mybook.MyBookFixture;
 import kr.mybrary.bookservice.mybook.domain.MyBookReadService;
 import kr.mybrary.bookservice.mybook.persistence.MyBook;
 import kr.mybrary.bookservice.recommend.RecommendationFeedDtoTestData;
+import kr.mybrary.bookservice.recommend.RecommendationFeedFixture;
 import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedCreateServiceRequest;
+import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedDeleteServiceRequest;
+import kr.mybrary.bookservice.recommend.domain.exception.RecommendationFeedAccessDeniedException;
 import kr.mybrary.bookservice.recommend.domain.exception.RecommendationFeedAlreadyExistException;
 import kr.mybrary.bookservice.recommend.domain.exception.RecommendationTargetDuplicateException;
 import kr.mybrary.bookservice.recommend.domain.exception.RecommendationTargetSizeExceededException;
 import kr.mybrary.bookservice.recommend.domain.exception.RecommendationTargetSizeLackException;
+import kr.mybrary.bookservice.recommend.persistence.RecommendationFeed;
 import kr.mybrary.bookservice.recommend.persistence.repository.RecommendationFeedRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -139,6 +145,46 @@ class RecommendationFeedWriteServiceTest {
                         .isInstanceOf(RecommendationFeedAlreadyExistException.class),
                 () -> verify(myBookReadService, never()).findMyBookById(any()),
                 () -> verify(recommendationFeedRepository, never()).save(any())
+        );
+    }
+
+    @DisplayName("추천 피드를 삭제한다.")
+    @Test
+    void deleteRecommendationFeed() {
+
+        // given
+        RecommendationFeedDeleteServiceRequest request = RecommendationFeedDtoTestData.createRecommendationFeedDeleteServiceRequest();
+        RecommendationFeed recommendationFeed = RecommendationFeedFixture.COMMON_LOGIN_USER_RECOMMENDATION_FEED.getRecommendationFeed();
+
+        given(recommendationFeedRepository.findById(any())).willReturn(Optional.of(recommendationFeed));
+        doNothing().when(recommendationFeedRepository).delete(any());
+
+        // when
+        recommendationFeedWriteService.deleteRecommendationFeed(request);
+
+        // then
+        assertAll(
+                () -> verify(recommendationFeedRepository, times(1)).findById(any()),
+                () -> verify(recommendationFeedRepository, times(1)).delete(any())
+        );
+    }
+
+    @DisplayName("다른 유저의 추천 피드을 삭제시, 예외가 발생한다.")
+    @Test
+    void occurExceptionWhenDeleteOtherUserRecommendationFeed() {
+
+        // given
+        RecommendationFeedDeleteServiceRequest request = RecommendationFeedDtoTestData.createRecommendationFeedDeleteServiceRequest();
+        RecommendationFeed recommendationFeed = RecommendationFeedFixture.COMMON_OTHER_USER_RECOMMENDATION_FEED.getRecommendationFeed();
+
+        given(recommendationFeedRepository.findById(any())).willReturn(Optional.of(recommendationFeed));
+
+        // when, then
+        assertAll(
+                () -> assertThatThrownBy(() -> recommendationFeedWriteService.deleteRecommendationFeed(request))
+                        .isInstanceOf(RecommendationFeedAccessDeniedException.class),
+                () -> verify(recommendationFeedRepository, times(1)).findById(any()),
+                () -> verify(recommendationFeedRepository, never()).delete(any())
         );
     }
 }
