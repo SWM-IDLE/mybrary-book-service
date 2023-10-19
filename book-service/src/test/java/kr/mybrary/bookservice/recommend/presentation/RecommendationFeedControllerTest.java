@@ -7,6 +7,7 @@ import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
@@ -213,4 +214,45 @@ class RecommendationFeedControllerTest {
                 .andExpect(jsonPath("$.data").isNotEmpty());
     }
 
+    @DisplayName("추천 피드를 삭제한다.")
+    @Test
+    void deleteRecommendationFeed() throws Exception {
+
+        // given
+        doNothing().when(recommendationFeedWriteService).deleteRecommendationFeed(any());
+
+        // when
+        ResultActions actions = mockMvc.perform(delete("/api/v1/recommendation-feeds/{id}", 1L)
+                .header("USER-ID", LOGIN_ID));
+
+        // then
+        actions
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$.status").value("200 OK"))
+                .andExpect(jsonPath("$.message").value("추천 피드를 삭제하였습니다."))
+                .andExpect(jsonPath("$.data").isEmpty());
+
+        // document
+        actions
+                .andDo(document("delete-recommendation-feed",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        resource(
+                                ResourceSnippetParameters.builder()
+                                        .tag("recommendation-feed")
+                                        .summary("추천 피드를 삭제한다.")
+                                        .requestSchema(Schema.schema("delete_recommendation_feed_request_body"))
+                                        .requestHeaders(
+                                                headerWithName("USER-ID").description("사용자 ID")
+                                        )
+                                        .pathParameters(
+                                                parameterWithName("id").type(SimpleType.NUMBER).description("추천 피드 ID")
+                                        )
+                                        .responseSchema(Schema.schema("delete_recommendation_feed_response_body"))
+                                        .responseFields(
+                                                fieldWithPath("status").type(STRING).description("응답 상태"),
+                                                fieldWithPath("message").type(STRING).description("응답 메시지"),
+                                                fieldWithPath("data").type(OBJECT).description("응답 데이터").optional()
+                                        ).build())));
+    }
 }

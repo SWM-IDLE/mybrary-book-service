@@ -10,4 +10,11 @@ public class RecommendationFeedDeleteServiceRequest {
     private Long recommendationFeedId;
     private String loginId;
 
+    public static RecommendationFeedDeleteServiceRequest of(Long recommendationFeedId, String loginId) {
+        return RecommendationFeedDeleteServiceRequest.builder()
+                .recommendationFeedId(recommendationFeedId)
+                .loginId(loginId)
+                .build();
+    }
+
 }

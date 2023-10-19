@@ -4,13 +4,16 @@ import kr.mybrary.bookservice.global.dto.response.SuccessResponse;
 import kr.mybrary.bookservice.recommend.domain.RecommendationFeedReadService;
 import kr.mybrary.bookservice.recommend.domain.RecommendationFeedWriteService;
 import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedCreateServiceRequest;
+import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedDeleteServiceRequest;
 import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedGetWithPagingServiceRequest;
 import kr.mybrary.bookservice.recommend.presentation.dto.request.RecommendationFeedCreateRequest;
 import kr.mybrary.bookservice.recommend.presentation.dto.response.RecommendationFeedViewAllResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -31,7 +34,8 @@ public class RecommendationFeedController {
             @RequestHeader("USER-ID") String loginId,
             @RequestBody RecommendationFeedCreateRequest request) {
 
-        RecommendationFeedCreateServiceRequest serviceRequest = RecommendationFeedCreateServiceRequest.of(loginId, request);
+        RecommendationFeedCreateServiceRequest serviceRequest = RecommendationFeedCreateServiceRequest.of(loginId,
+                request);
         recommendationFeedWriteService.create(serviceRequest);
 
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -48,5 +52,18 @@ public class RecommendationFeedController {
 
         return ResponseEntity.ok(SuccessResponse.of(HttpStatus.OK.toString(), "추천 피드를 조회하였습니다.",
                 recommendationFeedReadService.findRecommendationFeedWithNoOffsetPaging(request)));
+    }
+
+    @DeleteMapping("/recommendation-feeds/{id}")
+    public ResponseEntity<SuccessResponse<Void>> deleteRecommendationFeed(
+            @RequestHeader("USER-ID") String loginId,
+            @PathVariable("id") Long recommendationFeedId) {
+
+        RecommendationFeedDeleteServiceRequest request =
+                RecommendationFeedDeleteServiceRequest.of(recommendationFeedId, loginId);
+
+        recommendationFeedWriteService.deleteRecommendationFeed(request);
+
+        return ResponseEntity.ok(SuccessResponse.of(HttpStatus.OK.toString(), "추천 피드를 삭제하였습니다.", null));
     }
 }
