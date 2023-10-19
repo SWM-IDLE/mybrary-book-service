@@ -5,6 +5,7 @@ import kr.mybrary.bookservice.mybook.domain.MyBookReadService;
 import kr.mybrary.bookservice.mybook.persistence.MyBook;
 import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedCreateServiceRequest;
 import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedDeleteServiceRequest;
+import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedUpdateServiceRequest;
 import kr.mybrary.bookservice.recommend.domain.exception.RecommendationFeedAccessDeniedException;
 import kr.mybrary.bookservice.recommend.domain.exception.RecommendationFeedAlreadyExistException;
 import kr.mybrary.bookservice.recommend.domain.exception.RecommendationFeedNotFoundException;
@@ -39,12 +40,21 @@ public class RecommendationFeedWriteService {
         RecommendationFeed recommendationFeed = recommendationFeedRepository.findById(request.getRecommendationFeedId())
                 .orElseThrow(RecommendationFeedNotFoundException::new);
 
-        validateRecommendationFeedAccess(request, recommendationFeed);
+        validateRecommendationFeedAccess(request.getLoginId(), recommendationFeed);
         recommendationFeedRepository.delete(recommendationFeed);
     }
 
-    private void validateRecommendationFeedAccess(RecommendationFeedDeleteServiceRequest request, RecommendationFeed recommendationFeed) {
-        if (isOwnerSameAsRequester(recommendationFeed.getUserId(), request.getLoginId())) {
+    public void updateRecommendationFeed(RecommendationFeedUpdateServiceRequest request) {
+
+        RecommendationFeed recommendationFeed = recommendationFeedRepository.findById(request.getRecommendationFeedId())
+                .orElseThrow(RecommendationFeedNotFoundException::new);
+
+        validateRecommendationFeedAccess(request.getLoginId(), recommendationFeed);
+        recommendationFeed.update(request);
+    }
+
+    private void validateRecommendationFeedAccess(String loginId, RecommendationFeed recommendationFeed) {
+        if (isOwnerSameAsRequester(recommendationFeed.getUserId(), loginId)) {
             throw new RecommendationFeedAccessDeniedException();
         }
     }

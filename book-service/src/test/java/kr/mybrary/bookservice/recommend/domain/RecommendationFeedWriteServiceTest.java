@@ -1,5 +1,6 @@
 package kr.mybrary.bookservice.recommend.domain;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.BDDMockito.any;
@@ -18,6 +19,7 @@ import kr.mybrary.bookservice.recommend.RecommendationFeedDtoTestData;
 import kr.mybrary.bookservice.recommend.RecommendationFeedFixture;
 import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedCreateServiceRequest;
 import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedDeleteServiceRequest;
+import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedUpdateServiceRequest;
 import kr.mybrary.bookservice.recommend.domain.exception.RecommendationFeedAccessDeniedException;
 import kr.mybrary.bookservice.recommend.domain.exception.RecommendationFeedAlreadyExistException;
 import kr.mybrary.bookservice.recommend.domain.exception.RecommendationTargetDuplicateException;
@@ -185,6 +187,27 @@ class RecommendationFeedWriteServiceTest {
                         .isInstanceOf(RecommendationFeedAccessDeniedException.class),
                 () -> verify(recommendationFeedRepository, times(1)).findById(any()),
                 () -> verify(recommendationFeedRepository, never()).delete(any())
+        );
+    }
+
+    @DisplayName("추천 피드를 수정한다.")
+    @Test
+    void updateRecommendationFeed() {
+
+        // given
+        RecommendationFeedUpdateServiceRequest request = RecommendationFeedDtoTestData.createRecommendationFeedUpdateServiceRequest();
+        RecommendationFeed recommendationFeed = RecommendationFeedFixture.COMMON_LOGIN_USER_RECOMMENDATION_FEED.getRecommendationFeed();
+        given(recommendationFeedRepository.findById(any())).willReturn(Optional.of(recommendationFeed));
+
+        // when
+        recommendationFeedWriteService.updateRecommendationFeed(request);
+
+        // then
+        assertAll(
+                () -> verify(recommendationFeedRepository, times(1)).findById(any()),
+                () -> assertThat(recommendationFeed.getContent()).isEqualTo(request.getContent()),
+                () -> assertThat(recommendationFeed.getRecommendationTargets().getFeedRecommendationTargets()).extracting("targetName")
+                        .containsExactlyElementsOf(request.getRecommendationTargetNames())
         );
     }
 }

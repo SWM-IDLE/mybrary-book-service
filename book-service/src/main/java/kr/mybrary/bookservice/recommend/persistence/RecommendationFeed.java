@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
 import kr.mybrary.bookservice.mybook.persistence.MyBook;
 import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedCreateServiceRequest;
+import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedUpdateServiceRequest;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -46,5 +47,10 @@ public class RecommendationFeed {
                 .content(request.getContent())
                 .recommendationTargets(recommendationTargets)
                 .build();
+    }
+
+    public void update(RecommendationFeedUpdateServiceRequest request) {
+        this.content = request.getContent();
+        this.recommendationTargets = new RecommendationTargets(request.getRecommendationTargetNames().stream().map(RecommendationTarget::of).toList());
     }
 }

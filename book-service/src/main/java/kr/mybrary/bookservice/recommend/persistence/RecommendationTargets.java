@@ -7,8 +7,10 @@ import java.util.List;
 import kr.mybrary.bookservice.recommend.domain.exception.RecommendationTargetDuplicateException;
 import kr.mybrary.bookservice.recommend.domain.exception.RecommendationTargetSizeExceededException;
 import kr.mybrary.bookservice.recommend.domain.exception.RecommendationTargetSizeLackException;
+import lombok.Getter;
 
 @Embeddable
+@Getter
 public class RecommendationTargets {
 
     private static final int TARGET_MAX_SIZE = 5;
@@ -16,7 +18,7 @@ public class RecommendationTargets {
 
     @OneToMany(
             mappedBy = "recommendationFeed",
-            cascade = {CascadeType.PERSIST, CascadeType.REMOVE},
+            cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE},
             orphanRemoval = true
     )
     private List<RecommendationTarget> feedRecommendationTargets;
