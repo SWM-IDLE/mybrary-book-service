@@ -214,4 +214,38 @@ class RecommendationFeedRepositoryTest {
                         .containsExactly("테스트 저자 1", "테스트 저자 2", "테스트 저자 3")
         );
     }
+
+    @DisplayName("추천 피드를 삭제한다.")
+    @Test
+    void deleteRecommendationFeed() {
+
+        // given
+        Book book = entityManager.persist(BookFixture.COMMON_BOOK_WITHOUT_RELATION.getBook());
+        MyBook myBook = entityManager.persist(MyBookFixture.MY_BOOK_WITHOUT_RELATION.getMyBookWithBook(book));
+
+        RecommendationFeed recommendationFeed = RecommendationFeed.builder()
+                .userId("LOGIN_USER_ID")
+                .myBook(myBook)
+                .content("NEW CONTENT")
+                .recommendationTargets(new RecommendationTargets(List.of(
+                        RecommendationTarget.of("TARGET_NAME_1"),
+                        RecommendationTarget.of("TARGET_NAME_2"),
+                        RecommendationTarget.of("TARGET_NAME_3"),
+                        RecommendationTarget.of("TARGET_NAME_4"),
+                        RecommendationTarget.of("TARGET_NAME_5"))))
+                .build();
+
+        entityManager.flush();
+        entityManager.clear();
+        RecommendationFeed savedRecommendationFeed = recommendationFeedRepository.save(recommendationFeed);
+
+        // when
+        recommendationFeedRepository.delete(savedRecommendationFeed);
+
+        // then
+        assertAll(
+                () -> assertThat(recommendationFeedRepository.findById(savedRecommendationFeed.getId())).isEmpty(),
+                () -> assertThat(recommendationFeedTargetRepository.findAll()).isEmpty()
+        );
+    }
 }
