@@ -38,4 +38,8 @@ public class RecommendationTarget {
                 .targetName(targetName)
                 .build();
     }
+
+    public void assignRecommendationFeed(RecommendationFeed recommendationFeed) {
+        this.recommendationFeed = recommendationFeed;
+    }
 }

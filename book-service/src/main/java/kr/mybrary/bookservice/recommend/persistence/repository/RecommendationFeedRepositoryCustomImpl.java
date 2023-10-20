@@ -14,6 +14,8 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import kr.mybrary.bookservice.recommend.persistence.RecommendationFeed;
 import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedViewAllModel;
 import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedViewAllModel.BookAuthorModel;
 import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedViewAllModel.RecommendationTargetModel;
@@ -95,6 +97,13 @@ public class RecommendationFeedRepositoryCustomImpl implements RecommendationFee
         return models;
     }
 
+    @Override
+    public Optional<RecommendationFeed> getRecommendationFeedWithTargets(Long recommendationFeedId) {
+        return Optional.ofNullable(queryFactory.selectFrom(recommendationFeed)
+                .where(recommendationFeed.id.eq(recommendationFeedId))
+                .leftJoin(recommendationFeed.recommendationTargets.feedRecommendationTargets, recommendationTarget).fetchJoin()
+                .fetchOne());
+    }
 
     private BooleanExpression ltRecommendationFeedId(Long recommendationFeedId) {
         if (recommendationFeedId == null) {
