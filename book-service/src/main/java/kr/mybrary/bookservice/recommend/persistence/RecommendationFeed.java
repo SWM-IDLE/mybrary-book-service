@@ -52,9 +52,14 @@ public class RecommendationFeed {
 
     public void update(RecommendationFeedUpdateServiceRequest request) {
         this.content = request.getContent();
-        List<RecommendationTarget> recommendationTargets = request.getRecommendationTargetNames().stream()
-                .map(RecommendationTarget::of).toList();
-        addRecommendationFeedTarget(recommendationTargets);
+        this.recommendationTargets.getFeedRecommendationTargets().clear();
+        this.recommendationTargets.getFeedRecommendationTargets().addAll(
+                request.getRecommendationTargetNames().stream()
+                        .map(targetName -> RecommendationTarget.builder()
+                                .recommendationFeed(this)
+                                .targetName(targetName)
+                                .build())
+                        .toList());
     }
 
     public void addRecommendationFeedTarget(List<RecommendationTarget> recommendationTargets) {

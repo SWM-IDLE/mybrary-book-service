@@ -3,6 +3,7 @@ package kr.mybrary.bookservice.recommend.persistence;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.OneToMany;
+import java.util.ArrayList;
 import java.util.List;
 import kr.mybrary.bookservice.recommend.domain.exception.RecommendationTargetDuplicateException;
 import kr.mybrary.bookservice.recommend.domain.exception.RecommendationTargetSizeExceededException;
@@ -21,7 +22,7 @@ public class RecommendationTargets {
             cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE},
             orphanRemoval = true
     )
-    private List<RecommendationTarget> feedRecommendationTargets;
+    private List<RecommendationTarget> feedRecommendationTargets = new ArrayList<>();
 
     protected RecommendationTargets() {
     }
