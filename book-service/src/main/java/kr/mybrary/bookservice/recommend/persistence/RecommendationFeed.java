@@ -7,6 +7,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
+import java.util.List;
 import kr.mybrary.bookservice.mybook.persistence.MyBook;
 import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedCreateServiceRequest;
 import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedUpdateServiceRequest;
@@ -51,6 +52,13 @@ public class RecommendationFeed {
 
     public void update(RecommendationFeedUpdateServiceRequest request) {
         this.content = request.getContent();
-        this.recommendationTargets = new RecommendationTargets(request.getRecommendationTargetNames().stream().map(RecommendationTarget::of).toList());
+        List<RecommendationTarget> recommendationTargets = request.getRecommendationTargetNames().stream()
+                .map(RecommendationTarget::of).toList();
+        addRecommendationFeedTarget(recommendationTargets);
+    }
+
+    public void addRecommendationFeedTarget(List<RecommendationTarget> recommendationTargets) {
+        this.recommendationTargets = new RecommendationTargets(recommendationTargets);
+        recommendationTargets.forEach(recommendationTarget -> recommendationTarget.assignRecommendationFeed(this));
     }
 }

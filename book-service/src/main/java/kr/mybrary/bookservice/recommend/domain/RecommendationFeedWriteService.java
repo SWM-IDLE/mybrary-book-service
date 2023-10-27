@@ -32,6 +32,8 @@ public class RecommendationFeedWriteService {
         RecommendationTargets recommendationTargets = new RecommendationTargets(createRecommendationTargets(request));
 
         RecommendationFeed recommendationFeed = RecommendationFeed.of(request, myBook, recommendationTargets);
+
+        recommendationFeed.addRecommendationFeedTarget(recommendationTargets.getFeedRecommendationTargets());
         recommendationFeedRepository.save(recommendationFeed);
     }
 

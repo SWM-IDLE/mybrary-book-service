@@ -13,8 +13,6 @@ import kr.mybrary.bookservice.book.persistence.bookInfo.Author;
 import kr.mybrary.bookservice.book.persistence.bookInfo.BookAuthor;
 import kr.mybrary.bookservice.mybook.MyBookFixture;
 import kr.mybrary.bookservice.mybook.persistence.MyBook;
-import kr.mybrary.bookservice.recommend.RecommendationFeedDtoTestData;
-import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedUpdateServiceRequest;
 import kr.mybrary.bookservice.recommend.persistence.RecommendationFeed;
 import kr.mybrary.bookservice.recommend.persistence.RecommendationTarget;
 import kr.mybrary.bookservice.recommend.persistence.RecommendationTargets;
@@ -45,17 +43,20 @@ class RecommendationFeedRepositoryTest {
         Book book = entityManager.persist(BookFixture.COMMON_BOOK_WITHOUT_RELATION.getBook());
         MyBook myBook = entityManager.persist(MyBookFixture.MY_BOOK_WITHOUT_RELATION.getMyBookWithBook(book));
 
+        RecommendationTargets recommendationTargets = new RecommendationTargets(List.of(
+                RecommendationTarget.of("TARGET_NAME_1"),
+                RecommendationTarget.of("TARGET_NAME_2"),
+                RecommendationTarget.of("TARGET_NAME_3"),
+                RecommendationTarget.of("TARGET_NAME_4"),
+                RecommendationTarget.of("TARGET_NAME_5")));
+
         RecommendationFeed recommendationFeed = RecommendationFeed.builder()
                 .userId("LOGIN_USER_ID")
                 .myBook(myBook)
                 .content("NEW CONTENT")
-                .recommendationTargets(new RecommendationTargets(List.of(
-                        RecommendationTarget.of("TARGET_NAME_1"),
-                        RecommendationTarget.of("TARGET_NAME_2"),
-                        RecommendationTarget.of("TARGET_NAME_3"),
-                        RecommendationTarget.of("TARGET_NAME_4"),
-                        RecommendationTarget.of("TARGET_NAME_5"))))
                 .build();
+
+        recommendationFeed.addRecommendationFeedTarget(recommendationTargets.getFeedRecommendationTargets());
 
         entityManager.flush();
         entityManager.clear();
@@ -64,11 +65,16 @@ class RecommendationFeedRepositoryTest {
         RecommendationFeed savedRecommendationFeed = recommendationFeedRepository.save(recommendationFeed);
 
         // then
+        List<RecommendationTarget> savedRecommendationTargets = recommendationFeedTargetRepository.findAll();
         assertAll(
                 () -> assertNotNull(savedRecommendationFeed.getId()),
                 () -> assertThat(savedRecommendationFeed.getUserId()).isEqualTo("LOGIN_USER_ID"),
                 () -> assertThat(savedRecommendationFeed.getContent()).isEqualTo("NEW CONTENT"),
-                () -> assertThat(savedRecommendationFeed.getRecommendationTargets().getSize()).isEqualTo(5)
+                () -> assertThat(savedRecommendationFeed.getRecommendationTargets().getSize()).isEqualTo(5),
+                () -> assertThat(savedRecommendationTargets).hasSize(5),
+                () -> assertThat(savedRecommendationTargets).extracting("recommendationFeed")
+                        .containsExactlyInAnyOrder(savedRecommendationFeed, savedRecommendationFeed, savedRecommendationFeed,
+                                savedRecommendationFeed, savedRecommendationFeed)
         );
     }
 
@@ -294,53 +300,4 @@ class RecommendationFeedRepositoryTest {
         );
     }
 
-
-//    @DisplayName("추천 피드를 수정한다.")
-//    @Test
-//    void updateRecommendationFeed() {
-//
-//        // given
-//        Book book = entityManager.persist(BookFixture.COMMON_BOOK_WITHOUT_RELATION.getBook());
-//        MyBook myBook = entityManager.persist(MyBookFixture.MY_BOOK_WITHOUT_RELATION.getMyBookWithBook(book));
-//
-//        RecommendationFeed recommendationFeed = RecommendationFeed.builder()
-//                .userId("LOGIN_USER_ID")
-//                .myBook(myBook)
-//                .content("NEW CONTENT")
-//                .build();
-//
-//        List<RecommendationTarget> recommendationTargets = (List.of(
-//                RecommendationTarget.of("TARGET_NAME_1"),
-//                RecommendationTarget.of("TARGET_NAME_2"),
-//                RecommendationTarget.of("TARGET_NAME_3"),
-//                RecommendationTarget.of("TARGET_NAME_4"),
-//                RecommendationTarget.of("TARGET_NAME_5")));
-//
-//        recommendationFeed.addRecommendationFeedTarget(recommendationTargets);
-//
-//        RecommendationFeed savedRecommendationFeed = recommendationFeedRepository.save(recommendationFeed);
-//
-//        entityManager.flush();
-//        entityManager.clear();
-//
-//        // when
-//        RecommendationFeed findRecommendationFeed = recommendationFeedRepository.findById(savedRecommendationFeed.getId())
-//                .orElseThrow();
-//        RecommendationFeedUpdateServiceRequest request = RecommendationFeedDtoTestData.createRecommendationFeedUpdateServiceRequest();
-//        findRecommendationFeed.update(request);
-//
-//        entityManager.flush();
-//        entityManager.clear();
-//
-//        RecommendationFeed updatedRecommendationFeed = recommendationFeedRepository.findById(findRecommendationFeed.getId())
-//                .orElseThrow();
-//
-//        // then
-//        assertAll(
-//                () -> assertThat(updatedRecommendationFeed.getContent()).isEqualTo(request.getContent()),
-//                () -> assertThat(updatedRecommendationFeed.getRecommendationTargets().getSize()).isEqualTo(2),
-//                () -> assertThat(updatedRecommendationFeed.getRecommendationTargets().getFeedRecommendationTargets()).extracting("targetName")
-//                        .containsExactly("TARGET_NAME_1", "TARGET_NAME_2")
-//        );
-//    }
 }
