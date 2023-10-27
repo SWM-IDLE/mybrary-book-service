@@ -29,7 +29,7 @@ public class RecommendationFeedRepositoryCustomImpl implements RecommendationFee
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<RecommendationFeedViewAllModel> getRecommendationFeedViewAll(Long RecommendationFeedId, int pageSize) {
+    public List<RecommendationFeedViewAllModel> getRecommendationFeedViewAll(Long recommendationFeedId, int pageSize) {
         List<RecommendationFeedViewAllModel> models = queryFactory.select(fields(RecommendationFeedViewAllModel.class,
                         recommendationFeed.id.as("recommendationFeedId"),
                         recommendationFeed.content.as("content"),
@@ -43,7 +43,7 @@ public class RecommendationFeedRepositoryCustomImpl implements RecommendationFee
                         book.interestCount.as("interestCount")
                 ))
                 .from(recommendationFeed)
-                .where(ltRecommendationFeedId(RecommendationFeedId))
+                .where(ltRecommendationFeedId(recommendationFeedId))
                 .orderBy(recommendationFeed.id.desc())
                 .limit(pageSize)
                 .join(recommendationFeed.myBook, myBook).on(recommendationFeed.myBook.id.eq(myBook.id))

@@ -151,7 +151,7 @@ class RecommendationFeedRepositoryTest {
 
         // then
         assertAll(
-                () -> assertThat(recommendationFeedViewAll.size()).isEqualTo(10),
+                () -> assertThat(recommendationFeedViewAll).hasSize(10),
                 () -> assertThat(recommendationFeedViewAll.get(0).getRecommendationTargets()).hasSize(1),
                 () -> assertThat(recommendationFeedViewAll.get(0).getContent()).isEqualTo("NEW_CONTENT_20"),
                 () -> assertThat(recommendationFeedViewAll.get(0).getRecommendationTargets()).extracting("targetName")
@@ -210,7 +210,7 @@ class RecommendationFeedRepositoryTest {
 
         // then
         assertAll(
-                () -> assertThat(recommendationFeedViewAll.size()).isEqualTo(10),
+                () -> assertThat(recommendationFeedViewAll).hasSize(10),
                 () -> assertThat(recommendationFeedViewAll.get(0).getRecommendationTargets()).hasSize(1),
                 () -> assertThat(recommendationFeedViewAll.get(0).getContent()).isEqualTo("NEW_CONTENT_10"),
                 () -> assertThat(recommendationFeedViewAll.get(0).getRecommendationTargets()).extracting("targetName")
@@ -294,7 +294,7 @@ class RecommendationFeedRepositoryTest {
         // then
         assertAll(
                 () -> assertThat(recommendationFeedWithTargets.getRecommendationTargets()
-                        .getFeedRecommendationTargets() instanceof HibernateProxy).isFalse(),
+                        .getFeedRecommendationTargets()).isNotInstanceOf(HibernateProxy.class),
                 () -> assertThat(recommendationFeedWithTargets.getContent()).isEqualTo(savedRecommendationFeed.getContent()),
                 () -> assertThat(recommendationFeedWithTargets.getRecommendationTargets().getFeedRecommendationTargets())
                         .extracting("targetName")
