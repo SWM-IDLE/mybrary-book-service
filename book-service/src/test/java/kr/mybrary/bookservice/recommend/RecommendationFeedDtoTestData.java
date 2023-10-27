@@ -12,6 +12,7 @@ import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedGet
 import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedUpdateServiceRequest;
 import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedViewAllModel;
 import kr.mybrary.bookservice.recommend.presentation.dto.request.RecommendationFeedCreateRequest;
+import kr.mybrary.bookservice.recommend.presentation.dto.request.RecommendationFeedUpdateRequest;
 import kr.mybrary.bookservice.recommend.presentation.dto.response.RecommendationFeedViewAllResponse;
 import kr.mybrary.bookservice.recommend.presentation.dto.response.RecommendationFeedViewAllResponse.RecommendationFeedElement;
 
@@ -133,6 +134,13 @@ public class RecommendationFeedDtoTestData {
         return RecommendationFeedUpdateServiceRequest.builder()
                 .recommendationFeedId(1L)
                 .loginId("LOGIN_USER_ID")
+                .content("NEW CONTENT")
+                .recommendationTargetNames(List.of("New Target 1", "New Target 2"))
+                .build();
+    }
+
+    public static RecommendationFeedUpdateRequest createRecommendationFeedUpdateRequest() {
+        return RecommendationFeedUpdateRequest.builder()
                 .content("NEW CONTENT")
                 .recommendationTargetNames(List.of("New Target 1", "New Target 2"))
                 .build();

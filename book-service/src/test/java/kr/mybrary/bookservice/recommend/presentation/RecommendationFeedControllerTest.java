@@ -10,6 +10,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
@@ -29,6 +30,7 @@ import kr.mybrary.bookservice.recommend.RecommendationFeedDtoTestData;
 import kr.mybrary.bookservice.recommend.domain.RecommendationFeedReadService;
 import kr.mybrary.bookservice.recommend.domain.RecommendationFeedWriteService;
 import kr.mybrary.bookservice.recommend.presentation.dto.request.RecommendationFeedCreateRequest;
+import kr.mybrary.bookservice.recommend.presentation.dto.request.RecommendationFeedUpdateRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -249,6 +251,56 @@ class RecommendationFeedControllerTest {
                                                 parameterWithName("id").type(SimpleType.NUMBER).description("추천 피드 ID")
                                         )
                                         .responseSchema(Schema.schema("delete_recommendation_feed_response_body"))
+                                        .responseFields(
+                                                fieldWithPath("status").type(STRING).description("응답 상태"),
+                                                fieldWithPath("message").type(STRING).description("응답 메시지"),
+                                                fieldWithPath("data").type(OBJECT).description("응답 데이터").optional()
+                                        ).build())));
+    }
+
+    @DisplayName("추천 피드를 수정한다.")
+    @Test
+    void updateRecommendationFeed() throws Exception {
+
+        // given
+        RecommendationFeedUpdateRequest request = RecommendationFeedDtoTestData.createRecommendationFeedUpdateRequest();
+        String requestJson = objectMapper.writeValueAsString(request);
+        doNothing().when(recommendationFeedWriteService).updateRecommendationFeed(any());
+
+        // when
+        ResultActions actions = mockMvc.perform(put("/api/v1/recommendation-feeds/{id}", 1L)
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("USER-ID", LOGIN_ID)
+                .content(requestJson));
+
+        // then
+        actions
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$.status").value("200 OK"))
+                .andExpect(jsonPath("$.message").value("추천 피드를 수정했습니다."))
+                .andExpect(jsonPath("$.data").isEmpty());
+
+        // document
+        actions
+                .andDo(document("update-recommendation-feed",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        resource(
+                                ResourceSnippetParameters.builder()
+                                        .tag("recommendation-feed")
+                                        .summary("추천 피드를 수정한다.")
+                                        .requestSchema(Schema.schema("update_recommendation_feed_request_body"))
+                                        .requestHeaders(
+                                                headerWithName("USER-ID").description("사용자 ID")
+                                        )
+                                        .pathParameters(
+                                                parameterWithName("id").type(SimpleType.NUMBER).description("추천 피드 ID")
+                                        )
+                                        .requestFields(
+                                                fieldWithPath("content").type(STRING).description("마이북 리뷰 별점"),
+                                                fieldWithPath("recommendationTargetNames").type(ARRAY).description("마이북 리뷰 별점")
+                                        )
+                                        .responseSchema(Schema.schema("update_recommendation_feed_response_body"))
                                         .responseFields(
                                                 fieldWithPath("status").type(STRING).description("응답 상태"),
                                                 fieldWithPath("message").type(STRING).description("응답 메시지"),
