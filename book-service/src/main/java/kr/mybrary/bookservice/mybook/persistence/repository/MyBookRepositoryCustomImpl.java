@@ -23,9 +23,9 @@ import kr.mybrary.bookservice.mybook.persistence.ReadStatus;
 import kr.mybrary.bookservice.mybook.persistence.model.MyBookListDisplayElementModel;
 import kr.mybrary.bookservice.mybook.persistence.model.MyBookRegisteredListByDateModel;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Repository;
 
-@Service
+@Repository
 @RequiredArgsConstructor
 public class MyBookRepositoryCustomImpl implements MyBookRepositoryCustom {
 
