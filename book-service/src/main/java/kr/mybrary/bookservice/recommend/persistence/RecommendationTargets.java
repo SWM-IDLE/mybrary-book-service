@@ -6,6 +6,7 @@ import jakarta.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
 import kr.mybrary.bookservice.recommend.domain.exception.RecommendationTargetDuplicateException;
+import kr.mybrary.bookservice.recommend.domain.exception.RecommendationTargetLengthExceededException;
 import kr.mybrary.bookservice.recommend.domain.exception.RecommendationTargetSizeExceededException;
 import kr.mybrary.bookservice.recommend.domain.exception.RecommendationTargetSizeLackException;
 import lombok.Getter;
@@ -31,6 +32,7 @@ public class RecommendationTargets {
         validateMaxSize(feedRecommendationTargets);
         validateMinSize(feedRecommendationTargets);
         validateDuplicate(feedRecommendationTargets);
+        validateTargetLength(feedRecommendationTargets);
         this.feedRecommendationTargets = feedRecommendationTargets;
     }
 
@@ -57,6 +59,14 @@ public class RecommendationTargets {
                 .count()) {
 
             throw new RecommendationTargetDuplicateException();
+        }
+    }
+
+    private void validateTargetLength(List<RecommendationTarget> feedRecommendationTargets) {
+        for (RecommendationTarget target : feedRecommendationTargets) {
+            if (target.getTargetName().length() > 15) {
+                throw new RecommendationTargetLengthExceededException();
+            }
         }
     }
 }

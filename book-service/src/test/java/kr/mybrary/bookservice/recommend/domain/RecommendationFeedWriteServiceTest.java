@@ -23,6 +23,7 @@ import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedUpd
 import kr.mybrary.bookservice.recommend.domain.exception.RecommendationFeedAccessDeniedException;
 import kr.mybrary.bookservice.recommend.domain.exception.RecommendationFeedAlreadyExistException;
 import kr.mybrary.bookservice.recommend.domain.exception.RecommendationTargetDuplicateException;
+import kr.mybrary.bookservice.recommend.domain.exception.RecommendationTargetLengthExceededException;
 import kr.mybrary.bookservice.recommend.domain.exception.RecommendationTargetSizeExceededException;
 import kr.mybrary.bookservice.recommend.domain.exception.RecommendationTargetSizeLackException;
 import kr.mybrary.bookservice.recommend.persistence.RecommendationFeed;
@@ -136,7 +137,7 @@ class RecommendationFeedWriteServiceTest {
         // given
         RecommendationFeedCreateServiceRequest request = RecommendationFeedDtoTestData.createRecommendationFeedCreateServiceRequestBuilder()
                 .myBookId(1L)
-                .recommendationTargetNames(List.of("Target_1", "Target_1", "Target_3", "Target_4"))
+                .recommendationTargetNames(List.of("Target_1", "Target_2", "Target_3", "Target_4"))
                 .build();
 
         given(recommendationFeedRepository.existsByMyBookId(1L)).willReturn(true);
@@ -147,6 +148,27 @@ class RecommendationFeedWriteServiceTest {
                         .isInstanceOf(RecommendationFeedAlreadyExistException.class),
                 () -> verify(myBookReadService, never()).findMyBookById(any()),
                 () -> verify(recommendationFeedRepository, never()).save(any())
+        );
+    }
+
+    @DisplayName("추천 피드 대상의 길이가 15자를 넘으면, 예외가 발생한다.")
+    @Test
+    void occurExceptionWhenRecommendationFeedTargetLengthExceeded() {
+
+        // given
+        String targetNameGreaterThan15 = "Target".repeat(4);
+        RecommendationFeedCreateServiceRequest request = RecommendationFeedDtoTestData.createRecommendationFeedCreateServiceRequestBuilder()
+                .recommendationTargetNames(List.of(targetNameGreaterThan15, "Target_1", "Target_3", "Target_4"))
+                .build();
+
+        MyBook myBook = MyBookFixture.COMMON_LOGIN_USER_MYBOOK.getMyBook();
+        given(myBookReadService.findMyBookById(any())).willReturn(myBook);
+
+        // when, then
+        assertAll(
+                () -> assertThatThrownBy(() -> recommendationFeedWriteService.create(request))
+                        .isInstanceOf(RecommendationTargetLengthExceededException.class),
+                () -> verify(myBookReadService, times(1)).findMyBookById(any())
         );
     }
 
