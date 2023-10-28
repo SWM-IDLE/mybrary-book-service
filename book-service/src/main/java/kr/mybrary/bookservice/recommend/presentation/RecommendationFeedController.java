@@ -1,5 +1,6 @@
 package kr.mybrary.bookservice.recommend.presentation;
 
+import jakarta.validation.Valid;
 import kr.mybrary.bookservice.global.dto.response.SuccessResponse;
 import kr.mybrary.bookservice.recommend.domain.RecommendationFeedReadService;
 import kr.mybrary.bookservice.recommend.domain.RecommendationFeedWriteService;
@@ -35,7 +36,7 @@ public class RecommendationFeedController {
     @PostMapping("/recommendation-feeds")
     public ResponseEntity<SuccessResponse<Void>> createRecommendationFeed(
             @RequestHeader("USER-ID") String loginId,
-            @RequestBody RecommendationFeedCreateRequest request) {
+            @Valid @RequestBody RecommendationFeedCreateRequest request) {
 
         RecommendationFeedCreateServiceRequest serviceRequest = RecommendationFeedCreateServiceRequest.of(loginId,
                 request);
@@ -74,7 +75,7 @@ public class RecommendationFeedController {
     public ResponseEntity<SuccessResponse<Void>> updateRecommendationFeed(
             @RequestHeader("USER-ID") String loginId,
             @PathVariable("id") Long recommendationFeedId,
-            @RequestBody RecommendationFeedUpdateRequest request) {
+            @Valid @RequestBody RecommendationFeedUpdateRequest request) {
 
         RecommendationFeedUpdateServiceRequest serviceRequest = RecommendationFeedUpdateServiceRequest.of(loginId,
                 recommendationFeedId, request);
