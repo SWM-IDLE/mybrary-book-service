@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
 
 import kr.mybrary.bookservice.client.user.api.UserServiceClient;
 import kr.mybrary.bookservice.client.user.dto.response.UserInfoServiceResponse;
@@ -62,7 +63,9 @@ class RecommendationFeedReadServiceTest {
                                 tuple("USER_ID_7", "USER_NICKNAME_7", "USER_PICTURE_URL_7", "CONTENT_7", 7L),
                                 tuple("USER_ID_8", "USER_NICKNAME_8", "USER_PICTURE_URL_8", "CONTENT_8", 8L),
                                 tuple("USER_ID_9", "USER_NICKNAME_9", "USER_PICTURE_URL_9", "CONTENT_9", 9L),
-                                tuple("USER_ID_10", "USER_NICKNAME_10", "USER_PICTURE_URL_10", "CONTENT_10", 10L))
+                                tuple("USER_ID_10", "USER_NICKNAME_10", "USER_PICTURE_URL_10", "CONTENT_10", 10L)),
+                () -> verify(recommendationFeedRepository).getRecommendationFeedViewAll(any(), anyInt()),
+                () -> verify(userServiceClient).getUsersInfo(any())
         );
     }
 

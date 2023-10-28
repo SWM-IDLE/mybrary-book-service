@@ -260,7 +260,7 @@ class RecommendationFeedRepositoryTest {
         );
     }
 
-    @DisplayName("추천 피드 조회시, 페치조인을 통해 추천 피트 타겟도 조회한다.")
+    @DisplayName("추천 피드 조회시, 페치조인을 통해 추천 피드 타겟도 조회한다.")
     @Test
     void getRecommendationFeedWithTargetsUsingFetchJoin() {
 
