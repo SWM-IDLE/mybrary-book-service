@@ -145,9 +145,10 @@ class RecommendationFeedControllerTest {
                                 ResourceSnippetParameters.builder()
                                         .tag("recommendation-feed")
                                         .summary("페이징을 통해 추천 피드를 조회한다.")
-                                        .description("무한 스크롤 시, cursor의 값은 지난 응답의 lastRecommendationFeedId를 사용한다.\n" +
-                                                "처음 추천 피드를 조회할 경우, cursor는 생략한다.\n" +
-                                                "limit는 생략가능하며, 생략 시 10개로 설정된다.")
+                                        .description("""
+                                                무한 스크롤 시, cursor의 값은 지난 응답의 lastRecommendationFeedId를 사용한다.
+                                                처음 추천 피드를 조회할 경우, cursor는 생략한다.
+                                                limit는 생략가능하며, 생략 시 10개로 설정된다.""")
                                         .requestHeaders(
                                                 headerWithName("USER-ID").description("사용자 ID")
                                         )

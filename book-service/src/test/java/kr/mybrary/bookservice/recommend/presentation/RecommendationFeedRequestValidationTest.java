@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 
 public class RecommendationFeedRequestValidationTest {
 
-    private static Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+    private static final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
     @DisplayName("추천 피드 생성시, 추천피드 내 글은 5자 이상 50자 이하로 작성해야 한다.")
     @Test
