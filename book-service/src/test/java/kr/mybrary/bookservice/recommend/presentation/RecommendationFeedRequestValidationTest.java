@@ -12,7 +12,7 @@ import kr.mybrary.bookservice.recommend.presentation.dto.request.RecommendationF
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class RecommendationFeedRequestValidationTest {
+class RecommendationFeedRequestValidationTest {
 
     private static final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
