@@ -7,7 +7,7 @@ import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedView
 
 public interface RecommendationFeedRepositoryCustom {
 
-    List<RecommendationFeedViewAllModel> getRecommendationFeedViewAll(Long recommendationFeedId, int pageSize);
+    List<RecommendationFeedViewAllModel> getRecommendationFeedViewAll(Long recommendationFeedId, int pageSize, String userId);
 
     Optional<RecommendationFeed> getRecommendationFeedWithTargets(Long recommendationFeedId);
 }

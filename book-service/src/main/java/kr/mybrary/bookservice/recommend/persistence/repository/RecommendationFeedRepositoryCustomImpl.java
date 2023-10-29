@@ -3,7 +3,9 @@ package kr.mybrary.bookservice.recommend.persistence.repository;
 import static com.querydsl.core.group.GroupBy.groupBy;
 import static com.querydsl.core.group.GroupBy.list;
 import static com.querydsl.core.types.Projections.fields;
+import static com.querydsl.core.types.dsl.Expressions.set;
 import static kr.mybrary.bookservice.book.persistence.QBook.book;
+import static kr.mybrary.bookservice.book.persistence.QBookInterest.bookInterest;
 import static kr.mybrary.bookservice.book.persistence.bookInfo.QAuthor.author;
 import static kr.mybrary.bookservice.book.persistence.bookInfo.QBookAuthor.bookAuthor;
 import static kr.mybrary.bookservice.mybook.persistence.QMyBook.myBook;
@@ -15,6 +17,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import kr.mybrary.bookservice.recommend.persistence.RecommendationFeed;
 import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedViewAllModel;
 import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedViewAllModel.BookAuthorModel;
@@ -29,7 +32,7 @@ public class RecommendationFeedRepositoryCustomImpl implements RecommendationFee
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<RecommendationFeedViewAllModel> getRecommendationFeedViewAll(Long recommendationFeedId, int pageSize) {
+    public List<RecommendationFeedViewAllModel> getRecommendationFeedViewAll(Long recommendationFeedId, int pageSize, String userId) {
         List<RecommendationFeedViewAllModel> models = queryFactory.select(fields(RecommendationFeedViewAllModel.class,
                         recommendationFeed.id.as("recommendationFeedId"),
                         recommendationFeed.content.as("content"),
@@ -89,9 +92,14 @@ public class RecommendationFeedRepositoryCustomImpl implements RecommendationFee
                                 author.name.as("name")
                         ))));
 
+        Set<Long> interestedBookIdSet = queryFactory.select(book.id).from(bookInterest)
+                .where(bookInterest.userId.eq(userId))
+                .transform(groupBy(book.id).as(set(book.id))).keySet();
+
         models.forEach(model -> {
             model.setRecommendationTargets(recommendationTargetModelMap.getOrDefault(model.getRecommendationFeedId(), List.of()));
             model.setBookAuthors(bookAuthorModelMap.getOrDefault(model.getBookId(), List.of()));
+            model.setInterested(interestedBookIdSet.contains(model.getBookId()));
         });
 
         return models;

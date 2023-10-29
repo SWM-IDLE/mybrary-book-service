@@ -15,6 +15,7 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
+import static org.springframework.restdocs.payload.JsonFieldType.BOOLEAN;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.OBJECT;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
@@ -123,6 +124,7 @@ class RecommendationFeedControllerTest {
 
         // when
         ResultActions actions = mockMvc.perform(get("/api/v1/recommendation-feeds")
+                .header("USER-ID", LOGIN_ID)
                 .param("limit", String.valueOf(limit))
                 .param("cursor", String.valueOf(cursor))
                 .contentType(MediaType.APPLICATION_JSON));
@@ -146,6 +148,9 @@ class RecommendationFeedControllerTest {
                                         .description("무한 스크롤 시, cursor의 값은 지난 응답의 lastRecommendationFeedId를 사용한다.\n" +
                                                 "처음 추천 피드를 조회할 경우, cursor는 생략한다.\n" +
                                                 "limit는 생략가능하며, 생략 시 10개로 설정된다.")
+                                        .requestHeaders(
+                                                headerWithName("USER-ID").description("사용자 ID")
+                                        )
                                         .requestSchema(Schema.schema(
                                                 "get_recommendation_feed_with_no_offset_paging_request_body"))
                                         .queryParameters(
@@ -188,6 +193,8 @@ class RecommendationFeedControllerTest {
                                                         .description("추천 피드 책 보유자 수"),
                                                 fieldWithPath("data.recommendationFeeds[].interestCount").type(NUMBER)
                                                         .description("추천 피드 책 관심자 수"),
+                                                fieldWithPath("data.recommendationFeeds[].interested").type(BOOLEAN)
+                                                        .description("추천 피드 책 관심 여부"),
                                                 fieldWithPath("data.lastRecommendationFeedId").type(NUMBER)
                                                         .description("마지막 추천 피드 ID")
                                         ).build())));
@@ -205,6 +212,7 @@ class RecommendationFeedControllerTest {
 
         // when
         ResultActions actions = mockMvc.perform(get("/api/v1/recommendation-feeds")
+                .header("USER-ID", LOGIN_ID)
                 .param("limit", String.valueOf(limit))
                 .contentType(MediaType.APPLICATION_JSON));
 

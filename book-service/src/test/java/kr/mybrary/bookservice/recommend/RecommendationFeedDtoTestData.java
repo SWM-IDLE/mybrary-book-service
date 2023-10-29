@@ -36,6 +36,7 @@ public class RecommendationFeedDtoTestData {
 
     public static RecommendationFeedGetWithPagingServiceRequest createRecommendationFeedGetWithPagingServiceRequest() {
         return RecommendationFeedGetWithPagingServiceRequest.builder()
+                .loginId("LOGIN_USER_ID")
                 .recommendationFeedId(1L)
                 .pageSize(10)
                 .build();
@@ -72,6 +73,7 @@ public class RecommendationFeedDtoTestData {
                             .isbn13("ISBN13_" + i)
                             .holderCount(i)
                             .interestCount(i)
+                            .interested(true)
                             .recommendationTargets(List.of(
                                     RecommendationFeedViewAllModel.RecommendationTargetModel.builder()
                                             .targetId((long) i)
@@ -114,6 +116,7 @@ public class RecommendationFeedDtoTestData {
                         .authors(List.of("AUTHOR_NAME_" + i, "AUTHOR_NAME_" + (i + 1)))
                         .holderCount(i)
                         .interestCount(i)
+                        .interested(true)
                         .build()));
 
         return RecommendationFeedViewAllResponse.builder()

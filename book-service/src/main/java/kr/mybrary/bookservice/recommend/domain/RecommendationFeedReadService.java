@@ -27,7 +27,7 @@ public class RecommendationFeedReadService {
     public RecommendationFeedViewAllResponse findRecommendationFeedWithNoOffsetPaging(RecommendationFeedGetWithPagingServiceRequest request) {
 
         List<RecommendationFeedViewAllModel> recommendationFeeds =
-                recommendationFeedRepository.getRecommendationFeedViewAll(request.getRecommendationFeedId(), request.getPageSize());
+                recommendationFeedRepository.getRecommendationFeedViewAll(request.getRecommendationFeedId(), request.getPageSize(), request.getLoginId());
         Long lastRecommendationFeedId = recommendationFeeds.get(recommendationFeeds.size() - 1).getRecommendationFeedId();
 
         UserInfoServiceResponse usersInfo = userServiceClient.getUsersInfo(getUserIdFromRecommendationFeed(recommendationFeeds));
@@ -42,26 +42,7 @@ public class RecommendationFeedReadService {
 
         return recommendationFeeds.stream()
                 .filter(recommendationFeed -> userInfoMap.containsKey(recommendationFeed.getUserId()))
-                .map(recommendationFeed -> RecommendationFeedElement.builder()
-                        .content(recommendationFeed.getContent())
-                        .recommendationTargetNames(recommendationFeed.getRecommendationTargets().stream()
-                                .map(RecommendationTargetModel::getTargetName)
-                                .toList())
-                        .userId(recommendationFeed.getUserId())
-                        .nickname(userInfoMap.get(recommendationFeed.getUserId()).getNickname())
-                        .profileImageUrl(userInfoMap.get(recommendationFeed.getUserId()).getProfileImageUrl())
-                        .myBookId(recommendationFeed.getMyBookId())
-                        .bookId(recommendationFeed.getBookId())
-                        .title(recommendationFeed.getTitle())
-                        .thumbnailUrl(recommendationFeed.getThumbnailUrl())
-                        .isbn13(recommendationFeed.getIsbn13())
-                        .authors(recommendationFeed.getBookAuthors().stream()
-                                .map(RecommendationFeedViewAllModel.BookAuthorModel::getName)
-                                .toList())
-                        .holderCount(recommendationFeed.getHolderCount())
-                        .interestCount(recommendationFeed.getInterestCount())
-                        .build()
-                ).toList();
+                .map(recommendationFeed -> RecommendationFeedElement.of(recommendationFeed, userInfoMap)).toList();
     }
 
     private Map<String, UserInfo> createUserInfoMapFromResponse(

@@ -27,6 +27,7 @@ public class RecommendationFeedViewAllModel {
     private String isbn13;
     private Integer holderCount;
     private Integer interestCount;
+    private Boolean interested;
 
     public void setRecommendationTargets(List<RecommendationTargetModel> recommendationTargetModels) {
         this.recommendationTargets = recommendationTargetModels;
@@ -34,6 +35,10 @@ public class RecommendationFeedViewAllModel {
 
     public void setBookAuthors(List<BookAuthorModel> bookAuthorModels) {
         this.bookAuthors = bookAuthorModels;
+    }
+
+    public void setInterested(boolean interested) {
+        this.interested = interested;
     }
 
     @Getter

@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.tuple;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
@@ -43,7 +44,7 @@ class RecommendationFeedReadServiceTest {
         UserInfoServiceResponse userInfoServiceResponse = RecommendationFeedDtoTestData.createUserInfoResponseList();
         RecommendationFeedGetWithPagingServiceRequest request = RecommendationFeedDtoTestData.createRecommendationFeedGetWithPagingServiceRequest();
 
-        given(recommendationFeedRepository.getRecommendationFeedViewAll(any(), anyInt())).willReturn(RecommendationFeedDtoTestData.createRecommendationFeedViewAllModelList());
+        given(recommendationFeedRepository.getRecommendationFeedViewAll(any(), anyInt(), anyString())).willReturn(RecommendationFeedDtoTestData.createRecommendationFeedViewAllModelList());
         given(userServiceClient.getUsersInfo(any())).willReturn(userInfoServiceResponse);
 
         // when
@@ -64,7 +65,7 @@ class RecommendationFeedReadServiceTest {
                                 tuple("USER_ID_8", "USER_NICKNAME_8", "USER_PICTURE_URL_8", "CONTENT_8", 8L),
                                 tuple("USER_ID_9", "USER_NICKNAME_9", "USER_PICTURE_URL_9", "CONTENT_9", 9L),
                                 tuple("USER_ID_10", "USER_NICKNAME_10", "USER_PICTURE_URL_10", "CONTENT_10", 10L)),
-                () -> verify(recommendationFeedRepository).getRecommendationFeedViewAll(any(), anyInt()),
+                () -> verify(recommendationFeedRepository).getRecommendationFeedViewAll(any(), anyInt(), anyString()),
                 () -> verify(userServiceClient).getUsersInfo(any())
         );
     }

@@ -48,11 +48,12 @@ public class RecommendationFeedController {
 
     @GetMapping("/recommendation-feeds")
     public ResponseEntity<SuccessResponse<RecommendationFeedViewAllResponse>> getRecommendationFeedWithNoOffsetPaging(
+            @RequestHeader("USER-ID") String loginId,
             @RequestParam(value = "limit", required = false, defaultValue = "10") int limit,
             @RequestParam(value = "cursor", required = false) Long cursor) {
 
         RecommendationFeedGetWithPagingServiceRequest request =
-                RecommendationFeedGetWithPagingServiceRequest.of(cursor, limit);
+                RecommendationFeedGetWithPagingServiceRequest.of(cursor, limit, loginId);
 
         return ResponseEntity.ok(SuccessResponse.of(HttpStatus.OK.toString(), "추천 피드를 조회하였습니다.",
                 recommendationFeedReadService.findRecommendationFeedWithNoOffsetPaging(request)));

@@ -9,10 +9,12 @@ public class RecommendationFeedGetWithPagingServiceRequest {
 
     private Long recommendationFeedId;
     private int pageSize;
+    private String loginId;
 
-    public static RecommendationFeedGetWithPagingServiceRequest of(Long recommendationFeedId, int pageSize) {
+    public static RecommendationFeedGetWithPagingServiceRequest of(Long recommendationFeedId, int pageSize, String loginId) {
 
         return RecommendationFeedGetWithPagingServiceRequest.builder()
+                .loginId(loginId)
                 .recommendationFeedId(recommendationFeedId)
                 .pageSize(pageSize)
                 .build();
