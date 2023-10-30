@@ -19,6 +19,7 @@ import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedUpd
 import kr.mybrary.bookservice.recommend.persistence.RecommendationFeed;
 import kr.mybrary.bookservice.recommend.persistence.RecommendationTarget;
 import kr.mybrary.bookservice.recommend.persistence.RecommendationTargets;
+import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedOfUserViewModel;
 import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedViewAllModel;
 import org.hibernate.proxy.HibernateProxy;
 import org.junit.jupiter.api.DisplayName;
@@ -411,6 +412,74 @@ class RecommendationFeedRepositoryTest {
                         .containsExactly("테스트 저자 1", "테스트 저자 2", "테스트 저자 3"),
                 () -> assertThat(recommendationFeedViewAll.get(0).getInterested()).isTrue(),
                 () -> assertThat(recommendationFeedViewAll.get(9).getInterested()).isTrue()
+        );
+    }
+
+    @DisplayName("1번째부터 10번째의 추천 피드를 조회한다. paging 처리")
+    @Test
+    void getRecommendationFeedViewOfUserModel() {
+
+        // given
+        Author author_1 = entityManager.persist(Author.builder().aid(11).name("테스트 저자 1").build());
+        Author author_2 = entityManager.persist(Author.builder().aid(12).name("테스트 저자 2").build());
+        Author author_3 = entityManager.persist(Author.builder().aid(13).name("테스트 저자 3").build());
+
+        Book book = entityManager.persist(BookFixture.COMMON_BOOK_WITHOUT_RELATION.getBook());
+        entityManager.persist(BookAuthor.builder().book(book).author(author_1).build());
+        entityManager.persist(BookAuthor.builder().book(book).author(author_2).build());
+        entityManager.persist(BookAuthor.builder().book(book).author(author_3).build());
+
+        IntStream.range(1, 5)
+                .forEach(i -> {
+                    MyBook myBook = entityManager.persist(MyBookFixture.MY_BOOK_WITHOUT_RELATION.getMyBookWithBook(book));
+
+                    RecommendationFeed recommendationFeed = recommendationFeedRepository.save(RecommendationFeed.builder()
+                            .userId("LOGIN_USER_ID")
+                            .myBook(myBook)
+                            .content("NEW_CONTENT_" + i)
+                            .build());
+
+                    entityManager.persist(RecommendationTarget.builder()
+                            .recommendationFeed(recommendationFeed)
+                            .targetName("TARGET_NAME_" + i)
+                            .build());
+                });
+
+        IntStream.range(5, 10)
+                .forEach(i -> {
+                    MyBook myBook = entityManager.persist(MyBookFixture.MY_BOOK_WITHOUT_RELATION.getMyBookWithBook(book));
+
+                    RecommendationFeed recommendationFeed = recommendationFeedRepository.save(RecommendationFeed.builder()
+                            .userId("LOGIN_USER_ID_" + i)
+                            .myBook(myBook)
+                            .content("NEW_CONTENT_" + i)
+                            .build());
+
+                    entityManager.persist(RecommendationTarget.builder()
+                            .recommendationFeed(recommendationFeed)
+                            .targetName("TARGET_NAME_" + i)
+                            .build());
+                });
+
+        entityManager.flush();
+        entityManager.clear();
+
+        // when
+        List<RecommendationFeedOfUserViewModel> recommendationFeedViewAll =
+                recommendationFeedRepository.getRecommendationFeedViewOfUserModel("LOGIN_USER_ID");
+
+        // then
+        assertAll(
+                () -> {
+                    assertThat(recommendationFeedViewAll).hasSize(4);
+                    assertThat(recommendationFeedViewAll.get(0).getRecommendationTargets()).extracting("targetName")
+                            .containsExactly("TARGET_NAME_4");
+                    assertThat(recommendationFeedViewAll.get(3).getRecommendationTargets()).extracting("targetName")
+                            .containsExactly("TARGET_NAME_1");
+                },
+                () -> assertThat(recommendationFeedViewAll).extracting("content").containsExactlyInAnyOrder(
+                        "NEW_CONTENT_1", "NEW_CONTENT_2", "NEW_CONTENT_3", "NEW_CONTENT_4"
+                )
         );
     }
 }

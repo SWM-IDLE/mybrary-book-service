@@ -8,6 +8,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
 import java.util.List;
+import kr.mybrary.bookservice.global.BaseEntity;
 import kr.mybrary.bookservice.mybook.persistence.MyBook;
 import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedCreateServiceRequest;
 import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedUpdateServiceRequest;
@@ -25,7 +26,7 @@ import org.hibernate.annotations.Where;
 @NoArgsConstructor
 @Where(clause = "deleted = false")
 @SQLDelete(sql = "UPDATE recommendation_feed SET deleted = true WHERE id = ?")
-public class RecommendationFeed {
+public class RecommendationFeed extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -19,6 +19,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import kr.mybrary.bookservice.recommend.persistence.RecommendationFeed;
+import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedOfUserViewModel;
+import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedOfUserViewModel.RecommendationTargetOfUserModel;
 import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedViewAllModel;
 import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedViewAllModel.BookAuthorModel;
 import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedViewAllModel.RecommendationTargetModel;
@@ -119,5 +121,50 @@ public class RecommendationFeedRepositoryCustomImpl implements RecommendationFee
         }
 
         return recommendationFeed.id.lt(recommendationFeedId);
+    }
+
+    @Override
+    public List<RecommendationFeedOfUserViewModel> getRecommendationFeedViewOfUserModel(String userId) {
+        List<RecommendationFeedOfUserViewModel> models = queryFactory.select(fields(RecommendationFeedOfUserViewModel.class,
+                        recommendationFeed.id.as("recommendationFeedId"),
+                        recommendationFeed.content.as("content"),
+                        recommendationFeed.userId.as("userId"),
+                        recommendationFeed.createdAt.as("createdAt"),
+                        myBook.id.as("myBookId"),
+                        book.id.as("bookId"),
+                        book.title.as("title"),
+                        book.isbn13.as("isbn13"),
+                        book.thumbnailUrl.as("thumbnailUrl")
+                ))
+                .from(recommendationFeed)
+                .where(recommendationFeed.userId.eq(userId))
+                .orderBy(recommendationFeed.id.desc())
+                .join(recommendationFeed.myBook, myBook).on(recommendationFeed.myBook.id.eq(myBook.id))
+                .join(recommendationFeed.myBook.book, book).on(recommendationFeed.myBook.book.id.eq(book.id))
+                .fetch();
+
+        List<Long> recommendationFeedIds = models.stream()
+                .map(RecommendationFeedOfUserViewModel::getRecommendationFeedId)
+                .toList();
+
+        Map<Long, List<RecommendationTargetOfUserModel>> recommendationTargetModelMap = queryFactory
+                .select(
+                        fields(RecommendationTargetOfUserModel.class,
+                                recommendationTarget.id.as("targetId"),
+                                recommendationTarget.targetName.as("targetName")
+                        )
+                ).from(recommendationTarget)
+                .where(recommendationTarget.recommendationFeed.id.in(recommendationFeedIds))
+                .transform(groupBy(recommendationTarget.recommendationFeed.id)
+                        .as(list(fields(RecommendationTargetOfUserModel.class,
+                                recommendationTarget.id.as("targetId"),
+                                recommendationTarget.targetName.as("targetName")
+                        ))));
+
+        models.forEach(model -> {
+            model.setRecommendationTargets(recommendationTargetModelMap.getOrDefault(model.getRecommendationFeedId(), List.of()));
+        });
+
+        return models;
     }
 }
