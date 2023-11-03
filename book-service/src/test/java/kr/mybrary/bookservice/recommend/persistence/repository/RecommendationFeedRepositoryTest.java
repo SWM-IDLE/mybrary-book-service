@@ -584,10 +584,10 @@ class RecommendationFeedRepositoryTest {
 
         // when
         List<RecommendationFeedOfBookViewModel> recommendationFeedOfBook_1 =
-                recommendationFeedRepository.getRecommendationFeedViewOfBookModel(book_1.getId());
+                recommendationFeedRepository.getRecommendationFeedViewOfBookModel(book_1.getIsbn13());
 
         List<RecommendationFeedOfBookViewModel> recommendationFeedOfBook_2 =
-                recommendationFeedRepository.getRecommendationFeedViewOfBookModel(book_2.getId());
+                recommendationFeedRepository.getRecommendationFeedViewOfBookModel(book_2.getIsbn13());
 
         // then
         assertAll(

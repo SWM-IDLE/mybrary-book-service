@@ -48,7 +48,7 @@ public class RecommendationFeedReadService {
 
     public RecommendationFeedOfBookViewResponse findRecommendationFeedOfBookViewResponse(RecommendationFeedOfBookGetServiceRequest request) {
 
-        List<RecommendationFeedOfBookViewModel> recommendationFeeds = recommendationFeedRepository.getRecommendationFeedViewOfBookModel(request.getBookId());
+        List<RecommendationFeedOfBookViewModel> recommendationFeeds = recommendationFeedRepository.getRecommendationFeedViewOfBookModel(request.getIsbn13());
 
         UserInfoServiceResponse usersInfo = userServiceClient.getUsersInfo(getUserIdFromRecommendationFeedViewOfBookModel(recommendationFeeds));
         Map<String, UserInfo> userInfoMap = createUserInfoMapFromResponse(usersInfo.getData().getUserInfoElements());

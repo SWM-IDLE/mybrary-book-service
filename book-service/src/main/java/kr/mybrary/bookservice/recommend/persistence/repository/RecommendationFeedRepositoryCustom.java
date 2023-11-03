@@ -15,5 +15,5 @@ public interface RecommendationFeedRepositoryCustom {
 
     List<RecommendationFeedOfUserViewModel> getRecommendationFeedViewOfUserModel(String userId);
 
-    List<RecommendationFeedOfBookViewModel> getRecommendationFeedViewOfBookModel(Long bookId);
+    List<RecommendationFeedOfBookViewModel> getRecommendationFeedViewOfBookModel(String isbn13);
 }

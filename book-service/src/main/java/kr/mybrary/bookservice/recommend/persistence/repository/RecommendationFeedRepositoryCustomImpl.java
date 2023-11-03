@@ -169,7 +169,7 @@ public class RecommendationFeedRepositoryCustomImpl implements RecommendationFee
     }
 
     @Override
-    public List<RecommendationFeedOfBookViewModel> getRecommendationFeedViewOfBookModel(Long bookId) {
+    public List<RecommendationFeedOfBookViewModel> getRecommendationFeedViewOfBookModel(String isbn13) {
 
         List<RecommendationFeedOfBookViewModel> models = queryFactory.select(fields(RecommendationFeedOfBookViewModel.class,
                         recommendationFeed.id.as("recommendationFeedId"),
@@ -178,7 +178,7 @@ public class RecommendationFeedRepositoryCustomImpl implements RecommendationFee
                         recommendationFeed.userId.as("userId")
                 ))
                 .from(recommendationFeed)
-                .where(recommendationFeed.myBook.book.id.eq(bookId))
+                .where(recommendationFeed.myBook.book.isbn13.eq(isbn13))
                 .orderBy(recommendationFeed.id.desc())
                 .join(recommendationFeed.myBook, myBook).on(recommendationFeed.myBook.id.eq(myBook.id))
                 .join(recommendationFeed.myBook.book, book).on(recommendationFeed.myBook.book.id.eq(book.id))

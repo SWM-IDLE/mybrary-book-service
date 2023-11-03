@@ -7,10 +7,12 @@ import kr.mybrary.bookservice.recommend.domain.RecommendationFeedWriteService;
 import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedCreateServiceRequest;
 import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedDeleteServiceRequest;
 import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedGetWithPagingServiceRequest;
+import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedOfBookGetServiceRequest;
 import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedOfUserGetServiceRequest;
 import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedUpdateServiceRequest;
 import kr.mybrary.bookservice.recommend.presentation.dto.request.RecommendationFeedCreateRequest;
 import kr.mybrary.bookservice.recommend.presentation.dto.request.RecommendationFeedUpdateRequest;
+import kr.mybrary.bookservice.recommend.presentation.dto.response.RecommendationFeedOfBookViewResponse;
 import kr.mybrary.bookservice.recommend.presentation.dto.response.RecommendationFeedOfUserViewResponse;
 import kr.mybrary.bookservice.recommend.presentation.dto.response.RecommendationFeedViewAllResponse;
 import lombok.RequiredArgsConstructor;
@@ -96,5 +98,15 @@ public class RecommendationFeedController {
 
         return ResponseEntity.ok(SuccessResponse.of(HttpStatus.OK.toString(), "사용자의 추천 피드를 조회하였습니다.",
                 recommendationFeedReadService.findRecommendationFeedOfUserViewResponse(request)));
+    }
+
+    @GetMapping("/books/{isbn13}/recommendation-feeds/userInfos")
+    public ResponseEntity<SuccessResponse<RecommendationFeedOfBookViewResponse>> getRecommendationFeedOfBookViewResponse(
+            @PathVariable("isbn13") String isbn13) {
+
+        RecommendationFeedOfBookGetServiceRequest request = RecommendationFeedOfBookGetServiceRequest.of(isbn13);
+
+        return ResponseEntity.ok(SuccessResponse.of(HttpStatus.OK.toString(), "책의 추천 피드를 조회하였습니다.",
+                recommendationFeedReadService.findRecommendationFeedOfBookViewResponse(request)));
     }
 }

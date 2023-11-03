@@ -7,5 +7,11 @@ import lombok.Getter;
 @Builder
 public class RecommendationFeedOfBookGetServiceRequest {
 
-    private Long bookId;
+    private String isbn13;
+
+    public static RecommendationFeedOfBookGetServiceRequest of(String isbn13) {
+        return RecommendationFeedOfBookGetServiceRequest.builder()
+                .isbn13(isbn13)
+                .build();
+    }
 }

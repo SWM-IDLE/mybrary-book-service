@@ -20,6 +20,7 @@ import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedOfUs
 import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedViewAllModel;
 import kr.mybrary.bookservice.recommend.presentation.dto.request.RecommendationFeedCreateRequest;
 import kr.mybrary.bookservice.recommend.presentation.dto.request.RecommendationFeedUpdateRequest;
+import kr.mybrary.bookservice.recommend.presentation.dto.response.RecommendationFeedOfBookViewResponse;
 import kr.mybrary.bookservice.recommend.presentation.dto.response.RecommendationFeedOfUserViewResponse;
 import kr.mybrary.bookservice.recommend.presentation.dto.response.RecommendationFeedViewAllResponse;
 import kr.mybrary.bookservice.recommend.presentation.dto.response.RecommendationFeedViewAllResponse.RecommendationFeedElement;
@@ -211,7 +212,7 @@ public class RecommendationFeedDtoTestData {
 
     public static RecommendationFeedOfBookGetServiceRequest createRecommendationFeedOfBookGetServiceRequest() {
         return RecommendationFeedOfBookGetServiceRequest.builder()
-                .bookId(1L)
+                .isbn13("ISBN13")
                 .build();
     }
 
@@ -236,5 +237,28 @@ public class RecommendationFeedDtoTestData {
                         .build()));
 
         return recommendationFeedOfBookViewModels;
+    }
+
+    public static RecommendationFeedOfBookViewResponse createRecommendationFeedOfBookViewResponse() {
+
+        return RecommendationFeedOfBookViewResponse.builder()
+                .recommendationFeeds(
+                        List.of(
+                                RecommendationFeedOfBookViewResponse.RecommendationFeedElement.builder()
+                                        .userId("USER_ID_1")
+                                        .nickname("USER_NICKNAME_1")
+                                        .profileImageUrl("USER_PICTURE_URL_1")
+                                        .content("CONTENT_1")
+                                        .recommendationTargetNames(List.of("TARGET_NAME_1", "TARGET_NAME_2"))
+                                        .build(),
+                                RecommendationFeedOfBookViewResponse.RecommendationFeedElement.builder()
+                                        .userId("USER_ID_2")
+                                        .nickname("USER_NICKNAME_2")
+                                        .profileImageUrl("USER_PICTURE_URL_2")
+                                        .content("CONTENT_2")
+                                        .recommendationTargetNames(List.of("TARGET_NAME_3", "TARGET_NAME_4"))
+                                        .build()
+                        )
+                ).build();
     }
 }
