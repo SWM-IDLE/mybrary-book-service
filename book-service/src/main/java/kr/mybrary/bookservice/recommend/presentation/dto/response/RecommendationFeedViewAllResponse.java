@@ -36,36 +36,36 @@ public class RecommendationFeedViewAllResponse {
         private Integer holderCount;
         private Integer interestCount;
         private Boolean interested;
-
-        public static RecommendationFeedElement of(RecommendationFeedViewAllModel recommendationFeed,
-                                                   Map<String, UserInfo> userInfoMap) {
-
-            return RecommendationFeedElement.builder()
-                    .content(recommendationFeed.getContent())
-                    .recommendationTargetNames(recommendationFeed.getRecommendationTargets().stream()
-                            .map(RecommendationTargetModel::getTargetName)
-                            .toList())
-                    .userId(recommendationFeed.getUserId())
-                    .nickname(userInfoMap.get(recommendationFeed.getUserId()).getNickname())
-                    .profileImageUrl(userInfoMap.get(recommendationFeed.getUserId()).getProfileImageUrl())
-                    .myBookId(recommendationFeed.getMyBookId())
-                    .bookId(recommendationFeed.getBookId())
-                    .title(recommendationFeed.getTitle())
-                    .thumbnailUrl(recommendationFeed.getThumbnailUrl())
-                    .isbn13(recommendationFeed.getIsbn13())
-                    .authors(recommendationFeed.getBookAuthors().stream()
-                            .map(BookAuthorModel::getName)
-                            .toList())
-                    .holderCount(recommendationFeed.getHolderCount())
-                    .interestCount(recommendationFeed.getInterestCount())
-                    .interested(recommendationFeed.getInterested())
-                    .build();
-        }
     }
 
-    public static RecommendationFeedViewAllResponse of(List<RecommendationFeedElement> recommendationFeeds, Long lastRecommendationFeedId) {
+    public static RecommendationFeedViewAllResponse of(List<RecommendationFeedViewAllModel> recommendationFeeds,
+                                                       Map<String, UserInfo> userInfoMap,
+                                                       Long lastRecommendationFeedId) {
+
         return RecommendationFeedViewAllResponse.builder()
-                .recommendationFeeds(recommendationFeeds)
+                .recommendationFeeds(recommendationFeeds.stream()
+                        .filter(recommendationFeed -> userInfoMap.containsKey(recommendationFeed.getUserId()))
+                        .map(recommendationFeed -> RecommendationFeedElement.builder()
+                                .content(recommendationFeed.getContent())
+                                .recommendationTargetNames(recommendationFeed.getRecommendationTargets().stream()
+                                        .map(RecommendationTargetModel::getTargetName)
+                                        .toList())
+                                .userId(recommendationFeed.getUserId())
+                                .nickname(userInfoMap.get(recommendationFeed.getUserId()).getNickname())
+                                .profileImageUrl(userInfoMap.get(recommendationFeed.getUserId()).getProfileImageUrl())
+                                .myBookId(recommendationFeed.getMyBookId())
+                                .bookId(recommendationFeed.getBookId())
+                                .title(recommendationFeed.getTitle())
+                                .thumbnailUrl(recommendationFeed.getThumbnailUrl())
+                                .isbn13(recommendationFeed.getIsbn13())
+                                .authors(recommendationFeed.getBookAuthors().stream()
+                                        .map(BookAuthorModel::getName)
+                                        .toList())
+                                .holderCount(recommendationFeed.getHolderCount())
+                                .interestCount(recommendationFeed.getInterestCount())
+                                .interested(recommendationFeed.getInterested())
+                                .build())
+                        .toList())
                 .lastRecommendationFeedId(lastRecommendationFeedId)
                 .build();
     }

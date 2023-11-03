@@ -7,13 +7,15 @@ import kr.mybrary.bookservice.client.user.api.UserServiceClient;
 import kr.mybrary.bookservice.client.user.dto.response.UserInfoServiceResponse;
 import kr.mybrary.bookservice.client.user.dto.response.UserInfoServiceResponse.UserInfo;
 import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedGetWithPagingServiceRequest;
+import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedOfBookGetServiceRequest;
 import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedOfUserGetServiceRequest;
+import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedOfBookViewModel;
 import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedOfUserViewModel;
 import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedViewAllModel;
 import kr.mybrary.bookservice.recommend.persistence.repository.RecommendationFeedRepository;
+import kr.mybrary.bookservice.recommend.presentation.dto.response.RecommendationFeedOfBookViewResponse;
 import kr.mybrary.bookservice.recommend.presentation.dto.response.RecommendationFeedOfUserViewResponse;
 import kr.mybrary.bookservice.recommend.presentation.dto.response.RecommendationFeedViewAllResponse;
-import kr.mybrary.bookservice.recommend.presentation.dto.response.RecommendationFeedViewAllResponse.RecommendationFeedElement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,11 +34,10 @@ public class RecommendationFeedReadService {
                 recommendationFeedRepository.getRecommendationFeedViewAll(request.getRecommendationFeedId(), request.getPageSize(), request.getLoginId());
         Long lastRecommendationFeedId = recommendationFeeds.get(recommendationFeeds.size() - 1).getRecommendationFeedId();
 
-        UserInfoServiceResponse usersInfo = userServiceClient.getUsersInfo(getUserIdFromRecommendationFeed(recommendationFeeds));
+        UserInfoServiceResponse usersInfo = userServiceClient.getUsersInfo(getUserIdFromRecommendationFeedViewAllModel(recommendationFeeds));
         Map<String, UserInfo> userInfoMap = createUserInfoMapFromResponse(usersInfo.getData().getUserInfoElements());
 
-        List<RecommendationFeedElement> recommendationFeedElements = createRecommendationFeedElements(recommendationFeeds, userInfoMap);
-        return RecommendationFeedViewAllResponse.of(recommendationFeedElements, lastRecommendationFeedId);
+        return RecommendationFeedViewAllResponse.of(recommendationFeeds, userInfoMap, lastRecommendationFeedId);
     }
 
     public RecommendationFeedOfUserViewResponse findRecommendationFeedOfUserViewResponse(RecommendationFeedOfUserGetServiceRequest request) {
@@ -45,12 +46,14 @@ public class RecommendationFeedReadService {
         return RecommendationFeedOfUserViewResponse.of(recommendationFeeds);
     }
 
-    private List<RecommendationFeedElement> createRecommendationFeedElements(
-            List<RecommendationFeedViewAllModel> recommendationFeeds, Map<String, UserInfo> userInfoMap) {
+    public RecommendationFeedOfBookViewResponse findRecommendationFeedOfBookViewResponse(RecommendationFeedOfBookGetServiceRequest request) {
 
-        return recommendationFeeds.stream()
-                .filter(recommendationFeed -> userInfoMap.containsKey(recommendationFeed.getUserId()))
-                .map(recommendationFeed -> RecommendationFeedElement.of(recommendationFeed, userInfoMap)).toList();
+        List<RecommendationFeedOfBookViewModel> recommendationFeeds = recommendationFeedRepository.getRecommendationFeedViewOfBookModel(request.getBookId());
+
+        UserInfoServiceResponse usersInfo = userServiceClient.getUsersInfo(getUserIdFromRecommendationFeedViewOfBookModel(recommendationFeeds));
+        Map<String, UserInfo> userInfoMap = createUserInfoMapFromResponse(usersInfo.getData().getUserInfoElements());
+
+        return RecommendationFeedOfBookViewResponse.of(recommendationFeeds, userInfoMap);
     }
 
     private Map<String, UserInfo> createUserInfoMapFromResponse(
@@ -63,7 +66,13 @@ public class RecommendationFeedReadService {
                 );
     }
 
-    private List<String> getUserIdFromRecommendationFeed(List<RecommendationFeedViewAllModel> recommendationFeeds) {
+    private static List<String> getUserIdFromRecommendationFeedViewOfBookModel(List<RecommendationFeedOfBookViewModel> recommendationFeeds) {
+        return recommendationFeeds.stream()
+                .map(RecommendationFeedOfBookViewModel::getUserId)
+                .toList();
+    }
+
+    private List<String> getUserIdFromRecommendationFeedViewAllModel(List<RecommendationFeedViewAllModel> recommendationFeeds) {
         return recommendationFeeds.stream()
                 .map(RecommendationFeedViewAllModel::getUserId)
                 .toList();

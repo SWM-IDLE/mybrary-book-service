@@ -16,6 +16,7 @@ public class RecommendationFeedOfBookViewModel {
 
     private Long recommendationFeedId;
     private String content;
+    private String userId;
     private List<RecommendationTargetOfBookModel> recommendationTargets;
     private LocalDateTime createdAt;
 

@@ -11,8 +11,11 @@ import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedCre
 import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedCreateServiceRequest.RecommendationFeedCreateServiceRequestBuilder;
 import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedDeleteServiceRequest;
 import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedGetWithPagingServiceRequest;
+import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedOfBookGetServiceRequest;
 import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedOfUserGetServiceRequest;
 import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedUpdateServiceRequest;
+import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedOfBookViewModel;
+import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedOfBookViewModel.RecommendationTargetOfBookModel;
 import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedOfUserViewModel;
 import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedViewAllModel;
 import kr.mybrary.bookservice.recommend.presentation.dto.request.RecommendationFeedCreateRequest;
@@ -204,5 +207,34 @@ public class RecommendationFeedDtoTestData {
             return RecommendationFeedOfUserViewResponse.builder()
                     .recommendationFeeds(recommendationFeedElements)
                     .build();
+    }
+
+    public static RecommendationFeedOfBookGetServiceRequest createRecommendationFeedOfBookGetServiceRequest() {
+        return RecommendationFeedOfBookGetServiceRequest.builder()
+                .bookId(1L)
+                .build();
+    }
+
+    public static List<RecommendationFeedOfBookViewModel> createRecommendationFeedOfBookViewModelList() {
+
+        List<RecommendationFeedOfBookViewModel> recommendationFeedOfBookViewModels = new ArrayList<>();
+
+        IntStream.range(1, 6)
+                .forEach(i -> recommendationFeedOfBookViewModels.add(RecommendationFeedOfBookViewModel.builder()
+                        .recommendationFeedId((long) i)
+                        .content("CONTENT_" + i)
+                        .userId("USER_ID_" + i)
+                        .createdAt(LocalDateTime.now())
+                        .recommendationTargets(List.of(
+                                RecommendationTargetOfBookModel.builder()
+                                .targetId((long) i)
+                                .targetName("TARGET_NAME_" + i)
+                                .build(),
+                                RecommendationTargetOfBookModel.builder()
+                                .targetId((long) i + 1)
+                                .targetName("TARGET_NAME_" + (i + 1)).build()))
+                        .build()));
+
+        return recommendationFeedOfBookViewModels;
     }
 }

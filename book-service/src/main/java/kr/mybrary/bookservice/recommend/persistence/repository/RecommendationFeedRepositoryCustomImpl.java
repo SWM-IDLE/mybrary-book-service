@@ -176,7 +176,8 @@ public class RecommendationFeedRepositoryCustomImpl implements RecommendationFee
         List<RecommendationFeedOfBookViewModel> models = queryFactory.select(fields(RecommendationFeedOfBookViewModel.class,
                         recommendationFeed.id.as("recommendationFeedId"),
                         recommendationFeed.content.as("content"),
-                        recommendationFeed.createdAt.as("createdAt")
+                        recommendationFeed.createdAt.as("createdAt"),
+                        recommendationFeed.userId.as("userId")
                 ))
                 .from(recommendationFeed)
                 .where(recommendationFeed.myBook.book.id.eq(bookId))
