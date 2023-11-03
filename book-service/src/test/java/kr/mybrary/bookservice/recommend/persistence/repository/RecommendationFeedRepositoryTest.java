@@ -19,6 +19,7 @@ import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedUpd
 import kr.mybrary.bookservice.recommend.persistence.RecommendationFeed;
 import kr.mybrary.bookservice.recommend.persistence.RecommendationTarget;
 import kr.mybrary.bookservice.recommend.persistence.RecommendationTargets;
+import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedOfBookViewModel;
 import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedOfUserViewModel;
 import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedViewAllModel;
 import org.hibernate.proxy.HibernateProxy;
@@ -431,7 +432,7 @@ class RecommendationFeedRepositoryTest {
         );
     }
 
-    @DisplayName("1번째부터 10번째의 추천 피드를 조회한다. paging 처리")
+    @DisplayName("사용자의 추천 피드를 조회한다.")
     @Test
     void getRecommendationFeedViewOfUserModel() {
 
@@ -545,6 +546,59 @@ class RecommendationFeedRepositoryTest {
                         .extracting("targetName")
                         .containsExactlyInAnyOrder("TARGET_NAME_1", "TARGET_NAME_2", "TARGET_NAME_3", "TARGET_NAME_4",
                                 "TARGET_NAME_5")
+        );
+    }
+
+    @DisplayName("도서의 추천 피드를 조회한다.")
+    @Test
+    void getRecommendationFeedViewOfBookModel() {
+
+        // given
+        Book book_1 = entityManager.persist(BookFixture.COMMON_BOOK_WITHOUT_RELATION.getBookBuilder().isbn13("isbn13_1")
+                .isbn10("isbn10_1").build());
+        Book book_2 = entityManager.persist(BookFixture.COMMON_BOOK_WITHOUT_RELATION.getBookBuilder().isbn13("isbn13_2")
+                .isbn10("isbn10_2").build());
+
+        IntStream.range(1, 6)
+                .forEach(i -> {
+                    MyBook myBook = entityManager.persist(
+                            MyBookFixture.MY_BOOK_WITHOUT_RELATION.getMyBookWithBook(book_1));
+
+                    RecommendationFeed recommendationFeed = recommendationFeedRepository.save(
+                            RecommendationFeed.builder()
+                                    .userId("LOGIN_USER_ID")
+                                    .myBook(myBook)
+                                    .content("NEW_CONTENT_" + i)
+                                    .build());
+
+                    entityManager.persist(RecommendationTarget.builder()
+                            .recommendationFeed(recommendationFeed)
+                            .targetName("TARGET_NAME_" + i)
+                            .build());
+                });
+
+        entityManager.flush();
+        entityManager.clear();
+
+        // when
+        List<RecommendationFeedOfBookViewModel> recommendationFeedOfBook_1 =
+                recommendationFeedRepository.getRecommendationFeedViewOfBookModel(book_1.getId());
+
+        List<RecommendationFeedOfBookViewModel> recommendationFeedOfBook_2 =
+                recommendationFeedRepository.getRecommendationFeedViewOfBookModel(book_2.getId());
+
+        // then
+        assertAll(
+                () -> {
+                    assertThat(recommendationFeedOfBook_1).hasSize(5);
+                    assertThat(recommendationFeedOfBook_1.get(0).getRecommendationTargets()).extracting("targetName")
+                            .containsExactly("TARGET_NAME_5");
+                    assertThat(recommendationFeedOfBook_1.get(0).getContent()).isEqualTo("NEW_CONTENT_5");
+                    assertThat(recommendationFeedOfBook_1.get(0).getCreatedAt()).isNotNull();
+                    assertThat(recommendationFeedOfBook_1.get(4).getRecommendationTargets()).extracting("targetName")
+                            .containsExactly("TARGET_NAME_1");
+                },
+                () -> assertThat(recommendationFeedOfBook_2).hasSize(0)
         );
     }
 }
