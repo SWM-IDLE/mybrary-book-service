@@ -7,8 +7,11 @@ import kr.mybrary.bookservice.client.user.api.UserServiceClient;
 import kr.mybrary.bookservice.client.user.dto.response.UserInfoServiceResponse;
 import kr.mybrary.bookservice.client.user.dto.response.UserInfoServiceResponse.UserInfo;
 import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedGetWithPagingServiceRequest;
+import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedOfUserGetServiceRequest;
+import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedOfUserViewModel;
 import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedViewAllModel;
 import kr.mybrary.bookservice.recommend.persistence.repository.RecommendationFeedRepository;
+import kr.mybrary.bookservice.recommend.presentation.dto.response.RecommendationFeedOfUserViewResponse;
 import kr.mybrary.bookservice.recommend.presentation.dto.response.RecommendationFeedViewAllResponse;
 import kr.mybrary.bookservice.recommend.presentation.dto.response.RecommendationFeedViewAllResponse.RecommendationFeedElement;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +37,12 @@ public class RecommendationFeedReadService {
 
         List<RecommendationFeedElement> recommendationFeedElements = createRecommendationFeedElements(recommendationFeeds, userInfoMap);
         return RecommendationFeedViewAllResponse.of(recommendationFeedElements, lastRecommendationFeedId);
+    }
+
+    public RecommendationFeedOfUserViewResponse findRecommendationFeedOfUserViewResponse(RecommendationFeedOfUserGetServiceRequest request) {
+
+        List<RecommendationFeedOfUserViewModel> recommendationFeeds = recommendationFeedRepository.getRecommendationFeedViewOfUserModel(request.getUserId());
+        return RecommendationFeedOfUserViewResponse.of(recommendationFeeds);
     }
 
     private List<RecommendationFeedElement> createRecommendationFeedElements(

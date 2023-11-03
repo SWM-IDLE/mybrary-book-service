@@ -1,5 +1,6 @@
 package kr.mybrary.bookservice.recommend;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -9,7 +10,9 @@ import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedCre
 import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedCreateServiceRequest.RecommendationFeedCreateServiceRequestBuilder;
 import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedDeleteServiceRequest;
 import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedGetWithPagingServiceRequest;
+import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedOfUserGetServiceRequest;
 import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedUpdateServiceRequest;
+import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedOfUserViewModel;
 import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedViewAllModel;
 import kr.mybrary.bookservice.recommend.presentation.dto.request.RecommendationFeedCreateRequest;
 import kr.mybrary.bookservice.recommend.presentation.dto.request.RecommendationFeedUpdateRequest;
@@ -147,5 +150,35 @@ public class RecommendationFeedDtoTestData {
                 .content("NEW CONTENT")
                 .recommendationTargetNames(List.of("New Target 1", "New Target 2"))
                 .build();
+    }
+
+    public static RecommendationFeedOfUserGetServiceRequest createRecommendationFeedOfUserGetServiceRequest() {
+        return RecommendationFeedOfUserGetServiceRequest.builder()
+                .userId("LOGIN_USER_ID")
+                .build();
+    }
+
+    public static List<RecommendationFeedOfUserViewModel> createRecommendationFeedOfUserViewModelList() {
+
+            return IntStream.range(1, 11)
+                    .mapToObj(i -> RecommendationFeedOfUserViewModel.builder()
+                            .recommendationFeedId((long) i)
+                            .content("CONTENT_" + i)
+                            .myBookId((long) i)
+                            .bookId((long) i)
+                            .title("TITLE_" + i)
+                            .thumbnailUrl("THUMBNAIL_URL_" + i)
+                            .isbn13("ISBN13_" + i)
+                            .createdAt(LocalDateTime.now())
+                            .recommendationTargets(List.of(
+                                    RecommendationFeedOfUserViewModel.RecommendationTargetOfUserModel.builder()
+                                            .targetId((long) i)
+                                            .targetName("TARGET_NAME_" + i)
+                                            .build(),
+                                    RecommendationFeedOfUserViewModel.RecommendationTargetOfUserModel.builder()
+                                            .targetId((long) i + 1)
+                                            .targetName("TARGET_NAME_" + (i + 1)).build()))
+                            .build())
+                    .toList();
     }
 }
