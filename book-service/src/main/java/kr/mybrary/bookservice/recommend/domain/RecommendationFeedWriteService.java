@@ -28,21 +28,23 @@ public class RecommendationFeedWriteService {
     public void create(RecommendationFeedCreateServiceRequest request) {
         checkExistRecommendationFeed(request.getMyBookId());
 
-        MyBook myBook = myBookReadService.findMyBookById(request.getMyBookId());
+        MyBook myBook = myBookReadService.findMyBookByIdWithBook(request.getMyBookId());
         RecommendationTargets recommendationTargets = new RecommendationTargets(createRecommendationTargets(request));
 
         RecommendationFeed recommendationFeed = RecommendationFeed.of(request, myBook, recommendationTargets);
 
         recommendationFeed.addRecommendationFeedTarget(recommendationTargets.getFeedRecommendationTargets());
+        myBook.getBook().increaseRecommendationFeedCount();
         recommendationFeedRepository.save(recommendationFeed);
     }
 
     public void deleteRecommendationFeed(RecommendationFeedDeleteServiceRequest request) {
 
-        RecommendationFeed recommendationFeed = recommendationFeedRepository.findById(request.getRecommendationFeedId())
+        RecommendationFeed recommendationFeed = recommendationFeedRepository.findByIdWithMyBookAndBook(request.getRecommendationFeedId())
                 .orElseThrow(RecommendationFeedNotFoundException::new);
 
         validateRecommendationFeedAccess(request.getLoginId(), recommendationFeed);
+        recommendationFeed.getMyBook().getBook().decreaseRecommendationFeedCount();
         recommendationFeedRepository.delete(recommendationFeed);
     }
 

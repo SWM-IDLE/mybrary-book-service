@@ -130,13 +130,15 @@ class RecommendationFeedRepositoryTest {
 
         IntStream.range(1, 21)
                 .forEach(i -> {
-                    MyBook myBook = entityManager.persist(MyBookFixture.MY_BOOK_WITHOUT_RELATION.getMyBookWithBook(book));
+                    MyBook myBook = entityManager.persist(
+                            MyBookFixture.MY_BOOK_WITHOUT_RELATION.getMyBookWithBook(book));
 
-                    RecommendationFeed recommendationFeed = recommendationFeedRepository.save(RecommendationFeed.builder()
-                            .userId("LOGIN_USER_ID_" + i)
-                            .myBook(myBook)
-                            .content("NEW_CONTENT_" + i)
-                            .build());
+                    RecommendationFeed recommendationFeed = recommendationFeedRepository.save(
+                            RecommendationFeed.builder()
+                                    .userId("LOGIN_USER_ID_" + i)
+                                    .myBook(myBook)
+                                    .content("NEW_CONTENT_" + i)
+                                    .build());
 
                     entityManager.persist(RecommendationTarget.builder()
                             .recommendationFeed(recommendationFeed)
@@ -185,13 +187,15 @@ class RecommendationFeedRepositoryTest {
 
         IntStream.range(1, 21)
                 .forEach(i -> {
-                    MyBook myBook = entityManager.persist(MyBookFixture.MY_BOOK_WITHOUT_RELATION.getMyBookWithBook(book));
+                    MyBook myBook = entityManager.persist(
+                            MyBookFixture.MY_BOOK_WITHOUT_RELATION.getMyBookWithBook(book));
 
-                    RecommendationFeed recommendationFeed = recommendationFeedRepository.save(RecommendationFeed.builder()
-                            .userId("LOGIN_USER_ID_" + i)
-                            .myBook(myBook)
-                            .content("NEW_CONTENT_" + i)
-                            .build());
+                    RecommendationFeed recommendationFeed = recommendationFeedRepository.save(
+                            RecommendationFeed.builder()
+                                    .userId("LOGIN_USER_ID_" + i)
+                                    .myBook(myBook)
+                                    .content("NEW_CONTENT_" + i)
+                                    .build());
 
                     entityManager.persist(RecommendationTarget.builder()
                             .recommendationFeed(recommendationFeed)
@@ -208,7 +212,8 @@ class RecommendationFeedRepositoryTest {
 
         // when
         List<RecommendationFeedViewAllModel> recommendationFeedViewAll =
-                recommendationFeedRepository.getRecommendationFeedViewAll(lastPreviousRecommendationFeedId, 10, "LOGIN_USER_ID");
+                recommendationFeedRepository.getRecommendationFeedViewAll(lastPreviousRecommendationFeedId, 10,
+                        "LOGIN_USER_ID");
 
         // then
         assertAll(
@@ -297,10 +302,13 @@ class RecommendationFeedRepositoryTest {
         assertAll(
                 () -> assertThat(recommendationFeedWithTargets.getRecommendationTargets()
                         .getFeedRecommendationTargets()).isNotInstanceOf(HibernateProxy.class),
-                () -> assertThat(recommendationFeedWithTargets.getContent()).isEqualTo(savedRecommendationFeed.getContent()),
-                () -> assertThat(recommendationFeedWithTargets.getRecommendationTargets().getFeedRecommendationTargets())
+                () -> assertThat(recommendationFeedWithTargets.getContent()).isEqualTo(
+                        savedRecommendationFeed.getContent()),
+                () -> assertThat(
+                        recommendationFeedWithTargets.getRecommendationTargets().getFeedRecommendationTargets())
                         .extracting("targetName")
-                        .containsExactlyInAnyOrder("TARGET_NAME_1", "TARGET_NAME_2", "TARGET_NAME_3", "TARGET_NAME_4", "TARGET_NAME_5")
+                        .containsExactlyInAnyOrder("TARGET_NAME_1", "TARGET_NAME_2", "TARGET_NAME_3", "TARGET_NAME_4",
+                                "TARGET_NAME_5")
         );
     }
 
@@ -332,7 +340,8 @@ class RecommendationFeedRepositoryTest {
         entityManager.clear();
 
         // when
-        RecommendationFeed findRecommendationFeed = recommendationFeedRepository.findById(savedRecommendationFeed.getId())
+        RecommendationFeed findRecommendationFeed = recommendationFeedRepository.findById(
+                        savedRecommendationFeed.getId())
                 .orElseThrow();
         RecommendationFeedUpdateServiceRequest request = RecommendationFeedDtoTestData.createRecommendationFeedUpdateServiceRequest();
         findRecommendationFeed.update(request);
@@ -340,14 +349,17 @@ class RecommendationFeedRepositoryTest {
         entityManager.flush();
         entityManager.clear();
 
-        RecommendationFeed updatedRecommendationFeed = recommendationFeedRepository.findById(findRecommendationFeed.getId())
+        RecommendationFeed updatedRecommendationFeed = recommendationFeedRepository.findById(
+                        findRecommendationFeed.getId())
                 .orElseThrow();
 
         // then
         assertAll(
                 () -> assertThat(updatedRecommendationFeed.getContent()).isEqualTo(request.getContent()),
                 () -> assertThat(updatedRecommendationFeed.getRecommendationTargets().getSize()).isEqualTo(2),
-                () -> assertThat(updatedRecommendationFeed.getRecommendationTargets().getFeedRecommendationTargets()).extracting("targetName")
+                () -> assertThat(
+                        updatedRecommendationFeed.getRecommendationTargets().getFeedRecommendationTargets()).extracting(
+                                "targetName")
                         .containsExactly("New Target 1", "New Target 2"),
                 () -> assertThat(recommendationFeedTargetRepository.findAll()).hasSize(2).extracting("targetName")
                         .containsExactly("New Target 1", "New Target 2")
@@ -364,7 +376,9 @@ class RecommendationFeedRepositoryTest {
         Author author_3 = entityManager.persist(Author.builder().aid(13).name("테스트 저자 3").build());
 
         Book book_1 = entityManager.persist(BookFixture.COMMON_BOOK_WITHOUT_RELATION.getBook());
-        Book book_2 = entityManager.persist(BookFixture.COMMON_BOOK_WITHOUT_RELATION.getBookBuilder().isbn13("isbn13_1").isbn10("isbn10_1").build());
+        Book book_2 = entityManager.persist(
+                BookFixture.COMMON_BOOK_WITHOUT_RELATION.getBookBuilder().isbn13("isbn13_1").isbn10("isbn10_1")
+                        .build());
         entityManager.persist(BookAuthor.builder().book(book_1).author(author_1).build());
         entityManager.persist(BookAuthor.builder().book(book_1).author(author_2).build());
         entityManager.persist(BookAuthor.builder().book(book_1).author(author_3).build());
@@ -374,13 +388,15 @@ class RecommendationFeedRepositoryTest {
 
         IntStream.range(1, 21)
                 .forEach(i -> {
-                    MyBook myBook = entityManager.persist(MyBookFixture.MY_BOOK_WITHOUT_RELATION.getMyBookWithBook(book_1));
+                    MyBook myBook = entityManager.persist(
+                            MyBookFixture.MY_BOOK_WITHOUT_RELATION.getMyBookWithBook(book_1));
 
-                    RecommendationFeed recommendationFeed = recommendationFeedRepository.save(RecommendationFeed.builder()
-                            .userId("LOGIN_USER_ID_" + i)
-                            .myBook(myBook)
-                            .content("NEW_CONTENT_" + i)
-                            .build());
+                    RecommendationFeed recommendationFeed = recommendationFeedRepository.save(
+                            RecommendationFeed.builder()
+                                    .userId("LOGIN_USER_ID_" + i)
+                                    .myBook(myBook)
+                                    .content("NEW_CONTENT_" + i)
+                                    .build());
 
                     entityManager.persist(RecommendationTarget.builder()
                             .recommendationFeed(recommendationFeed)
@@ -431,13 +447,15 @@ class RecommendationFeedRepositoryTest {
 
         IntStream.range(1, 5)
                 .forEach(i -> {
-                    MyBook myBook = entityManager.persist(MyBookFixture.MY_BOOK_WITHOUT_RELATION.getMyBookWithBook(book));
+                    MyBook myBook = entityManager.persist(
+                            MyBookFixture.MY_BOOK_WITHOUT_RELATION.getMyBookWithBook(book));
 
-                    RecommendationFeed recommendationFeed = recommendationFeedRepository.save(RecommendationFeed.builder()
-                            .userId("LOGIN_USER_ID")
-                            .myBook(myBook)
-                            .content("NEW_CONTENT_" + i)
-                            .build());
+                    RecommendationFeed recommendationFeed = recommendationFeedRepository.save(
+                            RecommendationFeed.builder()
+                                    .userId("LOGIN_USER_ID")
+                                    .myBook(myBook)
+                                    .content("NEW_CONTENT_" + i)
+                                    .build());
 
                     entityManager.persist(RecommendationTarget.builder()
                             .recommendationFeed(recommendationFeed)
@@ -447,13 +465,15 @@ class RecommendationFeedRepositoryTest {
 
         IntStream.range(5, 10)
                 .forEach(i -> {
-                    MyBook myBook = entityManager.persist(MyBookFixture.MY_BOOK_WITHOUT_RELATION.getMyBookWithBook(book));
+                    MyBook myBook = entityManager.persist(
+                            MyBookFixture.MY_BOOK_WITHOUT_RELATION.getMyBookWithBook(book));
 
-                    RecommendationFeed recommendationFeed = recommendationFeedRepository.save(RecommendationFeed.builder()
-                            .userId("LOGIN_USER_ID_" + i)
-                            .myBook(myBook)
-                            .content("NEW_CONTENT_" + i)
-                            .build());
+                    RecommendationFeed recommendationFeed = recommendationFeedRepository.save(
+                            RecommendationFeed.builder()
+                                    .userId("LOGIN_USER_ID_" + i)
+                                    .myBook(myBook)
+                                    .content("NEW_CONTENT_" + i)
+                                    .build());
 
                     entityManager.persist(RecommendationTarget.builder()
                             .recommendationFeed(recommendationFeed)
@@ -480,6 +500,51 @@ class RecommendationFeedRepositoryTest {
                 () -> assertThat(recommendationFeedViewAll).extracting("content").containsExactlyInAnyOrder(
                         "NEW_CONTENT_1", "NEW_CONTENT_2", "NEW_CONTENT_3", "NEW_CONTENT_4"
                 )
+        );
+    }
+
+    @DisplayName("추천 피드 조회시, 페치조인을 통해 마이북과 도서를 함께 조회한다.")
+    @Test
+    void findByIdWithMyBookAndBook() {
+
+        // given
+        Book book = entityManager.persist(BookFixture.COMMON_BOOK_WITHOUT_RELATION.getBook());
+        MyBook myBook = entityManager.persist(MyBookFixture.MY_BOOK_WITHOUT_RELATION.getMyBookWithBook(book));
+
+        RecommendationFeed recommendationFeed = RecommendationFeed.builder()
+                .userId("LOGIN_USER_ID")
+                .myBook(myBook)
+                .content("NEW CONTENT")
+                .build();
+
+        List<RecommendationTarget> recommendationTargets = (List.of(
+                RecommendationTarget.of("TARGET_NAME_1"),
+                RecommendationTarget.of("TARGET_NAME_2"),
+                RecommendationTarget.of("TARGET_NAME_3"),
+                RecommendationTarget.of("TARGET_NAME_4"),
+                RecommendationTarget.of("TARGET_NAME_5")));
+
+        recommendationFeed.addRecommendationFeedTarget(recommendationTargets);
+
+        RecommendationFeed savedRecommendationFeed = recommendationFeedRepository.save(recommendationFeed);
+
+        entityManager.flush();
+        entityManager.clear();
+
+        RecommendationFeed recommendationFeedWithMyBookAndBook = recommendationFeedRepository.findByIdWithMyBookAndBook(
+                savedRecommendationFeed.getId()).orElseThrow();
+
+        // then
+        assertAll(
+                () -> assertThat(recommendationFeedWithMyBookAndBook.getMyBook()).isNotInstanceOf(HibernateProxy.class),
+                () -> assertThat(recommendationFeedWithMyBookAndBook.getMyBook().getBook()).isNotInstanceOf(HibernateProxy.class),
+                () -> assertThat(recommendationFeedWithMyBookAndBook.getContent()).isEqualTo(
+                        savedRecommendationFeed.getContent()),
+                () -> assertThat(
+                        recommendationFeedWithMyBookAndBook.getRecommendationTargets().getFeedRecommendationTargets())
+                        .extracting("targetName")
+                        .containsExactlyInAnyOrder("TARGET_NAME_1", "TARGET_NAME_2", "TARGET_NAME_3", "TARGET_NAME_4",
+                                "TARGET_NAME_5")
         );
     }
 }

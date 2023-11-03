@@ -17,11 +17,11 @@ import lombok.AllArgsConstructor;
 public enum BookFixture {
 
     COMMON_BOOK(1L, "title", "subTitle", "author","thumbnailUrl", "link", "isbn10", "isbn13", 100, "publisher",
-            LocalDateTime.now(), "description", "toc", 10, 11, 12, 13, 10000, 11000, 1, 1, 1, 4.5, 2, 3.5, 10,
+            LocalDateTime.now(), "description", "toc", 10, 11, 12, 13, 10000, 11000, 1, 1, 1,  1,4.5, 2, 3.5, 10,
             createBookCategory(), createBookAuthors(), createBookTranslators(), createBookInterest()),
 
     COMMON_BOOK_WITHOUT_RELATION(null, "title", "author","subTitle", "thumbnailUrl", "link", "isbn10", "isbn13", 100, "publisher",
-            LocalDateTime.now(), "description", "toc", 10, 11, 12, 13, 10000, 11000, 1, 1, 1, 4.5, 1, 3.5, 10,
+            LocalDateTime.now(), "description", "toc", 10, 11, 12, 13, 10000, 11000, 1, 1, 1, 1, 4.5, 1, 3.5, 10,
             null, null, null, null);
 
     private final Long id;
@@ -46,6 +46,7 @@ public enum BookFixture {
     private final Integer holderCount;
     private final Integer readCount;
     private final Integer interestCount;
+    private final Integer recommendationFeedCount;
     private final Double starRating;
     private final Integer reviewCount;
     private final Double aladinStarRating;
@@ -61,8 +62,9 @@ public enum BookFixture {
                 .description(description).toc(toc).weight(weight).sizeDepth(sizeDepth).sizeHeight(sizeHeight)
                 .sizeWidth(sizeWidth).priceSales(priceSales).priceStandard(priceStandard).holderCount(holderCount)
                 .readCount(readCount).interestCount(interestCount).starRating(starRating).reviewCount(reviewCount)
-                .bookAuthors(bookAuthors).aladinStarRating(aladinStarRating).aladinReviewCount(aladinReviewCount)
-                .bookCategory(bookCategory).bookTranslators(bookTranslators).bookInterests(bookInterests).build();
+                .recommendationFeedCount(recommendationFeedCount).bookAuthors(bookAuthors).aladinStarRating(aladinStarRating)
+                .aladinReviewCount(aladinReviewCount).bookCategory(bookCategory).bookTranslators(bookTranslators)
+                .bookInterests(bookInterests).build();
     }
 
     public BookBuilder getBookBuilder() {
@@ -71,8 +73,9 @@ public enum BookFixture {
                 .description(description).toc(toc).weight(weight).sizeDepth(sizeDepth).sizeHeight(sizeHeight)
                 .sizeWidth(sizeWidth).priceSales(priceSales).priceStandard(priceStandard).holderCount(holderCount)
                 .readCount(readCount).interestCount(interestCount).starRating(starRating).reviewCount(reviewCount)
-                .bookAuthors(bookAuthors).aladinStarRating(aladinStarRating).aladinReviewCount(aladinReviewCount)
-                .bookCategory(bookCategory).bookTranslators(bookTranslators).bookInterests(bookInterests);
+                .recommendationFeedCount(recommendationFeedCount).bookAuthors(bookAuthors).aladinStarRating(aladinStarRating)
+                .aladinReviewCount(aladinReviewCount).bookCategory(bookCategory).bookTranslators(bookTranslators)
+                .bookInterests(bookInterests);
     }
 
 
