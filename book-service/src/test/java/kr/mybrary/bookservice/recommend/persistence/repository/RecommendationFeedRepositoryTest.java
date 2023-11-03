@@ -600,7 +600,7 @@ class RecommendationFeedRepositoryTest {
                     assertThat(recommendationFeedOfBook_1.get(4).getRecommendationTargets()).extracting("targetName")
                             .containsExactly("TARGET_NAME_1");
                 },
-                () -> assertThat(recommendationFeedOfBook_2).hasSize(0)
+                () -> assertThat(recommendationFeedOfBook_2).isEmpty()
         );
     }
 
