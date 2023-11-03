@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.stream.IntStream;
 import kr.mybrary.bookservice.client.user.dto.response.UserInfoServiceResponse;
 import kr.mybrary.bookservice.client.user.dto.response.UserInfoServiceResponse.UserInfo;
+import kr.mybrary.bookservice.global.util.DateUtils;
 import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedCreateServiceRequest;
 import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedCreateServiceRequest.RecommendationFeedCreateServiceRequestBuilder;
 import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedDeleteServiceRequest;
@@ -16,6 +17,7 @@ import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedOfUs
 import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedViewAllModel;
 import kr.mybrary.bookservice.recommend.presentation.dto.request.RecommendationFeedCreateRequest;
 import kr.mybrary.bookservice.recommend.presentation.dto.request.RecommendationFeedUpdateRequest;
+import kr.mybrary.bookservice.recommend.presentation.dto.response.RecommendationFeedOfUserViewResponse;
 import kr.mybrary.bookservice.recommend.presentation.dto.response.RecommendationFeedViewAllResponse;
 import kr.mybrary.bookservice.recommend.presentation.dto.response.RecommendationFeedViewAllResponse.RecommendationFeedElement;
 
@@ -180,5 +182,27 @@ public class RecommendationFeedDtoTestData {
                                             .targetName("TARGET_NAME_" + (i + 1)).build()))
                             .build())
                     .toList();
+    }
+
+    public static RecommendationFeedOfUserViewResponse createRecommendationFeedOfUserViewResponse() {
+
+            List<RecommendationFeedOfUserViewResponse.RecommendationFeedElement> recommendationFeedElements = new ArrayList<>();
+
+            IntStream.range(1, 5)
+                    .forEach(i -> recommendationFeedElements.add(RecommendationFeedOfUserViewResponse.RecommendationFeedElement.builder()
+                            .content("CONTENT_" + i)
+                            .recommendationTargetNames(List.of("TARGET_NAME_" + i, "TARGET_NAME_" + (i + 1)))
+                            .recommendationFeedId((long) i)
+                            .myBookId((long) i)
+                            .bookId((long) i)
+                            .title("TITLE_" + i)
+                            .thumbnailUrl("THUMBNAIL_URL_" + i)
+                            .isbn13("ISBN13_" + i)
+                            .createdAt(DateUtils.toDotFormatYYYYMMDD(LocalDateTime.now()))
+                            .build()));
+
+            return RecommendationFeedOfUserViewResponse.builder()
+                    .recommendationFeeds(recommendationFeedElements)
+                    .build();
     }
 }

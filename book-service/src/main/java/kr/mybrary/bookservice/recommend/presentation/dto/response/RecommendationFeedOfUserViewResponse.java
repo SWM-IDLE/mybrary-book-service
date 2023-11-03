@@ -1,7 +1,7 @@
 package kr.mybrary.bookservice.recommend.presentation.dto.response;
 
-import java.time.LocalDateTime;
 import java.util.List;
+import kr.mybrary.bookservice.global.util.DateUtils;
 import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedOfUserViewModel;
 import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedOfUserViewModel.RecommendationTargetOfUserModel;
 import lombok.Builder;
@@ -24,7 +24,7 @@ public class RecommendationFeedOfUserViewResponse {
                                 .title(recommendationFeed.getTitle())
                                 .thumbnailUrl(recommendationFeed.getThumbnailUrl())
                                 .isbn13(recommendationFeed.getIsbn13())
-                                .createdAt(recommendationFeed.getCreatedAt())
+                                .createdAt(DateUtils.toDotFormatYYYYMMDD(recommendationFeed.getCreatedAt()))
                                 .recommendationTargetNames(recommendationFeed.getRecommendationTargets().stream()
                                         .map(RecommendationTargetOfUserModel::getTargetName).toList())
                                 .build()).toList()).build();
@@ -41,7 +41,7 @@ public class RecommendationFeedOfUserViewResponse {
         private String title;
         private String thumbnailUrl;
         private String isbn13;
-        private LocalDateTime createdAt;
+        private String createdAt;
 
         private List<String> recommendationTargetNames;
     }
