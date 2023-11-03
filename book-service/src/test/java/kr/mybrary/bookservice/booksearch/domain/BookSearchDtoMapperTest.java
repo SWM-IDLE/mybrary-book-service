@@ -290,7 +290,8 @@ class BookSearchDtoMapperTest {
                 () -> assertThat(dto.getPriceSales()).isEqualTo(response.getPriceSales()),
                 () -> assertThat(dto.getHolderCount()).isEqualTo(0),
                 () -> assertThat(dto.getReadCount()).isEqualTo(0),
-                () -> assertThat(dto.getInterestCount()).isEqualTo(0)
+                () -> assertThat(dto.getInterestCount()).isEqualTo(0),
+                () -> assertThat(dto.getRecommendationFeedCount()).isEqualTo(0)
         );
     }
 

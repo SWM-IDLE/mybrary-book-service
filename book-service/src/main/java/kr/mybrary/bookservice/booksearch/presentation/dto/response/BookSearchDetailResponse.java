@@ -35,6 +35,7 @@ public class BookSearchDetailResponse {
     private Integer holderCount;
     private Integer readCount;
     private Integer interestCount;
+    private Integer recommendationFeedCount;
 
     @Builder
     @Getter

@@ -56,7 +56,8 @@ class BookDtoMapperTest {
                 () -> assertThat(book.getReadCount()).isEqualTo(0),
                 () -> assertThat(book.getInterestCount()).isEqualTo(0),
                 () -> assertThat(book.getStarRating()).isEqualTo(0),
-                () -> assertThat(book.getReviewCount()).isEqualTo(0)
+                () -> assertThat(book.getReviewCount()).isEqualTo(0),
+                () -> assertThat(book.getRecommendationFeedCount()).isEqualTo(0)
         );
     }
 
@@ -168,6 +169,7 @@ class BookDtoMapperTest {
                 () -> assertThat(target.getAladinReviewCount()).isEqualTo(source.getReviewCount()),
                 () -> assertThat(target.getStarRating()).isEqualTo(0),
                 () -> assertThat(target.getReviewCount()).isEqualTo(0),
+                () -> assertThat(target.getRecommendationFeedCount()).isEqualTo(0),
                 () -> assertThat(target.getAuthors().size()).isEqualTo(source.getAuthors().size()),
                 () -> assertThat(target.getTranslators().size()).isEqualTo(source.getTranslators().size())
         );

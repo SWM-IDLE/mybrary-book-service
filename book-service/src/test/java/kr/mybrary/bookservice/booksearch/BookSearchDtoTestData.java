@@ -130,6 +130,7 @@ public class BookSearchDtoTestData {
                 .interestCount(10)
                 .holderCount(10)
                 .readCount(10)
+                .recommendationFeedCount(10)
                 .build();
     }
 

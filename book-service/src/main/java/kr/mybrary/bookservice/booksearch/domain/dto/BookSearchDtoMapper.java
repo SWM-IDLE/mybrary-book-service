@@ -63,6 +63,7 @@ public interface BookSearchDtoMapper {
     @Mapping(target = "holderCount", constant = "0")
     @Mapping(target = "readCount", constant = "0")
     @Mapping(target = "interestCount", constant = "0")
+    @Mapping(target = "recommendationFeedCount", constant = "0")
     BookSearchDetailResponse kakaoSearchResponseToDetailResponse(
             KakaoBookSearchResponse.Document kakaoBookSearchResponse);
 
@@ -86,6 +87,7 @@ public interface BookSearchDtoMapper {
     @Mapping(target = "holderCount", constant = "0")
     @Mapping(target = "readCount", constant = "0")
     @Mapping(target = "interestCount", constant = "0")
+    @Mapping(target = "recommendationFeedCount", constant = "0")
     BookSearchDetailResponse aladinSearchResponseToDetailResponse(AladinBookSearchDetailResponse.Item aladinBookSearchResponse);
 
     @Mapping(target = "thumbnailUrl", source = "cover")

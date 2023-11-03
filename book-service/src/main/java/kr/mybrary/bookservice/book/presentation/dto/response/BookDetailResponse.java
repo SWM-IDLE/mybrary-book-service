@@ -18,6 +18,7 @@ public class BookDetailResponse {
     private Integer holderCount;
     private Integer readCount;
     private Integer interestCount;
+    private Integer recommendationFeedCount;
     private String publicationDate;
     private String category;
     private Integer categoryId;
