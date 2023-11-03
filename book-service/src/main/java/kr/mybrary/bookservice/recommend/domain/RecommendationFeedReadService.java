@@ -8,12 +8,16 @@ import kr.mybrary.bookservice.client.user.dto.response.UserInfoServiceResponse;
 import kr.mybrary.bookservice.client.user.dto.response.UserInfoServiceResponse.UserInfo;
 import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedGetWithPagingServiceRequest;
 import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedOfBookGetServiceRequest;
+import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedOfMyBookServiceRequest;
 import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedOfUserGetServiceRequest;
+import kr.mybrary.bookservice.recommend.domain.exception.RecommendationFeedNotFoundException;
+import kr.mybrary.bookservice.recommend.persistence.RecommendationFeed;
 import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedOfBookViewModel;
 import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedOfUserViewModel;
 import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedViewAllModel;
 import kr.mybrary.bookservice.recommend.persistence.repository.RecommendationFeedRepository;
 import kr.mybrary.bookservice.recommend.presentation.dto.response.RecommendationFeedOfBookViewResponse;
+import kr.mybrary.bookservice.recommend.presentation.dto.response.RecommendationFeedOfMyBookResponse;
 import kr.mybrary.bookservice.recommend.presentation.dto.response.RecommendationFeedOfUserViewResponse;
 import kr.mybrary.bookservice.recommend.presentation.dto.response.RecommendationFeedViewAllResponse;
 import lombok.RequiredArgsConstructor;
@@ -54,6 +58,15 @@ public class RecommendationFeedReadService {
         Map<String, UserInfo> userInfoMap = createUserInfoMapFromResponse(usersInfo.getData().getUserInfoElements());
 
         return RecommendationFeedOfBookViewResponse.of(recommendationFeeds, userInfoMap);
+    }
+
+    public RecommendationFeedOfMyBookResponse findRecommendationFeedOfMyBookResponse(
+            RecommendationFeedOfMyBookServiceRequest request) {
+
+        RecommendationFeed recommendationFeed = recommendationFeedRepository.getRecommendationFeedWithTargetsByMyBookId(
+                        request.getMyBookId()).orElseThrow(RecommendationFeedNotFoundException::new);
+
+        return RecommendationFeedOfMyBookResponse.of(recommendationFeed);
     }
 
     private Map<String, UserInfo> createUserInfoMapFromResponse(

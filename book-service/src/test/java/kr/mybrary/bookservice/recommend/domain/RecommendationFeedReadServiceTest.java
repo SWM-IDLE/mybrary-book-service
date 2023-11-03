@@ -10,14 +10,19 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import java.util.Optional;
 import kr.mybrary.bookservice.client.user.api.UserServiceClient;
 import kr.mybrary.bookservice.client.user.dto.response.UserInfoServiceResponse;
 import kr.mybrary.bookservice.recommend.RecommendationFeedDtoTestData;
+import kr.mybrary.bookservice.recommend.RecommendationFeedFixture;
 import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedGetWithPagingServiceRequest;
 import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedOfBookGetServiceRequest;
+import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedOfMyBookServiceRequest;
 import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedOfUserGetServiceRequest;
+import kr.mybrary.bookservice.recommend.persistence.RecommendationFeed;
 import kr.mybrary.bookservice.recommend.persistence.repository.RecommendationFeedRepository;
 import kr.mybrary.bookservice.recommend.presentation.dto.response.RecommendationFeedOfBookViewResponse;
+import kr.mybrary.bookservice.recommend.presentation.dto.response.RecommendationFeedOfMyBookResponse;
 import kr.mybrary.bookservice.recommend.presentation.dto.response.RecommendationFeedOfUserViewResponse;
 import kr.mybrary.bookservice.recommend.presentation.dto.response.RecommendationFeedViewAllResponse;
 import org.junit.jupiter.api.DisplayName;
@@ -124,6 +129,31 @@ class RecommendationFeedReadServiceTest {
                                 tuple("USER_ID_5", "USER_NICKNAME_5", "USER_PICTURE_URL_5", "CONTENT_5")),
                 () -> verify(recommendationFeedRepository).getRecommendationFeedViewOfBookModel(any()),
                 () -> verify(userServiceClient).getUsersInfo(any())
+        );
+    }
+
+    @DisplayName("마이북의 추천 피드를 조회한다.")
+    @Test
+    void findRecommendationFeedOfMyBookResponse() {
+
+        // given
+        RecommendationFeedOfMyBookServiceRequest request = RecommendationFeedDtoTestData.createRecommendationFeedOfMyBookServiceRequest();
+        RecommendationFeed recommendationFeed = RecommendationFeedFixture.COMMON_LOGIN_USER_RECOMMENDATION_FEED.getRecommendationFeed();
+
+        given(recommendationFeedRepository.getRecommendationFeedWithTargetsByMyBookId(any())).willReturn(
+                Optional.ofNullable(recommendationFeed));
+
+        // when
+        RecommendationFeedOfMyBookResponse response = recommendationFeedReadService.findRecommendationFeedOfMyBookResponse(
+                request);
+
+        // then
+        assertAll(
+                () -> {
+                    assert recommendationFeed != null;
+                    assertThat(response.getContent()).isEqualTo(recommendationFeed.getContent());
+                },
+                () -> verify(recommendationFeedRepository).getRecommendationFeedWithTargetsByMyBookId(any())
         );
     }
 }
