@@ -156,19 +156,21 @@ class RecommendationFeedRepositoryTest {
 
         // then
         assertAll(
-                () -> assertThat(recommendationFeedViewAll).hasSize(10),
-                () -> assertThat(recommendationFeedViewAll.get(0).getRecommendationTargets()).hasSize(1),
-                () -> assertThat(recommendationFeedViewAll.get(0).getContent()).isEqualTo("NEW_CONTENT_20"),
-                () -> assertThat(recommendationFeedViewAll.get(0).getRecommendationTargets()).extracting("targetName")
-                        .containsExactly("TARGET_NAME_20"),
-                () -> assertThat(recommendationFeedViewAll.get(0).getBookAuthors()).extracting("name")
-                        .containsExactly("테스트 저자 1", "테스트 저자 2", "테스트 저자 3"),
-                () -> assertThat(recommendationFeedViewAll.get(9).getRecommendationTargets()).hasSize(1),
-                () -> assertThat(recommendationFeedViewAll.get(9).getContent()).isEqualTo("NEW_CONTENT_11"),
-                () -> assertThat(recommendationFeedViewAll.get(9).getRecommendationTargets()).extracting("targetName")
-                        .containsExactly("TARGET_NAME_11"),
-                () -> assertThat(recommendationFeedViewAll.get(9).getBookAuthors()).extracting("name")
-                        .containsExactly("테스트 저자 1", "테스트 저자 2", "테스트 저자 3")
+                () -> {
+                    assertThat(recommendationFeedViewAll).hasSize(10);
+                    assertThat(recommendationFeedViewAll.get(0).getRecommendationTargets()).hasSize(1);
+                    assertThat(recommendationFeedViewAll.get(0).getContent()).isEqualTo("NEW_CONTENT_20");
+                    assertThat(recommendationFeedViewAll.get(0).getRecommendationTargets()).extracting("targetName")
+                            .containsExactly("TARGET_NAME_20");
+                    assertThat(recommendationFeedViewAll.get(0).getBookAuthors()).extracting("name")
+                            .containsExactly("테스트 저자 1", "테스트 저자 2", "테스트 저자 3");
+                    assertThat(recommendationFeedViewAll.get(9).getRecommendationTargets()).hasSize(1);
+                    assertThat(recommendationFeedViewAll.get(9).getContent()).isEqualTo("NEW_CONTENT_11");
+                    assertThat(recommendationFeedViewAll.get(9).getRecommendationTargets()).extracting("targetName")
+                            .containsExactly("TARGET_NAME_11");
+                    assertThat(recommendationFeedViewAll.get(9).getBookAuthors()).extracting("name")
+                            .containsExactly("테스트 저자 1", "테스트 저자 2", "테스트 저자 3");
+                }
         );
     }
 

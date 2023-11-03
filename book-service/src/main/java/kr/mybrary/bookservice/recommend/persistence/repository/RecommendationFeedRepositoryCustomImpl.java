@@ -163,9 +163,7 @@ public class RecommendationFeedRepositoryCustomImpl implements RecommendationFee
                                 recommendationTarget.targetName.as("targetName")
                         ))));
 
-        models.forEach(model -> {
-            model.setRecommendationTargets(recommendationTargetModelMap.getOrDefault(model.getRecommendationFeedId(), List.of()));
-        });
+        models.forEach(model -> model.setRecommendationTargets(recommendationTargetModelMap.getOrDefault(model.getRecommendationFeedId(), List.of())));
 
         return models;
     }
@@ -204,9 +202,7 @@ public class RecommendationFeedRepositoryCustomImpl implements RecommendationFee
                                 recommendationTarget.targetName.as("targetName")
                         ))));
 
-        models.forEach(model -> {
-            model.setRecommendationTargets(recommendationTargetModelMap.getOrDefault(model.getRecommendationFeedId(), List.of()));
-        });
+        models.forEach(model -> model.setRecommendationTargets(recommendationTargetModelMap.getOrDefault(model.getRecommendationFeedId(), List.of())));
 
         return models;
     }
