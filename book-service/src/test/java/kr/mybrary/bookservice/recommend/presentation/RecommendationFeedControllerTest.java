@@ -33,6 +33,7 @@ import kr.mybrary.bookservice.recommend.domain.RecommendationFeedWriteService;
 import kr.mybrary.bookservice.recommend.presentation.dto.request.RecommendationFeedCreateRequest;
 import kr.mybrary.bookservice.recommend.presentation.dto.request.RecommendationFeedUpdateRequest;
 import kr.mybrary.bookservice.recommend.presentation.dto.response.RecommendationFeedOfBookViewResponse;
+import kr.mybrary.bookservice.recommend.presentation.dto.response.RecommendationFeedOfMyBookResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -424,6 +425,48 @@ class RecommendationFeedControllerTest {
                                                 fieldWithPath("data.recommendationFeeds[].recommendationTargetNames").type(ARRAY)
                                                         .description("추천 피드 대상자 목록"),
                                                 fieldWithPath("data.recommendationFeeds[].content").type(STRING).description("추천 피드 내용")
+                                        ).build())));
+    }
+
+    @DisplayName("마이북의 추천 피드를 조회한다.")
+    @Test
+    void getRecommendationFeedOfMyBookResponse() throws Exception {
+
+        // given
+        RecommendationFeedOfMyBookResponse response = RecommendationFeedDtoTestData.createRecommendationFeedOfMyBookResponse();
+
+        given(recommendationFeedReadService.findRecommendationFeedOfMyBookResponse(any())).willReturn(response);
+
+        // when
+        ResultActions actions = mockMvc.perform(get("/api/v1/mybooks/{myBookId}/recommendation-feeds", "1"));
+
+        // then
+        actions
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("200 OK"))
+                .andExpect(jsonPath("$.message").value("마이북의 추천 피드를 조회하였습니다."))
+                .andExpect(jsonPath("$.data").isNotEmpty());
+
+        // document
+        actions
+                .andDo(document("get-recommendation-feed-of-my-book",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        resource(
+                                ResourceSnippetParameters.builder()
+                                        .tag("recommendation-feed")
+                                        .summary("마이북에 대해서 추천 피드를 조회한다.")
+                                        .pathParameters(
+                                                parameterWithName("myBookId").type(SimpleType.NUMBER).description("마이북 ID")
+                                        )
+                                        .responseSchema(Schema.schema("get_recommendation_feed_of_my_book_response_body"))
+                                        .responseFields(
+                                                fieldWithPath("status").type(STRING).description("응답 상태"),
+                                                fieldWithPath("message").type(STRING).description("응답 메시지"),
+                                                fieldWithPath("data").type(OBJECT).description("응답 데이터"),
+                                                fieldWithPath("data.recommendationFeedId").type(NUMBER).description("추천피드 ID"),
+                                                fieldWithPath("data.content").type(STRING).description("추천피드 내용"),
+                                                fieldWithPath("data.recommendationTargetNames").type(ARRAY).description("추천피드 타겟")
                                         ).build())));
     }
 }

@@ -8,11 +8,13 @@ import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedCre
 import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedDeleteServiceRequest;
 import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedGetWithPagingServiceRequest;
 import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedOfBookGetServiceRequest;
+import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedOfMyBookServiceRequest;
 import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedOfUserGetServiceRequest;
 import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedUpdateServiceRequest;
 import kr.mybrary.bookservice.recommend.presentation.dto.request.RecommendationFeedCreateRequest;
 import kr.mybrary.bookservice.recommend.presentation.dto.request.RecommendationFeedUpdateRequest;
 import kr.mybrary.bookservice.recommend.presentation.dto.response.RecommendationFeedOfBookViewResponse;
+import kr.mybrary.bookservice.recommend.presentation.dto.response.RecommendationFeedOfMyBookResponse;
 import kr.mybrary.bookservice.recommend.presentation.dto.response.RecommendationFeedOfUserViewResponse;
 import kr.mybrary.bookservice.recommend.presentation.dto.response.RecommendationFeedViewAllResponse;
 import lombok.RequiredArgsConstructor;
@@ -108,5 +110,15 @@ public class RecommendationFeedController {
 
         return ResponseEntity.ok(SuccessResponse.of(HttpStatus.OK.toString(), "책의 추천 피드를 조회하였습니다.",
                 recommendationFeedReadService.findRecommendationFeedOfBookViewResponse(request)));
+    }
+
+    @GetMapping("/mybooks/{myBookId}/recommendation-feeds")
+    public ResponseEntity<SuccessResponse<RecommendationFeedOfMyBookResponse>> getRecommendationFeedOfMyBookResponse(
+            @PathVariable("myBookId") Long myBookId) {
+
+        RecommendationFeedOfMyBookServiceRequest request = RecommendationFeedOfMyBookServiceRequest.of(myBookId);
+
+        return ResponseEntity.ok(SuccessResponse.of(HttpStatus.OK.toString(), "마이북의 추천 피드를 조회하였습니다.",
+                recommendationFeedReadService.findRecommendationFeedOfMyBookResponse(request)));
     }
 }

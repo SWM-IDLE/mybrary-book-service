@@ -9,4 +9,10 @@ public class RecommendationFeedOfMyBookServiceRequest {
 
     private Long myBookId;
 
+    public static RecommendationFeedOfMyBookServiceRequest of(Long myBookId) {
+
+        return RecommendationFeedOfMyBookServiceRequest.builder()
+                .myBookId(myBookId)
+                .build();
+    }
 }

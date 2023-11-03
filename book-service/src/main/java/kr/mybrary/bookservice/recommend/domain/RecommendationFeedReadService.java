@@ -10,8 +10,6 @@ import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedGet
 import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedOfBookGetServiceRequest;
 import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedOfMyBookServiceRequest;
 import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedOfUserGetServiceRequest;
-import kr.mybrary.bookservice.recommend.domain.exception.RecommendationFeedNotFoundException;
-import kr.mybrary.bookservice.recommend.persistence.RecommendationFeed;
 import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedOfBookViewModel;
 import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedOfUserViewModel;
 import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedViewAllModel;
@@ -63,10 +61,9 @@ public class RecommendationFeedReadService {
     public RecommendationFeedOfMyBookResponse findRecommendationFeedOfMyBookResponse(
             RecommendationFeedOfMyBookServiceRequest request) {
 
-        RecommendationFeed recommendationFeed = recommendationFeedRepository.getRecommendationFeedWithTargetsByMyBookId(
-                        request.getMyBookId()).orElseThrow(RecommendationFeedNotFoundException::new);
-
-        return RecommendationFeedOfMyBookResponse.of(recommendationFeed);
+        return recommendationFeedRepository.getRecommendationFeedWithTargetsByMyBookId(request.getMyBookId())
+                .map(RecommendationFeedOfMyBookResponse::of)
+                .orElse(null);
     }
 
     private Map<String, UserInfo> createUserInfoMapFromResponse(

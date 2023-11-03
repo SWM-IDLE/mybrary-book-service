@@ -22,6 +22,7 @@ import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedView
 import kr.mybrary.bookservice.recommend.presentation.dto.request.RecommendationFeedCreateRequest;
 import kr.mybrary.bookservice.recommend.presentation.dto.request.RecommendationFeedUpdateRequest;
 import kr.mybrary.bookservice.recommend.presentation.dto.response.RecommendationFeedOfBookViewResponse;
+import kr.mybrary.bookservice.recommend.presentation.dto.response.RecommendationFeedOfMyBookResponse;
 import kr.mybrary.bookservice.recommend.presentation.dto.response.RecommendationFeedOfUserViewResponse;
 import kr.mybrary.bookservice.recommend.presentation.dto.response.RecommendationFeedViewAllResponse;
 import kr.mybrary.bookservice.recommend.presentation.dto.response.RecommendationFeedViewAllResponse.RecommendationFeedElement;
@@ -266,6 +267,14 @@ public class RecommendationFeedDtoTestData {
     public static RecommendationFeedOfMyBookServiceRequest createRecommendationFeedOfMyBookServiceRequest() {
         return RecommendationFeedOfMyBookServiceRequest.builder()
                 .myBookId(1L)
+                .build();
+    }
+
+    public static RecommendationFeedOfMyBookResponse createRecommendationFeedOfMyBookResponse() {
+        return RecommendationFeedOfMyBookResponse.builder()
+                .recommendationFeedId(1L)
+                .content("CONTENT")
+                .recommendationTargetNames(List.of("TARGET_NAME_1", "TARGET_NAME_2"))
                 .build();
     }
 }
