@@ -206,4 +206,12 @@ public class RecommendationFeedRepositoryCustomImpl implements RecommendationFee
 
         return models;
     }
+
+    @Override
+    public Optional<RecommendationFeed> getRecommendationFeedWithTargetsByMyBookId(Long myBookId) {
+        return Optional.ofNullable(queryFactory.selectFrom(recommendationFeed)
+                .where(recommendationFeed.myBook.id.eq(myBookId))
+                .leftJoin(recommendationFeed.recommendationTargets.feedRecommendationTargets, recommendationTarget).fetchJoin()
+                .fetchOne());
+    }
 }

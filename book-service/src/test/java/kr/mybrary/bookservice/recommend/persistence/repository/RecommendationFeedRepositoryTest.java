@@ -603,4 +603,49 @@ class RecommendationFeedRepositoryTest {
                 () -> assertThat(recommendationFeedOfBook_2).hasSize(0)
         );
     }
+
+    @DisplayName("마이북 ID로 추천 피드 조회시, 페치조인을 통해 추천 피드 타겟도 조회한다.")
+    @Test
+    void getRecommendationFeedByMyBookIdWithTargetsUsingFetchJoin() {
+
+        // given
+        Book book = entityManager.persist(BookFixture.COMMON_BOOK_WITHOUT_RELATION.getBook());
+        MyBook myBook = entityManager.persist(MyBookFixture.MY_BOOK_WITHOUT_RELATION.getMyBookWithBook(book));
+
+        RecommendationFeed recommendationFeed = RecommendationFeed.builder()
+                .userId("LOGIN_USER_ID")
+                .myBook(myBook)
+                .content("NEW CONTENT")
+                .build();
+
+        List<RecommendationTarget> recommendationTargets = (List.of(
+                RecommendationTarget.of("TARGET_NAME_1"),
+                RecommendationTarget.of("TARGET_NAME_2"),
+                RecommendationTarget.of("TARGET_NAME_3"),
+                RecommendationTarget.of("TARGET_NAME_4"),
+                RecommendationTarget.of("TARGET_NAME_5")));
+
+        recommendationFeed.addRecommendationFeedTarget(recommendationTargets);
+
+        RecommendationFeed savedRecommendationFeed = recommendationFeedRepository.save(recommendationFeed);
+
+        entityManager.flush();
+        entityManager.clear();
+
+        RecommendationFeed recommendationFeedWithTargets = recommendationFeedRepository.getRecommendationFeedWithTargetsByMyBookId(
+                myBook.getId()).orElseThrow();
+
+        // then
+        assertAll(
+                () -> assertThat(recommendationFeedWithTargets.getRecommendationTargets()
+                        .getFeedRecommendationTargets()).isNotInstanceOf(HibernateProxy.class),
+                () -> assertThat(recommendationFeedWithTargets.getContent()).isEqualTo(
+                        savedRecommendationFeed.getContent()),
+                () -> assertThat(
+                        recommendationFeedWithTargets.getRecommendationTargets().getFeedRecommendationTargets())
+                        .extracting("targetName")
+                        .containsExactlyInAnyOrder("TARGET_NAME_1", "TARGET_NAME_2", "TARGET_NAME_3", "TARGET_NAME_4",
+                                "TARGET_NAME_5")
+        );
+    }
 }
