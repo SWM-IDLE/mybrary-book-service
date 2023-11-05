@@ -7,9 +7,15 @@ import kr.mybrary.bookservice.recommend.domain.RecommendationFeedWriteService;
 import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedCreateServiceRequest;
 import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedDeleteServiceRequest;
 import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedGetWithPagingServiceRequest;
+import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedOfBookGetServiceRequest;
+import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedOfMyBookServiceRequest;
+import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedOfUserGetServiceRequest;
 import kr.mybrary.bookservice.recommend.domain.dto.request.RecommendationFeedUpdateServiceRequest;
 import kr.mybrary.bookservice.recommend.presentation.dto.request.RecommendationFeedCreateRequest;
 import kr.mybrary.bookservice.recommend.presentation.dto.request.RecommendationFeedUpdateRequest;
+import kr.mybrary.bookservice.recommend.presentation.dto.response.RecommendationFeedOfBookViewResponse;
+import kr.mybrary.bookservice.recommend.presentation.dto.response.RecommendationFeedOfMyBookResponse;
+import kr.mybrary.bookservice.recommend.presentation.dto.response.RecommendationFeedOfUserViewResponse;
 import kr.mybrary.bookservice.recommend.presentation.dto.response.RecommendationFeedViewAllResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -83,5 +89,36 @@ public class RecommendationFeedController {
 
         recommendationFeedWriteService.updateRecommendationFeed(serviceRequest);
         return ResponseEntity.ok(SuccessResponse.of(HttpStatus.OK.toString(), "추천 피드를 수정했습니다.", null));
+    }
+
+    @GetMapping("/recommendation-feeds/{userId}")
+    public ResponseEntity<SuccessResponse<RecommendationFeedOfUserViewResponse>> getRecommendationFeedOfUserViewResponse(
+            @RequestHeader("USER-ID") String loginId,
+            @PathVariable("userId") String userId) {
+
+        RecommendationFeedOfUserGetServiceRequest request = RecommendationFeedOfUserGetServiceRequest.of(userId, loginId);
+
+        return ResponseEntity.ok(SuccessResponse.of(HttpStatus.OK.toString(), "사용자의 추천 피드를 조회하였습니다.",
+                recommendationFeedReadService.findRecommendationFeedOfUserViewResponse(request)));
+    }
+
+    @GetMapping("/books/{isbn13}/recommendation-feeds/userInfos")
+    public ResponseEntity<SuccessResponse<RecommendationFeedOfBookViewResponse>> getRecommendationFeedOfBookViewResponse(
+            @PathVariable("isbn13") String isbn13) {
+
+        RecommendationFeedOfBookGetServiceRequest request = RecommendationFeedOfBookGetServiceRequest.of(isbn13);
+
+        return ResponseEntity.ok(SuccessResponse.of(HttpStatus.OK.toString(), "책의 추천 피드를 조회하였습니다.",
+                recommendationFeedReadService.findRecommendationFeedOfBookViewResponse(request)));
+    }
+
+    @GetMapping("/mybooks/{myBookId}/recommendation-feed")
+    public ResponseEntity<SuccessResponse<RecommendationFeedOfMyBookResponse>> getRecommendationFeedOfMyBookResponse(
+            @PathVariable("myBookId") Long myBookId) {
+
+        RecommendationFeedOfMyBookServiceRequest request = RecommendationFeedOfMyBookServiceRequest.of(myBookId);
+
+        return ResponseEntity.ok(SuccessResponse.of(HttpStatus.OK.toString(), "마이북의 추천 피드를 조회하였습니다.",
+                recommendationFeedReadService.findRecommendationFeedOfMyBookResponse(request)));
     }
 }

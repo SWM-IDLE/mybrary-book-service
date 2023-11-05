@@ -102,6 +102,7 @@ class BookSearchControllerTest {
                 .andExpect(jsonPath("$.data.priceSales").value(response.getPriceSales()))
                 .andExpect(jsonPath("$.data.holderCount").value(response.getHolderCount()))
                 .andExpect(jsonPath("$.data.readCount").value(response.getReadCount()))
+                .andExpect(jsonPath("$.data.recommendationFeedCount").value(response.getRecommendationFeedCount()))
                 .andExpect(jsonPath("$.data.interestCount").value(response.getInterestCount()));
 
         // document
@@ -148,7 +149,8 @@ class BookSearchControllerTest {
                                                 fieldWithPath("data.priceSales").type(NUMBER).description("도서 판매가"),
                                                 fieldWithPath("data.holderCount").type(NUMBER).description("도서 보류 수"),
                                                 fieldWithPath("data.readCount").type(NUMBER).description("도서 완독 수"),
-                                                fieldWithPath("data.interestCount").type(NUMBER).description("도서 관심 수")
+                                                fieldWithPath("data.interestCount").type(NUMBER).description("도서 관심 수"),
+                                                fieldWithPath("data.recommendationFeedCount").type(NUMBER).description("도서 추천 피드 수")
                                         ).build())));
     }
 

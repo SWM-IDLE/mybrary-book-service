@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import kr.mybrary.bookservice.global.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,7 +21,7 @@ import org.hibernate.annotations.Where;
 @NoArgsConstructor
 @Where(clause = "deleted = false")
 @SQLDelete(sql = "UPDATE recommendation_target SET deleted = true WHERE id = ?")
-public class RecommendationTarget {
+public class RecommendationTarget extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

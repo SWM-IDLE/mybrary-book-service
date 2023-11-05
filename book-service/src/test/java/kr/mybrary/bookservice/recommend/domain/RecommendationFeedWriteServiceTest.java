@@ -57,7 +57,9 @@ class RecommendationFeedWriteServiceTest {
         RecommendationFeedCreateServiceRequest request =
                 RecommendationFeedDtoTestData.createRecommendationFeedCreateServiceRequestBuilder().build();
         MyBook myBook = MyBookFixture.COMMON_LOGIN_USER_MYBOOK.getMyBook();
-        given(myBookReadService.findMyBookById(any())).willReturn(myBook);
+        Integer originRecommendationFeedCount = myBook.getBook().getRecommendationFeedCount();
+
+        given(myBookReadService.findMyBookByIdWithBook(any())).willReturn(myBook);
         given(recommendationFeedRepository.save(any())).willReturn(null);
 
         // when
@@ -65,7 +67,8 @@ class RecommendationFeedWriteServiceTest {
 
         // then
         assertAll(
-                () -> verify(myBookReadService, times(1)).findMyBookById(any()),
+                () -> assertThat(myBook.getBook().getRecommendationFeedCount()).isEqualTo(originRecommendationFeedCount + 1),
+                () -> verify(myBookReadService, times(1)).findMyBookByIdWithBook(any()),
                 () -> verify(recommendationFeedRepository, times(1)).save(any())
         );
     }
@@ -80,13 +83,13 @@ class RecommendationFeedWriteServiceTest {
                 .build();
 
         MyBook myBook = MyBookFixture.COMMON_LOGIN_USER_MYBOOK.getMyBook();
-        given(myBookReadService.findMyBookById(any())).willReturn(myBook);
+        given(myBookReadService.findMyBookByIdWithBook(any())).willReturn(myBook);
 
         // when, then
         assertAll(
                 () -> assertThatThrownBy(() -> recommendationFeedWriteService.create(request))
                         .isInstanceOf(RecommendationTargetSizeExceededException.class),
-                () -> verify(myBookReadService, times(1)).findMyBookById(any())
+                () -> verify(myBookReadService, times(1)).findMyBookByIdWithBook(any())
         );
     }
 
@@ -100,13 +103,13 @@ class RecommendationFeedWriteServiceTest {
                 .build();
 
         MyBook myBook = MyBookFixture.COMMON_LOGIN_USER_MYBOOK.getMyBook();
-        given(myBookReadService.findMyBookById(any())).willReturn(myBook);
+        given(myBookReadService.findMyBookByIdWithBook(any())).willReturn(myBook);
 
         // when, then
         assertAll(
                 () -> assertThatThrownBy(() -> recommendationFeedWriteService.create(request))
                         .isInstanceOf(RecommendationTargetSizeLackException.class),
-                () -> verify(myBookReadService, times(1)).findMyBookById(any())
+                () -> verify(myBookReadService, times(1)).findMyBookByIdWithBook(any())
         );
     }
 
@@ -120,13 +123,13 @@ class RecommendationFeedWriteServiceTest {
                 .build();
 
         MyBook myBook = MyBookFixture.COMMON_LOGIN_USER_MYBOOK.getMyBook();
-        given(myBookReadService.findMyBookById(any())).willReturn(myBook);
+        given(myBookReadService.findMyBookByIdWithBook(any())).willReturn(myBook);
 
         // when, then
         assertAll(
                 () -> assertThatThrownBy(() -> recommendationFeedWriteService.create(request))
                         .isInstanceOf(RecommendationTargetDuplicateException.class),
-                () -> verify(myBookReadService, times(1)).findMyBookById(any())
+                () -> verify(myBookReadService, times(1)).findMyBookByIdWithBook(any())
         );
     }
 
@@ -146,7 +149,7 @@ class RecommendationFeedWriteServiceTest {
         assertAll(
                 () -> assertThatThrownBy(() -> recommendationFeedWriteService.create(request))
                         .isInstanceOf(RecommendationFeedAlreadyExistException.class),
-                () -> verify(myBookReadService, never()).findMyBookById(any()),
+                () -> verify(myBookReadService, never()).findMyBookByIdWithBook(any()),
                 () -> verify(recommendationFeedRepository, never()).save(any())
         );
     }
@@ -162,13 +165,13 @@ class RecommendationFeedWriteServiceTest {
                 .build();
 
         MyBook myBook = MyBookFixture.COMMON_LOGIN_USER_MYBOOK.getMyBook();
-        given(myBookReadService.findMyBookById(any())).willReturn(myBook);
+        given(myBookReadService.findMyBookByIdWithBook(any())).willReturn(myBook);
 
         // when, then
         assertAll(
                 () -> assertThatThrownBy(() -> recommendationFeedWriteService.create(request))
                         .isInstanceOf(RecommendationTargetLengthExceededException.class),
-                () -> verify(myBookReadService, times(1)).findMyBookById(any())
+                () -> verify(myBookReadService, times(1)).findMyBookByIdWithBook(any())
         );
     }
 
@@ -179,8 +182,9 @@ class RecommendationFeedWriteServiceTest {
         // given
         RecommendationFeedDeleteServiceRequest request = RecommendationFeedDtoTestData.createRecommendationFeedDeleteServiceRequest();
         RecommendationFeed recommendationFeed = RecommendationFeedFixture.COMMON_LOGIN_USER_RECOMMENDATION_FEED.getRecommendationFeed();
+        Integer originRecommendationFeedCount = recommendationFeed.getMyBook().getBook().getRecommendationFeedCount();
 
-        given(recommendationFeedRepository.findById(any())).willReturn(Optional.of(recommendationFeed));
+        given(recommendationFeedRepository.findByIdWithMyBookAndBook(any())).willReturn(Optional.of(recommendationFeed));
         doNothing().when(recommendationFeedRepository).delete(any());
 
         // when
@@ -188,7 +192,8 @@ class RecommendationFeedWriteServiceTest {
 
         // then
         assertAll(
-                () -> verify(recommendationFeedRepository, times(1)).findById(any()),
+                () -> assertThat(recommendationFeed.getMyBook().getBook().getRecommendationFeedCount()).isEqualTo(originRecommendationFeedCount - 1),
+                () -> verify(recommendationFeedRepository, times(1)).findByIdWithMyBookAndBook(any()),
                 () -> verify(recommendationFeedRepository, times(1)).delete(any())
         );
     }
@@ -201,13 +206,13 @@ class RecommendationFeedWriteServiceTest {
         RecommendationFeedDeleteServiceRequest request = RecommendationFeedDtoTestData.createRecommendationFeedDeleteServiceRequest();
         RecommendationFeed recommendationFeed = RecommendationFeedFixture.COMMON_OTHER_USER_RECOMMENDATION_FEED.getRecommendationFeed();
 
-        given(recommendationFeedRepository.findById(any())).willReturn(Optional.of(recommendationFeed));
+        given(recommendationFeedRepository.findByIdWithMyBookAndBook(any())).willReturn(Optional.of(recommendationFeed));
 
         // when, then
         assertAll(
                 () -> assertThatThrownBy(() -> recommendationFeedWriteService.deleteRecommendationFeed(request))
                         .isInstanceOf(RecommendationFeedAccessDeniedException.class),
-                () -> verify(recommendationFeedRepository, times(1)).findById(any()),
+                () -> verify(recommendationFeedRepository, times(1)).findByIdWithMyBookAndBook(any()),
                 () -> verify(recommendationFeedRepository, never()).delete(any())
         );
     }
