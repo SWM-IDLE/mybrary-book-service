@@ -70,6 +70,7 @@ public class Book extends BaseEntity {
     private Integer holderCount;
     private Integer readCount;
     private Integer interestCount;
+    private Integer recommendationFeedCount;
     private Double starRating;
     private Integer reviewCount;
 
@@ -131,6 +132,14 @@ public class Book extends BaseEntity {
 
     public void decreaseReadCount() {
         this.readCount--;
+    }
+
+    public void increaseRecommendationFeedCount() {
+        this.recommendationFeedCount++;
+    }
+
+    public void decreaseRecommendationFeedCount() {
+        this.recommendationFeedCount--;
     }
 
     public void adjustReadCount(ReadStatus previousReadStatus, ReadStatus currentReadStatus) {
