@@ -434,7 +434,7 @@ class RecommendationFeedRepositoryTest {
         );
     }
 
-    @DisplayName("사용자의 추천 피드를 조회한다.")
+    @DisplayName("사용자의 추천 피드를 최신순으로 조회한다.")
     @Test
     void getRecommendationFeedViewOfUserModel() {
 

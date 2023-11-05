@@ -112,7 +112,7 @@ public class RecommendationFeedController {
                 recommendationFeedReadService.findRecommendationFeedOfBookViewResponse(request)));
     }
 
-    @GetMapping("/mybooks/{myBookId}/recommendation-feeds")
+    @GetMapping("/mybooks/{myBookId}/recommendation-feed")
     public ResponseEntity<SuccessResponse<RecommendationFeedOfMyBookResponse>> getRecommendationFeedOfMyBookResponse(
             @PathVariable("myBookId") Long myBookId) {
 

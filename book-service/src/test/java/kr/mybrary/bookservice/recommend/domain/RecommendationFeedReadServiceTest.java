@@ -149,10 +149,8 @@ class RecommendationFeedReadServiceTest {
 
         // then
         assertAll(
-                () -> {
-                    assert recommendationFeed != null;
-                    assertThat(response.getContent()).isEqualTo(recommendationFeed.getContent());
-                },
+                () -> assertThat(recommendationFeed).isNotNull(),
+                () -> assertThat(response.getContent()).isEqualTo(recommendationFeed.getContent()),
                 () -> verify(recommendationFeedRepository).getRecommendationFeedWithTargetsByMyBookId(any())
         );
     }

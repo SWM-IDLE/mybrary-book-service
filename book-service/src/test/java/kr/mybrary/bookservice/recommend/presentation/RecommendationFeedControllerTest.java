@@ -347,7 +347,7 @@ class RecommendationFeedControllerTest {
                         resource(
                                 ResourceSnippetParameters.builder()
                                         .tag("recommendation-feed")
-                                        .summary("사용자 의천 피드를 조회한다.")
+                                        .summary("사용자의 추천 피드를 조회한다.")
                                         .pathParameters(
                                                 parameterWithName("userId").type(SimpleType.STRING).description("사용자 ID")
                                         )
@@ -438,7 +438,7 @@ class RecommendationFeedControllerTest {
         given(recommendationFeedReadService.findRecommendationFeedOfMyBookResponse(any())).willReturn(response);
 
         // when
-        ResultActions actions = mockMvc.perform(get("/api/v1/mybooks/{myBookId}/recommendation-feeds", "1"));
+        ResultActions actions = mockMvc.perform(get("/api/v1/mybooks/{myBookId}/recommendation-feed", "1"));
 
         // then
         actions
