@@ -368,6 +368,9 @@ class RecommendationFeedControllerTest {
                                                 fieldWithPath(
                                                         "data.recommendationFeeds[].recommendationTargetNames").type(ARRAY)
                                                         .description("추천 피드 대상자 목록"),
+                                                fieldWithPath(
+                                                        "data.recommendationFeeds[].authors").type(ARRAY)
+                                                        .description("추천 피드 도서 저자들의 이름"),
                                                 fieldWithPath("data.recommendationFeeds[].myBookId").type(NUMBER)
                                                         .description("추천 피드 마이북 ID"),
                                                 fieldWithPath("data.recommendationFeeds[].bookId").type(NUMBER)
