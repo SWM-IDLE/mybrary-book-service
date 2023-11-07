@@ -16,6 +16,7 @@ public class RecommendationFeedOfUserViewModel {
 
     private String content;
     private List<RecommendationTargetOfUserModel> recommendationTargets;
+    private List<RecommendationFeedOfUserBookAuthorModel> bookAuthors;
 
     private Long recommendationFeedId;
     private Long myBookId;
@@ -29,6 +30,10 @@ public class RecommendationFeedOfUserViewModel {
         this.recommendationTargets = recommendationTargetOfUserModels;
     }
 
+    public void setBookAuthors(List<RecommendationFeedOfUserBookAuthorModel> bookAuthors) {
+        this.bookAuthors = bookAuthors;
+    }
+
     @Getter
     @Builder
     @NoArgsConstructor
@@ -38,5 +43,17 @@ public class RecommendationFeedOfUserViewModel {
 
         private Long targetId;
         private String targetName;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @EqualsAndHashCode
+    public static class RecommendationFeedOfUserBookAuthorModel {
+
+        private Long authorId;
+        private Integer aid;
+        private String name;
     }
 }

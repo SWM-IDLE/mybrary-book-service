@@ -178,6 +178,17 @@ public class RecommendationFeedDtoTestData {
                             .thumbnailUrl("THUMBNAIL_URL_" + i)
                             .isbn13("ISBN13_" + i)
                             .createdAt(LocalDateTime.now())
+                            .bookAuthors(List.of(
+                                    RecommendationFeedOfUserViewModel.RecommendationFeedOfUserBookAuthorModel.builder()
+                                            .authorId((long) i)
+                                            .aid(i)
+                                            .name("AUTHOR_NAME_" + i)
+                                            .build(),
+                                    RecommendationFeedOfUserViewModel.RecommendationFeedOfUserBookAuthorModel.builder()
+                                            .authorId((long) i + 1)
+                                            .aid(i + 1)
+                                            .name("AUTHOR_NAME_" + (i + 1))
+                                            .build()))
                             .recommendationTargets(List.of(
                                     RecommendationFeedOfUserViewModel.RecommendationTargetOfUserModel.builder()
                                             .targetId((long) i)
@@ -204,6 +215,7 @@ public class RecommendationFeedDtoTestData {
                             .title("TITLE_" + i)
                             .thumbnailUrl("THUMBNAIL_URL_" + i)
                             .isbn13("ISBN13_" + i)
+                            .authors(List.of("AUTHOR_NAME_" + i, "AUTHOR_NAME_" + (i + 1)))
                             .createdAt(DateUtils.toDotFormatYYYYMMDD(LocalDateTime.now()))
                             .build()));
 

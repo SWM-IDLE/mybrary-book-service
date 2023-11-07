@@ -3,6 +3,7 @@ package kr.mybrary.bookservice.recommend.presentation.dto.response;
 import java.util.List;
 import kr.mybrary.bookservice.global.util.DateUtils;
 import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedOfUserViewModel;
+import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedOfUserViewModel.RecommendationFeedOfUserBookAuthorModel;
 import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedOfUserViewModel.RecommendationTargetOfUserModel;
 import lombok.Builder;
 import lombok.Getter;
@@ -27,6 +28,8 @@ public class RecommendationFeedOfUserViewResponse {
                                 .createdAt(DateUtils.toDotFormatYYYYMMDD(recommendationFeed.getCreatedAt()))
                                 .recommendationTargetNames(recommendationFeed.getRecommendationTargets().stream()
                                         .map(RecommendationTargetOfUserModel::getTargetName).toList())
+                                .authors(recommendationFeed.getBookAuthors().stream().map(
+                                        RecommendationFeedOfUserBookAuthorModel::getName).toList())
                                 .build()).toList()).build();
     }
 
@@ -44,5 +47,6 @@ public class RecommendationFeedOfUserViewResponse {
         private String createdAt;
 
         private List<String> recommendationTargetNames;
+        private List<String> authors;
     }
 }

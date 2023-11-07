@@ -488,21 +488,24 @@ class RecommendationFeedRepositoryTest {
         entityManager.clear();
 
         // when
-        List<RecommendationFeedOfUserViewModel> recommendationFeedViewAll =
+        List<RecommendationFeedOfUserViewModel> recommendationFeedOfUserView =
                 recommendationFeedRepository.getRecommendationFeedViewOfUserModel("LOGIN_USER_ID");
 
         // then
         assertAll(
                 () -> {
-                    assertThat(recommendationFeedViewAll).hasSize(4);
-                    assertThat(recommendationFeedViewAll.get(0).getRecommendationTargets()).extracting("targetName")
+                    assertThat(recommendationFeedOfUserView).hasSize(4);
+                    assertThat(recommendationFeedOfUserView.get(0).getRecommendationTargets()).extracting("targetName")
                             .containsExactly("TARGET_NAME_4");
-                    assertThat(recommendationFeedViewAll.get(3).getRecommendationTargets()).extracting("targetName")
+                    assertThat(recommendationFeedOfUserView.get(3).getRecommendationTargets()).extracting("targetName")
                             .containsExactly("TARGET_NAME_1");
+                    assertThat(recommendationFeedOfUserView.get(0).getBookAuthors()).extracting("name")
+                            .containsExactly("테스트 저자 1", "테스트 저자 2", "테스트 저자 3");
+                    assertThat(recommendationFeedOfUserView.get(3).getBookAuthors()).extracting("name")
+                            .containsExactly("테스트 저자 1", "테스트 저자 2", "테스트 저자 3");
                 },
-                () -> assertThat(recommendationFeedViewAll).extracting("content").containsExactlyInAnyOrder(
-                        "NEW_CONTENT_1", "NEW_CONTENT_2", "NEW_CONTENT_3", "NEW_CONTENT_4"
-                )
+                () -> assertThat(recommendationFeedOfUserView).extracting("content").containsExactlyInAnyOrder(
+                        "NEW_CONTENT_1", "NEW_CONTENT_2", "NEW_CONTENT_3", "NEW_CONTENT_4")
         );
     }
 
