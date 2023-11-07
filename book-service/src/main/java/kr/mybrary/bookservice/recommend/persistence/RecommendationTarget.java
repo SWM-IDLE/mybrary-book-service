@@ -11,16 +11,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
 
 @Entity
 @Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Where(clause = "deleted = false")
-@SQLDelete(sql = "UPDATE recommendation_target SET deleted = true WHERE id = ?")
 public class RecommendationTarget extends BaseEntity {
 
     @Id
@@ -31,8 +27,6 @@ public class RecommendationTarget extends BaseEntity {
     private RecommendationFeed recommendationFeed;
 
     private String targetName;
-
-    private boolean deleted;
 
     public static RecommendationTarget of(String targetName) {
         return RecommendationTarget.builder()

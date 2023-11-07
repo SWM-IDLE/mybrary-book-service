@@ -16,16 +16,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
 
 @Entity
 @Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Where(clause = "deleted = false")
-@SQLDelete(sql = "UPDATE recommendation_feed SET deleted = true WHERE id = ?")
 public class RecommendationFeed extends BaseEntity {
 
     @Id
@@ -40,7 +36,6 @@ public class RecommendationFeed extends BaseEntity {
 
     private String userId;
     private String content;
-    private boolean deleted;
 
     public static RecommendationFeed of(RecommendationFeedCreateServiceRequest request, MyBook myBook, RecommendationTargets recommendationTargets) {
         return RecommendationFeed.builder()
