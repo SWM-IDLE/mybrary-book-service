@@ -22,6 +22,7 @@ import kr.mybrary.bookservice.recommend.persistence.RecommendationFeed;
 import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedOfBookViewModel;
 import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedOfBookViewModel.RecommendationTargetOfBookModel;
 import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedOfUserViewModel;
+import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedOfUserViewModel.RecommendationFeedOfUserBookAuthorModel;
 import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedOfUserViewModel.RecommendationTargetOfUserModel;
 import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedViewAllModel;
 import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedViewAllModel.BookAuthorModel;
@@ -149,6 +150,10 @@ public class RecommendationFeedRepositoryCustomImpl implements RecommendationFee
                 .map(RecommendationFeedOfUserViewModel::getRecommendationFeedId)
                 .toList();
 
+        List<Long> bookIds = models.stream()
+                .map(RecommendationFeedOfUserViewModel::getBookId)
+                .toList();
+
         Map<Long, List<RecommendationTargetOfUserModel>> recommendationTargetModelMap = queryFactory
                 .select(
                         fields(RecommendationTargetOfUserModel.class,
@@ -163,7 +168,27 @@ public class RecommendationFeedRepositoryCustomImpl implements RecommendationFee
                                 recommendationTarget.targetName.as("targetName")
                         ))));
 
-        models.forEach(model -> model.setRecommendationTargets(recommendationTargetModelMap.getOrDefault(model.getRecommendationFeedId(), List.of())));
+        Map<Long, List<RecommendationFeedOfUserBookAuthorModel>> bookAuthorModelMap = queryFactory
+                .select(
+                        fields(RecommendationFeedOfUserBookAuthorModel.class,
+                                author.id.as("authorId"),
+                                author.aid.as("aid"),
+                                author.name.as("name")
+                        )
+                ).from(bookAuthor)
+                .join(bookAuthor.author, author).on(bookAuthor.author.id.eq(author.id))
+                .where(bookAuthor.book.id.in(bookIds))
+                .transform(groupBy(bookAuthor.book.id)
+                        .as(list(fields(RecommendationFeedOfUserBookAuthorModel.class,
+                                author.id.as("authorId"),
+                                author.aid.as("aid"),
+                                author.name.as("name")
+                        ))));
+
+        models.forEach(model -> {
+            model.setRecommendationTargets(recommendationTargetModelMap.getOrDefault(model.getRecommendationFeedId(), List.of()));
+            model.setBookAuthors(bookAuthorModelMap.getOrDefault(model.getBookId(), List.of()));
+        });
 
         return models;
     }
