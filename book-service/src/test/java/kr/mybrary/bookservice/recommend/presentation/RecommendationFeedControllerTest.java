@@ -198,6 +198,8 @@ class RecommendationFeedControllerTest {
                                                         .description("추천 피드 책 관심자 수"),
                                                 fieldWithPath("data.recommendationFeeds[].interested").type(BOOLEAN)
                                                         .description("추천 피드 책 관심 여부"),
+                                                fieldWithPath("data.recommendationFeeds[].recommendationFeedId").type(NUMBER)
+                                                                .description("추천 피드 ID"),
                                                 fieldWithPath("data.lastRecommendationFeedId").type(NUMBER)
                                                         .description("마지막 추천 피드 ID")
                                         ).build())));

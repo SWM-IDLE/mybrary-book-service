@@ -23,6 +23,7 @@ public class RecommendationFeedViewAllResponse {
         private String content;
         private List<String> recommendationTargetNames;
 
+        private Long recommendationFeedId;
         private String userId;
         private String nickname;
         private String profileImageUrl;
@@ -64,6 +65,7 @@ public class RecommendationFeedViewAllResponse {
                                 .holderCount(recommendationFeed.getHolderCount())
                                 .interestCount(recommendationFeed.getInterestCount())
                                 .interested(recommendationFeed.getInterested())
+                                .recommendationFeedId(recommendationFeed.getRecommendationFeedId())
                                 .build())
                         .toList())
                 .lastRecommendationFeedId(lastRecommendationFeedId)
