@@ -34,6 +34,11 @@ public class RecommendationFeedReadService {
 
         List<RecommendationFeedViewAllModel> recommendationFeeds =
                 recommendationFeedRepository.getRecommendationFeedViewAll(request.getRecommendationFeedId(), request.getPageSize(), request.getLoginId());
+
+        if (recommendationFeeds.isEmpty()) {
+            return RecommendationFeedViewAllResponse.builder().lastRecommendationFeedId(null).recommendationFeeds(List.of()).build();
+        }
+
         Long lastRecommendationFeedId = recommendationFeeds.get(recommendationFeeds.size() - 1).getRecommendationFeedId();
 
         UserInfoServiceResponse usersInfo = userServiceClient.getUsersInfo(getUserIdFromRecommendationFeedViewAllModel(recommendationFeeds));
