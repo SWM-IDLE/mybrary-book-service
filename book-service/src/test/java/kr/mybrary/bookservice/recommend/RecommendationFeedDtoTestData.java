@@ -128,6 +128,7 @@ public class RecommendationFeedDtoTestData {
                         .holderCount(i)
                         .interestCount(i)
                         .interested(true)
+                        .recommendationFeedId((long) i)
                         .build()));
 
         return RecommendationFeedViewAllResponse.builder()
