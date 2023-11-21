@@ -1,12 +1,16 @@
 package kr.mybrary.bookservice.book.domain;
 
+import java.util.List;
 import java.util.Optional;
 import kr.mybrary.bookservice.book.domain.dto.BookDtoMapper;
 import kr.mybrary.bookservice.book.domain.dto.request.BookDetailServiceRequest;
+import kr.mybrary.bookservice.book.domain.dto.request.BookRankedByServiceRequest;
 import kr.mybrary.bookservice.book.domain.exception.BookNotFoundException;
 import kr.mybrary.bookservice.book.persistence.Book;
+import kr.mybrary.bookservice.book.persistence.model.RankedBookElementModel;
 import kr.mybrary.bookservice.book.persistence.repository.BookRepository;
 import kr.mybrary.bookservice.book.presentation.dto.response.BookDetailResponse;
+import kr.mybrary.bookservice.book.presentation.dto.response.BookRankedListByResponse;
 import kr.mybrary.bookservice.booksearch.domain.PlatformBookSearchApiService;
 import kr.mybrary.bookservice.booksearch.domain.dto.request.BookSearchServiceRequest;
 import kr.mybrary.bookservice.booksearch.presentation.dto.response.BookSearchDetailResponse;
@@ -42,5 +46,17 @@ public class BookReadService {
 
     public Optional<Book> findOptionalBookByISBN13(String isbn13) {
         return bookRepository.findByIsbn13(isbn13);
+    }
+
+    public BookRankedListByResponse getBookRankedListBy(BookRankedByServiceRequest request) {
+
+        List<RankedBookElementModel> models = bookRepository.findRankedBookListBy(request.getLimit(),
+                request.getBookRankedOrderType());
+
+        return BookRankedListByResponse.builder()
+                .books(models.stream()
+                        .map(BookDtoMapper.INSTANCE::RankedBookElementModelToBookRankedElement)
+                        .toList())
+                .build();
     }
 }
