@@ -8,7 +8,7 @@ import kr.mybrary.bookservice.book.domain.dto.request.BookInterestStatusServiceR
 import kr.mybrary.bookservice.book.domain.dto.request.BookMyInterestFindServiceRequest;
 import kr.mybrary.bookservice.book.persistence.Book;
 import kr.mybrary.bookservice.book.persistence.BookInterest;
-import kr.mybrary.bookservice.book.persistence.repository.BookInterestRepository;
+import kr.mybrary.bookservice.book.persistence.repository.interest.BookInterestRepository;
 import kr.mybrary.bookservice.book.presentation.dto.response.UserInfoWithInterestForBookResponse;
 import kr.mybrary.bookservice.book.presentation.dto.response.BookInterestElementResponse;
 import kr.mybrary.bookservice.book.presentation.dto.response.BookInterestHandleResponse;

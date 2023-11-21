@@ -22,7 +22,7 @@ import kr.mybrary.bookservice.book.domain.dto.request.UserInfoWithInterestForBoo
 import kr.mybrary.bookservice.book.persistence.Book;
 import kr.mybrary.bookservice.book.persistence.BookInterest;
 import kr.mybrary.bookservice.book.persistence.BookOrderType;
-import kr.mybrary.bookservice.book.persistence.repository.BookInterestRepository;
+import kr.mybrary.bookservice.book.persistence.repository.interest.BookInterestRepository;
 import kr.mybrary.bookservice.book.presentation.dto.response.BookInterestElementResponse;
 import kr.mybrary.bookservice.book.presentation.dto.response.BookInterestHandleResponse;
 import kr.mybrary.bookservice.book.presentation.dto.response.BookInterestStatusResponse;

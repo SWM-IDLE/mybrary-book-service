@@ -1,4 +1,4 @@
-package kr.mybrary.bookservice.book.persistence.repository;
+package kr.mybrary.bookservice.book.persistence.repository.interest;
 
 import static kr.mybrary.bookservice.book.persistence.QBook.book;
 import static kr.mybrary.bookservice.book.persistence.QBookInterest.bookInterest;
