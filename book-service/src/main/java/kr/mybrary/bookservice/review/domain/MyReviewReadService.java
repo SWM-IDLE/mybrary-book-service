@@ -13,10 +13,13 @@ import kr.mybrary.bookservice.mybook.domain.MyBookReadService;
 import kr.mybrary.bookservice.mybook.persistence.MyBook;
 import kr.mybrary.bookservice.review.domain.dto.MyReviewDtoMapper;
 import kr.mybrary.bookservice.review.domain.dto.request.MyReviewOfMyBookGetServiceRequest;
+import kr.mybrary.bookservice.review.domain.dto.request.MyReviewOfUserIdGetServiceRequest;
 import kr.mybrary.bookservice.review.domain.dto.request.MyReviewsOfBookGetServiceRequest;
+import kr.mybrary.bookservice.review.persistence.model.MyReviewElementByUserIdModel;
 import kr.mybrary.bookservice.review.persistence.model.MyReviewElementModel;
 import kr.mybrary.bookservice.review.persistence.repository.MyReviewRepository;
 import kr.mybrary.bookservice.review.presentation.dto.response.MyReviewOfMyBookGetResponse;
+import kr.mybrary.bookservice.review.presentation.dto.response.MyReviewOfUserIdGetResponse;
 import kr.mybrary.bookservice.review.presentation.dto.response.MyReviewsOfBookGetResponse;
 import kr.mybrary.bookservice.review.presentation.dto.response.MyReviewsOfBookGetResponse.ReviewElement;
 import lombok.RequiredArgsConstructor;
@@ -62,6 +65,17 @@ public class MyReviewReadService {
         return myBookReviewRepository.findReviewByMyBook(myBook)
                 .map(MyReviewDtoMapper.INSTANCE::reviewOfMyBookModelToResponse)
                 .orElse(null);
+    }
+
+    public MyReviewOfUserIdGetResponse getReviewsFromUserId(MyReviewOfUserIdGetServiceRequest request) {
+
+        List<MyReviewElementByUserIdModel> reviewElements = myBookReviewRepository.findReviewsByUserId(request.getUserId());
+
+        return MyReviewOfUserIdGetResponse.builder()
+                .reviews(reviewElements.stream()
+                        .map(MyReviewDtoMapper.INSTANCE::MyReviewByUserIdModelToElement)
+                        .toList())
+                .build();
     }
 
     @NotNull

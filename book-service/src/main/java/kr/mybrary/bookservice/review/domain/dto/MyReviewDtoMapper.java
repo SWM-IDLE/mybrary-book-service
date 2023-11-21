@@ -2,8 +2,10 @@ package kr.mybrary.bookservice.review.domain.dto;
 
 import java.time.LocalDateTime;
 import kr.mybrary.bookservice.global.util.DateUtils;
+import kr.mybrary.bookservice.review.persistence.model.MyReviewElementByUserIdModel;
 import kr.mybrary.bookservice.review.persistence.model.MyReviewFromMyBookModel;
 import kr.mybrary.bookservice.review.presentation.dto.response.MyReviewOfMyBookGetResponse;
+import kr.mybrary.bookservice.review.presentation.dto.response.MyReviewOfUserIdGetResponse.MyReviewOfUserIdElement;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -20,6 +22,10 @@ public interface MyReviewDtoMapper {
     @Mapping(target = "createdAt", source = "createdAt", qualifiedByName = "toFormatMyBookReviewUI")
     @Mapping(target = "updatedAt", source = "updatedAt", qualifiedByName = "toFormatMyBookReviewUI")
     MyReviewOfMyBookGetResponse reviewOfMyBookModelToResponse(MyReviewFromMyBookModel reviewOfMyBookGetModel);
+
+    @Mapping(target = "createdAt", source = "createdAt", qualifiedByName = "toFormatMyBookReviewUI")
+    @Mapping(target = "updatedAt", source = "updatedAt", qualifiedByName = "toFormatMyBookReviewUI")
+    MyReviewOfUserIdElement MyReviewByUserIdModelToElement(MyReviewElementByUserIdModel myReviewElementByUserIdModel);
 
     @Named("toFormatMyBookReviewUI")
     static String toFormatMyBookReviewUI(LocalDateTime dateTime) {

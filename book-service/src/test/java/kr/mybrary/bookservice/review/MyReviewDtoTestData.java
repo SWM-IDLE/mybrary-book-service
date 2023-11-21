@@ -8,9 +8,11 @@ import kr.mybrary.bookservice.client.user.dto.response.UserInfoServiceResponse.U
 import kr.mybrary.bookservice.review.domain.dto.request.MyReviewCreateServiceRequest;
 import kr.mybrary.bookservice.review.domain.dto.request.MyReviewDeleteServiceRequest;
 import kr.mybrary.bookservice.review.domain.dto.request.MyReviewOfMyBookGetServiceRequest;
+import kr.mybrary.bookservice.review.domain.dto.request.MyReviewOfUserIdGetServiceRequest;
 import kr.mybrary.bookservice.review.domain.dto.request.MyReviewUpdateServiceRequest;
 import kr.mybrary.bookservice.review.domain.dto.request.MyReviewsOfBookGetServiceRequest;
 import kr.mybrary.bookservice.review.domain.dto.request.MyReviewsOfBookGetServiceRequest.MyReviewsOfBookGetServiceRequestBuilder;
+import kr.mybrary.bookservice.review.persistence.model.MyReviewElementByUserIdModel;
 import kr.mybrary.bookservice.review.persistence.model.MyReviewElementModel;
 import kr.mybrary.bookservice.review.persistence.model.MyReviewFromMyBookModel;
 import kr.mybrary.bookservice.review.presentation.dto.request.MyReviewCreateRequest;
@@ -160,4 +162,41 @@ public class MyReviewDtoTestData {
                 .build();
     }
 
+    public static MyReviewElementByUserIdModel createMyReviewElementByUserIdModel() {
+        return MyReviewElementByUserIdModel.builder()
+                .reviewId(1L)
+                .myBookId(1L)
+                .bookTitle("Test Book Title")
+                .bookIsbn13("9788956609959")
+                .bookThumbnailUrl("Test Book Thumbnail Url")
+                .content("리뷰 내용입니다.")
+                .starRating(4.5)
+                .createdAt(LocalDateTime.of(2023, 1, 1, 0, 0, 0))
+                .updatedAt(LocalDateTime.of(2023, 1, 1, 0, 0, 0))
+                .build();
+    }
+
+    public static List<MyReviewElementByUserIdModel> createMyReviewElementByUserIdModelList() {
+
+        return IntStream.range(1, 6)
+                .mapToObj(i -> MyReviewElementByUserIdModel.builder()
+                        .reviewId((long) i)
+                        .myBookId((long) i)
+                        .bookTitle("Test Book Title")
+                        .bookIsbn13("9788956609959")
+                        .bookThumbnailUrl("Test Book Thumbnail Url")
+                        .content("리뷰 내용입니다.")
+                        .starRating(4.5)
+                        .createdAt(LocalDateTime.of(2023, 1, 1, i, 0, 0))
+                        .updatedAt(LocalDateTime.of(2023, 1, 1, i, 0, 0))
+                        .build())
+                .toList();
+    }
+
+    public static MyReviewOfUserIdGetServiceRequest createReviewOfUserIdGetServiceRequest() {
+
+        return MyReviewOfUserIdGetServiceRequest.builder()
+                .userId("USER_ID")
+                .build();
+    }
 }
