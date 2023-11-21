@@ -11,4 +11,10 @@ public class BookRankedByServiceRequest {
     private BookRankedOrderType bookRankedOrderType;
     private Integer limit;
 
+    public static BookRankedByServiceRequest of(int limit, BookRankedOrderType type) {
+        return BookRankedByServiceRequest.builder()
+                .limit(limit)
+                .bookRankedOrderType(type)
+                .build();
+    }
 }
