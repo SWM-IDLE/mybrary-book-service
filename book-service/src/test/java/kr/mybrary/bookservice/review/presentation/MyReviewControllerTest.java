@@ -30,6 +30,7 @@ import kr.mybrary.bookservice.review.domain.MyReviewWriteService;
 import kr.mybrary.bookservice.review.presentation.dto.request.MyReviewCreateRequest;
 import kr.mybrary.bookservice.review.presentation.dto.request.MyReviewUpdateRequest;
 import kr.mybrary.bookservice.review.presentation.dto.response.MyReviewOfMyBookGetResponse;
+import kr.mybrary.bookservice.review.presentation.dto.response.MyReviewOfUserIdGetResponse;
 import kr.mybrary.bookservice.review.presentation.dto.response.MyReviewUpdateResponse;
 import kr.mybrary.bookservice.review.presentation.dto.response.MyReviewsOfBookGetResponse;
 import org.junit.jupiter.api.DisplayName;
@@ -305,6 +306,54 @@ class MyReviewControllerTest {
                                                 fieldWithPath("status").type(STRING).description("응답 상태"),
                                                 fieldWithPath("message").type(STRING).description("응답 메시지"),
                                                 fieldWithPath("data").type(OBJECT).description("응답 데이터").optional()
+                                        ).build())));
+    }
+
+    @DisplayName("유저의 모든 리뷰를 조회한다.")
+    @Test
+    void getReviewsFromUserId() throws Exception {
+
+        // given
+        MyReviewOfUserIdGetResponse response = MyReviewDtoTestData.createReviewOfUserIdGetResponse();
+
+        given(myReviewReadService.getReviewsFromUserId(any())).willReturn(response);
+
+        // when
+        ResultActions actions = mockMvc.perform(get("/api/v1/reviews/users/{userId}", 1L));
+
+        // then
+        actions
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("200 OK"))
+                .andExpect(jsonPath("$.message").value("유저의 전체 리뷰 목록입니다."))
+                .andExpect(jsonPath("$.data").isNotEmpty());
+
+        // document
+        actions
+                .andDo(document("get-reviews-from-userId",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        resource(
+                                ResourceSnippetParameters.builder()
+                                        .tag("review")
+                                        .summary("유저의 모든 대한 리뷰를 조회한다. (리뷰가 없을 경우, 빈 리스트이다.)")
+                                        .requestSchema(Schema.schema("get_review_from_userId_request_body"))
+                                        .pathParameters(
+                                                parameterWithName("userId").type(SimpleType.NUMBER).description("유저 Id")
+                                        )
+                                        .responseSchema(Schema.schema("get_review_from_userId_response_body"))
+                                        .responseFields(
+                                                fieldWithPath("status").type(STRING).description("응답 상태"),
+                                                fieldWithPath("message").type(STRING).description("응답 메시지"),
+                                                fieldWithPath("data.reviews[0].reviewId").type(NUMBER).description("리뷰 ID"),
+                                                fieldWithPath("data.reviews[0].content").type(STRING).description("리뷰 내용"),
+                                                fieldWithPath("data.reviews[0].starRating").type(NUMBER).description("리뷰 별점"),
+                                                fieldWithPath("data.reviews[0].createdAt").type(STRING).description("리뷰 생성일"),
+                                                fieldWithPath("data.reviews[0].updatedAt").type(STRING).description("리뷰 수정일"),
+                                                fieldWithPath("data.reviews[0].myBookId").type(NUMBER).description("마이북 ID"),
+                                                fieldWithPath("data.reviews[0].bookTitle").type(STRING).description("도서 제목"),
+                                                fieldWithPath("data.reviews[0].bookIsbn13").type(STRING).description("도서 ISBN13"),
+                                                fieldWithPath("data.reviews[0].bookThumbnailUrl").type(STRING).description("도서 썸네일 URL")
                                         ).build())));
     }
 }

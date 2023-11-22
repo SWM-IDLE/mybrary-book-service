@@ -5,10 +5,12 @@ import kr.mybrary.bookservice.review.domain.MyReviewReadService;
 import kr.mybrary.bookservice.review.domain.MyReviewWriteService;
 import kr.mybrary.bookservice.review.domain.dto.request.MyReviewDeleteServiceRequest;
 import kr.mybrary.bookservice.review.domain.dto.request.MyReviewOfMyBookGetServiceRequest;
+import kr.mybrary.bookservice.review.domain.dto.request.MyReviewOfUserIdGetServiceRequest;
 import kr.mybrary.bookservice.review.domain.dto.request.MyReviewUpdateServiceRequest;
 import kr.mybrary.bookservice.review.domain.dto.request.MyReviewsOfBookGetServiceRequest;
 import kr.mybrary.bookservice.review.presentation.dto.request.MyReviewCreateRequest;
 import kr.mybrary.bookservice.review.presentation.dto.request.MyReviewUpdateRequest;
+import kr.mybrary.bookservice.review.presentation.dto.response.MyReviewOfUserIdGetResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -82,5 +84,14 @@ public class MyReviewController {
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(SuccessResponse.of(HttpStatus.OK.toString(), "마이 리뷰를 삭제했습니다.", null));
+    }
+
+    @GetMapping("/reviews/users/{userId}")
+    public ResponseEntity<SuccessResponse<MyReviewOfUserIdGetResponse>> getReviewsFromUserId(@PathVariable String userId) {
+
+        MyReviewOfUserIdGetServiceRequest request = MyReviewOfUserIdGetServiceRequest.of(userId);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(SuccessResponse.of(HttpStatus.OK.toString(), "유저의 전체 리뷰 목록입니다.", myReviewReadService.getReviewsFromUserId(request)));
     }
 }

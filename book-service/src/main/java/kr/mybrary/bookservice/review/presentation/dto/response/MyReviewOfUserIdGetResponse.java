@@ -1,6 +1,5 @@
 package kr.mybrary.bookservice.review.presentation.dto.response;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Builder;
 import lombok.Getter;

@@ -9,4 +9,10 @@ public class MyReviewOfUserIdGetServiceRequest {
 
     private String userId;
 
+    public static MyReviewOfUserIdGetServiceRequest of(String userId) {
+        return MyReviewOfUserIdGetServiceRequest.builder()
+                .userId(userId)
+                .build();
+    }
+
 }

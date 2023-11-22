@@ -18,6 +18,7 @@ import kr.mybrary.bookservice.review.persistence.model.MyReviewFromMyBookModel;
 import kr.mybrary.bookservice.review.presentation.dto.request.MyReviewCreateRequest;
 import kr.mybrary.bookservice.review.presentation.dto.request.MyReviewUpdateRequest;
 import kr.mybrary.bookservice.review.presentation.dto.response.MyReviewOfMyBookGetResponse;
+import kr.mybrary.bookservice.review.presentation.dto.response.MyReviewOfUserIdGetResponse;
 import kr.mybrary.bookservice.review.presentation.dto.response.MyReviewUpdateResponse;
 import kr.mybrary.bookservice.review.presentation.dto.response.MyReviewsOfBookGetResponse;
 import kr.mybrary.bookservice.review.presentation.dto.response.MyReviewsOfBookGetResponse.ReviewElement;
@@ -197,6 +198,36 @@ public class MyReviewDtoTestData {
 
         return MyReviewOfUserIdGetServiceRequest.builder()
                 .userId("USER_ID")
+                .build();
+    }
+
+    public static MyReviewOfUserIdGetResponse createReviewOfUserIdGetResponse() {
+
+        return MyReviewOfUserIdGetResponse.builder()
+                .reviews(List.of(
+                        MyReviewOfUserIdGetResponse.MyReviewOfUserIdElement.builder()
+                                .reviewId(1L)
+                                .myBookId(1L)
+                                .bookTitle("Test Book Title")
+                                .bookIsbn13("9788956609959")
+                                .bookThumbnailUrl("Test Book Thumbnail Url")
+                                .content("리뷰 내용입니다.")
+                                .starRating(4.5)
+                                .createdAt("2023.01.01")
+                                .updatedAt("2023.01.01")
+                                .build(),
+                        MyReviewOfUserIdGetResponse.MyReviewOfUserIdElement.builder()
+                                .reviewId(2L)
+                                .myBookId(2L)
+                                .bookTitle("Test Book Title")
+                                .bookIsbn13("9788956609959")
+                                .bookThumbnailUrl("Test Book Thumbnail Url")
+                                .content("리뷰 내용입니다.")
+                                .starRating(4.5)
+                                .createdAt("2023.01.01")
+                                .updatedAt("2023.01.01")
+                                .build()
+                ))
                 .build();
     }
 }
