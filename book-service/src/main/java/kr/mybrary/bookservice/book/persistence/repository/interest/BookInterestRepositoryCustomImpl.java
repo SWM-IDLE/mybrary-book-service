@@ -45,7 +45,7 @@ public class BookInterestRepositoryCustomImpl implements BookInterestRepositoryC
         return Arrays.stream(BookOrderType.values())
                 .filter(orderType -> orderType == bookOrderType)
                 .findFirst()
-                .orElseGet(() -> BookOrderType.NONE)
+                .orElse(BookOrderType.NONE)
                 .getOrderSpecifier();
     }
 }

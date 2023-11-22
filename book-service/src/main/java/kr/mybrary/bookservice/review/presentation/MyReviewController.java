@@ -10,7 +10,10 @@ import kr.mybrary.bookservice.review.domain.dto.request.MyReviewUpdateServiceReq
 import kr.mybrary.bookservice.review.domain.dto.request.MyReviewsOfBookGetServiceRequest;
 import kr.mybrary.bookservice.review.presentation.dto.request.MyReviewCreateRequest;
 import kr.mybrary.bookservice.review.presentation.dto.request.MyReviewUpdateRequest;
+import kr.mybrary.bookservice.review.presentation.dto.response.MyReviewOfMyBookGetResponse;
 import kr.mybrary.bookservice.review.presentation.dto.response.MyReviewOfUserIdGetResponse;
+import kr.mybrary.bookservice.review.presentation.dto.response.MyReviewUpdateResponse;
+import kr.mybrary.bookservice.review.presentation.dto.response.MyReviewsOfBookGetResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +36,7 @@ public class MyReviewController {
     private final MyReviewReadService myReviewReadService;
 
     @PostMapping("/mybooks/{myBookId}/reviews")
-    public ResponseEntity create(@RequestHeader("USER-ID") String loginId,
+    public ResponseEntity<SuccessResponse<Void>> create(@RequestHeader("USER-ID") String loginId,
             @PathVariable Long myBookId,
             @RequestBody MyReviewCreateRequest request) {
 
@@ -44,7 +47,7 @@ public class MyReviewController {
     }
 
     @GetMapping("/books/{isbn13}/reviews")
-    public ResponseEntity getReviewsFromBook(@PathVariable String isbn13) {
+    public ResponseEntity<SuccessResponse<MyReviewsOfBookGetResponse>> getReviewsFromBook(@PathVariable String isbn13) {
 
         MyReviewsOfBookGetServiceRequest request = MyReviewsOfBookGetServiceRequest.of(isbn13);
 
@@ -54,7 +57,7 @@ public class MyReviewController {
     }
 
     @GetMapping("/mybooks/{myBookId}/review")
-    public ResponseEntity getReviewFromMyBook(@PathVariable Long myBookId) {
+    public ResponseEntity<SuccessResponse<MyReviewOfMyBookGetResponse>> getReviewFromMyBook(@PathVariable Long myBookId) {
 
         MyReviewOfMyBookGetServiceRequest request = MyReviewOfMyBookGetServiceRequest.of(myBookId);
 
@@ -64,9 +67,9 @@ public class MyReviewController {
     }
 
     @PutMapping("/reviews/{reviewId}")
-    public ResponseEntity updateReview(@RequestHeader("USER-ID") String loginId,
-            @PathVariable Long reviewId,
-            @RequestBody MyReviewUpdateRequest request) {
+    public ResponseEntity<SuccessResponse<MyReviewUpdateResponse>> updateReview(@RequestHeader("USER-ID") String loginId,
+                                                                                @PathVariable Long reviewId,
+                                                                                @RequestBody MyReviewUpdateRequest request) {
 
         MyReviewUpdateServiceRequest serviceRequest = request.toServiceRequest(loginId, reviewId);
 
@@ -76,7 +79,7 @@ public class MyReviewController {
     }
 
     @DeleteMapping("/reviews/{reviewId}")
-    public ResponseEntity deleteReview(@RequestHeader("USER-ID") String loginId,
+    public ResponseEntity<SuccessResponse<Void>> deleteReview(@RequestHeader("USER-ID") String loginId,
             @PathVariable Long reviewId) {
 
         MyReviewDeleteServiceRequest request = MyReviewDeleteServiceRequest.of(reviewId, loginId);

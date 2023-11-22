@@ -169,7 +169,7 @@ class MyReviewRepositoryTest {
         MyReview myReview_2 = entityManager.persist(MyReviewFixture.MY_BOOK_REVIEW_WITHOUT_RELATION
                 .getMyBookReviewBuilder().book(book_2).myBook(myBook_2).build());
 
-        MyReview myReview_3 = entityManager.persist(MyReviewFixture.MY_BOOK_REVIEW_WITHOUT_RELATION
+        entityManager.persist(MyReviewFixture.MY_BOOK_REVIEW_WITHOUT_RELATION
                 .getMyBookReviewBuilder().book(book_3).myBook(myBook_3).build());
 
         entityManager.flush();
