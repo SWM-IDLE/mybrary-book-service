@@ -1,8 +1,10 @@
 package kr.mybrary.bookservice.review.domain.dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import kr.mybrary.bookservice.global.util.DateUtils;
 import kr.mybrary.bookservice.review.persistence.model.MyReviewElementByUserIdModel;
+import kr.mybrary.bookservice.review.persistence.model.MyReviewElementByUserIdModel.BookAuthorModel;
 import kr.mybrary.bookservice.review.persistence.model.MyReviewFromMyBookModel;
 import kr.mybrary.bookservice.review.presentation.dto.response.MyReviewOfMyBookGetResponse;
 import kr.mybrary.bookservice.review.presentation.dto.response.MyReviewOfUserIdGetResponse.MyReviewOfUserIdElement;
@@ -25,10 +27,18 @@ public interface MyReviewDtoMapper {
 
     @Mapping(target = "createdAt", source = "createdAt", qualifiedByName = "toFormatMyBookReviewUI")
     @Mapping(target = "updatedAt", source = "updatedAt", qualifiedByName = "toFormatMyBookReviewUI")
-    MyReviewOfUserIdElement MyReviewByUserIdModelToElement(MyReviewElementByUserIdModel myReviewElementByUserIdModel);
+    @Mapping(target = "authors", source = "bookAuthors", qualifiedByName = "getAuthors")
+    MyReviewOfUserIdElement myReviewByUserIdModelToElement(MyReviewElementByUserIdModel myReviewElementByUserIdModel);
 
     @Named("toFormatMyBookReviewUI")
     static String toFormatMyBookReviewUI(LocalDateTime dateTime) {
         return DateUtils.toDotFormatYYYYMMDD(dateTime);
+    }
+
+    @Named("getAuthors")
+    static List<String> getAuthors(List<MyReviewElementByUserIdModel.BookAuthorModel> bookAuthors) {
+        return bookAuthors.stream()
+                .map(BookAuthorModel::getName)
+                .toList();
     }
 }

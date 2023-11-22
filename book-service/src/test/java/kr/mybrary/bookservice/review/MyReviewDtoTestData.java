@@ -174,6 +174,18 @@ public class MyReviewDtoTestData {
                 .starRating(4.5)
                 .createdAt(LocalDateTime.of(2023, 1, 1, 0, 0, 0))
                 .updatedAt(LocalDateTime.of(2023, 1, 1, 0, 0, 0))
+                .bookAuthors(List.of(
+                        MyReviewElementByUserIdModel.BookAuthorModel.builder()
+                                .authorId(1L)
+                                .aid(1)
+                                .name("Author_Name_1")
+                                .build(),
+                        MyReviewElementByUserIdModel.BookAuthorModel.builder()
+                                .authorId(2L)
+                                .aid(2)
+                                .name("Author_Name_2")
+                                .build()
+                ))
                 .build();
     }
 
@@ -190,6 +202,18 @@ public class MyReviewDtoTestData {
                         .starRating(4.5)
                         .createdAt(LocalDateTime.of(2023, 1, 1, i, 0, 0))
                         .updatedAt(LocalDateTime.of(2023, 1, 1, i, 0, 0))
+                        .bookAuthors(List.of(
+                                MyReviewElementByUserIdModel.BookAuthorModel.builder()
+                                        .authorId(1L)
+                                        .aid(1)
+                                        .name("Author_Name_1")
+                                        .build(),
+                                MyReviewElementByUserIdModel.BookAuthorModel.builder()
+                                        .authorId(2L)
+                                        .aid(2)
+                                        .name("Author_Name_2")
+                                        .build()
+                        ))
                         .build())
                 .toList();
     }
@@ -215,6 +239,7 @@ public class MyReviewDtoTestData {
                                 .starRating(4.5)
                                 .createdAt("2023.01.01")
                                 .updatedAt("2023.01.01")
+                                .authors(List.of("Author_Name_1", "Author_Name_2"))
                                 .build(),
                         MyReviewOfUserIdGetResponse.MyReviewOfUserIdElement.builder()
                                 .reviewId(2L)
@@ -226,6 +251,7 @@ public class MyReviewDtoTestData {
                                 .starRating(4.5)
                                 .createdAt("2023.01.01")
                                 .updatedAt("2023.01.01")
+                                .authors(List.of("Author_Name_2", "Author_Name_3"))
                                 .build()
                 ))
                 .build();

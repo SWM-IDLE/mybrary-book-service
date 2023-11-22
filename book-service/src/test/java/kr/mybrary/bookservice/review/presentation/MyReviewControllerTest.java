@@ -13,6 +13,7 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.OBJECT;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
@@ -345,15 +346,16 @@ class MyReviewControllerTest {
                                         .responseFields(
                                                 fieldWithPath("status").type(STRING).description("응답 상태"),
                                                 fieldWithPath("message").type(STRING).description("응답 메시지"),
-                                                fieldWithPath("data.reviews[0].reviewId").type(NUMBER).description("리뷰 ID"),
-                                                fieldWithPath("data.reviews[0].content").type(STRING).description("리뷰 내용"),
-                                                fieldWithPath("data.reviews[0].starRating").type(NUMBER).description("리뷰 별점"),
-                                                fieldWithPath("data.reviews[0].createdAt").type(STRING).description("리뷰 생성일"),
-                                                fieldWithPath("data.reviews[0].updatedAt").type(STRING).description("리뷰 수정일"),
-                                                fieldWithPath("data.reviews[0].myBookId").type(NUMBER).description("마이북 ID"),
-                                                fieldWithPath("data.reviews[0].bookTitle").type(STRING).description("도서 제목"),
-                                                fieldWithPath("data.reviews[0].bookIsbn13").type(STRING).description("도서 ISBN13"),
-                                                fieldWithPath("data.reviews[0].bookThumbnailUrl").type(STRING).description("도서 썸네일 URL")
+                                                fieldWithPath("data.reviews[].reviewId").type(NUMBER).description("리뷰 ID"),
+                                                fieldWithPath("data.reviews[].content").type(STRING).description("리뷰 내용"),
+                                                fieldWithPath("data.reviews[].starRating").type(NUMBER).description("리뷰 별점"),
+                                                fieldWithPath("data.reviews[].createdAt").type(STRING).description("리뷰 생성일"),
+                                                fieldWithPath("data.reviews[].updatedAt").type(STRING).description("리뷰 수정일"),
+                                                fieldWithPath("data.reviews[].myBookId").type(NUMBER).description("마이북 ID"),
+                                                fieldWithPath("data.reviews[].bookTitle").type(STRING).description("도서 제목"),
+                                                fieldWithPath("data.reviews[].bookIsbn13").type(STRING).description("도서 ISBN13"),
+                                                fieldWithPath("data.reviews[].bookThumbnailUrl").type(STRING).description("도서 썸네일 URL"),
+                                                fieldWithPath("data.reviews[].authors").type(ARRAY).description("도서 저자")
                                         ).build())));
     }
 }

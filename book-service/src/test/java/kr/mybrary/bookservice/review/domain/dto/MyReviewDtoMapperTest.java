@@ -57,7 +57,7 @@ class MyReviewDtoMapperTest {
         MyReviewElementByUserIdModel source = MyReviewDtoTestData.createMyReviewElementByUserIdModel();
 
         // when
-        MyReviewOfUserIdElement target = MyReviewDtoMapper.INSTANCE.MyReviewByUserIdModelToElement(
+        MyReviewOfUserIdElement target = MyReviewDtoMapper.INSTANCE.myReviewByUserIdModelToElement(
                 source);
 
         // then
@@ -70,7 +70,9 @@ class MyReviewDtoMapperTest {
                 () -> assertThat(target.getContent()).isEqualTo(source.getContent()),
                 () -> assertThat(target.getStarRating()).isEqualTo(source.getStarRating()),
                 () -> assertThat(target.getCreatedAt()).isEqualTo(MyReviewDtoMapper.toFormatMyBookReviewUI(source.getCreatedAt())),
-                () -> assertThat(target.getUpdatedAt()).isEqualTo(MyReviewDtoMapper.toFormatMyBookReviewUI(source.getUpdatedAt()))
+                () -> assertThat(target.getUpdatedAt()).isEqualTo(MyReviewDtoMapper.toFormatMyBookReviewUI(source.getUpdatedAt())),
+                () -> assertThat(target.getAuthors()).hasSize(2),
+                () -> assertThat(target.getAuthors()).containsExactlyInAnyOrder("Author_Name_1", "Author_Name_2")
         );
     }
 }

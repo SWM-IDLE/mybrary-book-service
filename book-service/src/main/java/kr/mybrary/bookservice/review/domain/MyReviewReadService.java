@@ -73,7 +73,7 @@ public class MyReviewReadService {
 
         return MyReviewOfUserIdGetResponse.builder()
                 .reviews(reviewElements.stream()
-                        .map(MyReviewDtoMapper.INSTANCE::MyReviewByUserIdModelToElement)
+                        .map(MyReviewDtoMapper.INSTANCE::myReviewByUserIdModelToElement)
                         .toList())
                 .build();
     }

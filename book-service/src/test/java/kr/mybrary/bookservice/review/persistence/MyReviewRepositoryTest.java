@@ -8,6 +8,8 @@ import java.util.Optional;
 import kr.mybrary.bookservice.PersistenceTest;
 import kr.mybrary.bookservice.book.BookFixture;
 import kr.mybrary.bookservice.book.persistence.Book;
+import kr.mybrary.bookservice.book.persistence.bookInfo.Author;
+import kr.mybrary.bookservice.book.persistence.bookInfo.BookAuthor;
 import kr.mybrary.bookservice.mybook.MyBookFixture;
 import kr.mybrary.bookservice.mybook.persistence.MyBook;
 import kr.mybrary.bookservice.review.MyReviewFixture;
@@ -150,9 +152,16 @@ class MyReviewRepositoryTest {
     void findReviewsByUserId() {
 
         // given
+        Author author_1 = entityManager.persist(Author.builder().name("Author_Name_1").aid(1).build());
+        Author author_2 = entityManager.persist(Author.builder().name("Author_Name_2").aid(2).build());
+
         Book book_1 = entityManager.persist(BookFixture.COMMON_BOOK_WITHOUT_RELATION.getBookBuilder().isbn13("ISBN13_1").isbn10("ISBN10_1").build());
         Book book_2 = entityManager.persist(BookFixture.COMMON_BOOK_WITHOUT_RELATION.getBookBuilder().isbn13("ISBN13_2").isbn10("ISBN10_2").build());
         Book book_3 = entityManager.persist(BookFixture.COMMON_BOOK_WITHOUT_RELATION.getBookBuilder().isbn13("ISBN13_3").isbn10("ISBN10_3").build());
+
+        entityManager.persist(BookAuthor.builder().author(author_1).book(book_1).build());
+        entityManager.persist(BookAuthor.builder().author(author_2).book(book_1).build());
+        entityManager.persist(BookAuthor.builder().author(author_1).book(book_2).build());
 
         MyBook myBook_1 = entityManager.persist(
                 MyBookFixture.MY_BOOK_WITHOUT_RELATION.getMyBookBuilder().userId("USER_ID").book(book_1).build());
@@ -192,6 +201,8 @@ class MyReviewRepositoryTest {
                     assertThat(models.get(0).getStarRating()).isEqualTo(myReview_2.getStarRating());
                     assertThat(models.get(0).getCreatedAt()).isNotNull();
                     assertThat(models.get(0).getUpdatedAt()).isNotNull();
+                    assertThat(models.get(0).getBookAuthors()).extracting("name")
+                            .containsExactlyInAnyOrder("Author_Name_1");
                 },
                 () -> {
                     assert models != null;
@@ -204,6 +215,8 @@ class MyReviewRepositoryTest {
                     assertThat(models.get(1).getStarRating()).isEqualTo(myReview_1.getStarRating());
                     assertThat(models.get(1).getCreatedAt()).isNotNull();
                     assertThat(models.get(1).getUpdatedAt()).isNotNull();
+                    assertThat(models.get(1).getBookAuthors()).extracting("name")
+                            .containsExactlyInAnyOrder("Author_Name_1", "Author_Name_2");
                 }
         );
     }

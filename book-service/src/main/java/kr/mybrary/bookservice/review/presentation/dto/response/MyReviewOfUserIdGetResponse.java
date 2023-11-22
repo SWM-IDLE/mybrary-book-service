@@ -24,6 +24,6 @@ public class MyReviewOfUserIdGetResponse {
         private Double starRating;
         private String createdAt;
         private String updatedAt;
+        private List<String> authors;
     }
-
 }
