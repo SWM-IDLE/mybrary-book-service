@@ -1,5 +1,6 @@
 package kr.mybrary.bookservice.book.domain.dto;
 
+import static kr.mybrary.bookservice.book.presentation.dto.response.BookRankedListByResponse.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -9,6 +10,7 @@ import kr.mybrary.bookservice.book.BookDtoTestData;
 import kr.mybrary.bookservice.book.BookFixture;
 import kr.mybrary.bookservice.book.BookInterestFixture;
 import kr.mybrary.bookservice.book.domain.dto.request.BookCreateServiceRequest;
+import kr.mybrary.bookservice.book.persistence.model.RankedBookElementModel;
 import kr.mybrary.bookservice.book.presentation.dto.response.BookDetailResponse;
 import kr.mybrary.bookservice.book.presentation.dto.response.BookDetailResponse.Author;
 import kr.mybrary.bookservice.book.presentation.dto.response.BookDetailResponse.Translator;
@@ -265,6 +267,30 @@ class BookDtoMapperTest {
                 () -> assertThat(target.getIsbn13()).isEqualTo(source.getBook().getIsbn13()),
                 () -> assertThat(target.getThumbnailUrl()).isEqualTo(source.getBook().getThumbnailUrl()),
                 () -> assertThat(target.getAuthor()).isEqualTo(source.getBook().getAuthor())
+        );
+    }
+
+    @DisplayName("RankedBookElementModel를 BookRankedListByResponse.BookRankedElement로 매핑한다.")
+    @Test
+    void RankedBookElementModelToBookRankedElement() {
+
+        // given
+        RankedBookElementModel source = BookDtoTestData.createRankedBookElementModel();
+
+        // when
+        BookRankedElement target = BookDtoMapper.INSTANCE.RankedBookElementModelToBookRankedElement(source);
+
+        // then
+        assertAll(
+                () -> assertThat(target.getTitle()).isEqualTo(source.getTitle()),
+                () -> assertThat(target.getIsbn13()).isEqualTo(source.getIsbn13()),
+                () -> assertThat(target.getThumbnailUrl()).isEqualTo(source.getThumbnailUrl()),
+                () -> assertThat(target.getHolderCount()).isEqualTo(source.getHolderCount()),
+                () -> assertThat(target.getReadCount()).isEqualTo(source.getReadCount()),
+                () -> assertThat(target.getInterestCount()).isEqualTo(source.getInterestCount()),
+                () -> assertThat(target.getRecommendationFeedCount()).isEqualTo(source.getRecommendationFeedCount()),
+                () -> assertThat(target.getStarRating()).isEqualTo(source.getStarRating()),
+                () -> assertThat(target.getReviewCount()).isEqualTo(source.getReviewCount())
         );
     }
 

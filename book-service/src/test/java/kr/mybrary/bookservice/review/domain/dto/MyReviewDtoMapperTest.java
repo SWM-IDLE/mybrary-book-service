@@ -5,8 +5,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDateTime;
 import kr.mybrary.bookservice.review.MyReviewDtoTestData;
+import kr.mybrary.bookservice.review.persistence.model.MyReviewElementByUserIdModel;
 import kr.mybrary.bookservice.review.persistence.model.MyReviewFromMyBookModel;
 import kr.mybrary.bookservice.review.presentation.dto.response.MyReviewOfMyBookGetResponse;
+import kr.mybrary.bookservice.review.presentation.dto.response.MyReviewOfUserIdGetResponse.MyReviewOfUserIdElement;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -45,5 +47,32 @@ class MyReviewDtoMapperTest {
 
         // then
         assertThat(target).isEqualTo(expected);
+    }
+
+    @DisplayName("MyReviewElementByUserIdModel를 MyReviewOfUserIdElement로 매핑한다.")
+    @Test
+    void myReviewElementByUserIdModelToMyReviewOfUserIdElement() {
+
+        // given
+        MyReviewElementByUserIdModel source = MyReviewDtoTestData.createMyReviewElementByUserIdModel();
+
+        // when
+        MyReviewOfUserIdElement target = MyReviewDtoMapper.INSTANCE.myReviewByUserIdModelToElement(
+                source);
+
+        // then
+        assertAll(
+                () -> assertThat(target.getReviewId()).isEqualTo(source.getReviewId()),
+                () -> assertThat(target.getMyBookId()).isEqualTo(source.getMyBookId()),
+                () -> assertThat(target.getBookTitle()).isEqualTo(source.getBookTitle()),
+                () -> assertThat(target.getBookIsbn13()).isEqualTo(source.getBookIsbn13()),
+                () -> assertThat(target.getBookThumbnailUrl()).isEqualTo(source.getBookThumbnailUrl()),
+                () -> assertThat(target.getContent()).isEqualTo(source.getContent()),
+                () -> assertThat(target.getStarRating()).isEqualTo(source.getStarRating()),
+                () -> assertThat(target.getCreatedAt()).isEqualTo(MyReviewDtoMapper.toFormatMyBookReviewUI(source.getCreatedAt())),
+                () -> assertThat(target.getUpdatedAt()).isEqualTo(MyReviewDtoMapper.toFormatMyBookReviewUI(source.getUpdatedAt())),
+                () -> assertThat(target.getAuthors()).hasSize(2),
+                () -> assertThat(target.getAuthors()).containsExactlyInAnyOrder("Author_Name_1", "Author_Name_2")
+        );
     }
 }

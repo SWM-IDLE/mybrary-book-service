@@ -1,4 +1,4 @@
-package kr.mybrary.bookservice.book.persistence.repository;
+package kr.mybrary.bookservice.book.persistence.repository.interest;
 
 import static kr.mybrary.bookservice.book.persistence.QBook.book;
 import static kr.mybrary.bookservice.book.persistence.QBookInterest.bookInterest;
@@ -45,7 +45,7 @@ public class BookInterestRepositoryCustomImpl implements BookInterestRepositoryC
         return Arrays.stream(BookOrderType.values())
                 .filter(orderType -> orderType == bookOrderType)
                 .findFirst()
-                .orElseGet(() -> BookOrderType.NONE)
+                .orElse(BookOrderType.NONE)
                 .getOrderSpecifier();
     }
 }

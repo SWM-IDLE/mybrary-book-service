@@ -9,7 +9,7 @@ import java.util.Optional;
 import kr.mybrary.bookservice.PersistenceTest;
 import kr.mybrary.bookservice.book.BookFixture;
 import kr.mybrary.bookservice.book.BookInterestFixture;
-import kr.mybrary.bookservice.book.persistence.repository.BookInterestRepository;
+import kr.mybrary.bookservice.book.persistence.repository.interest.BookInterestRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

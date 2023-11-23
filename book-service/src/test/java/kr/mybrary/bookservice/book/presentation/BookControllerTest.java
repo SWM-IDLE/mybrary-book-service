@@ -35,6 +35,7 @@ import kr.mybrary.bookservice.book.presentation.dto.request.BookCreateRequest;
 import kr.mybrary.bookservice.book.presentation.dto.response.BookInterestElementResponse;
 import kr.mybrary.bookservice.book.presentation.dto.response.BookInterestHandleResponse;
 import kr.mybrary.bookservice.book.presentation.dto.response.BookInterestStatusResponse;
+import kr.mybrary.bookservice.book.presentation.dto.response.BookRankedListByResponse;
 import kr.mybrary.bookservice.book.presentation.dto.response.UserInfoWithInterestForBookResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -451,6 +452,58 @@ class BookControllerTest {
                                                 fieldWithPath("data.userInfos[0].userId").type(STRING).description("유저 ID"),
                                                 fieldWithPath("data.userInfos[0].nickname").type(STRING).description("유저 닉네임"),
                                                 fieldWithPath("data.userInfos[0].profileImageUrl").type(STRING).description("유저 프로필 이미지 URL")
+                                        ).build())));
+    }
+
+    @DisplayName("등록수/완독수/관심도서수/추천피드수/리뷰수/별점 기준 도서 조회한다.")
+    @Test
+    void getBookRankedListByResponse() throws Exception {
+
+        // given
+        BookRankedListByResponse response = BookDtoTestData.createBookRankedListByResponse();
+
+        given(bookReadService.getBookRankedListBy(any())).willReturn(response);
+
+        // when
+        ResultActions actions = mockMvc.perform(get("/api/v1/books/ranked")
+                .param("limit", "10")
+                .param("order", "read"));
+
+        // then
+        actions
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("200 OK"))
+                .andExpect(jsonPath("$.message").value("도서 랭킹 조회에 성공했습니다."))
+                .andExpect(jsonPath("$.data").isNotEmpty());
+
+        // document
+        actions
+                .andDo(document("get-book-ranked-list-by",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        resource(
+                                ResourceSnippetParameters.builder()
+                                        .tag("book")
+                                        .summary("등록수/완독수/관심도서수/추천피드수/리뷰수/별점 기준 도서 조회한다.")
+                                        .description("쿼리 파라미터의 order는 등록수(holder), 완독수(read), 관심도서수(interest), 추천피드수(recommendation), 리뷰수(review), 별점(star) 등으로 괄호 내의 문자열을 order 값으로 보낸다."
+                                                + " limit는 조회할 도서의 개수를 의미.")
+                                        .queryParameters(
+                                                parameterWithName("order").type(SimpleType.STRING).description("조회 기준"),
+                                                parameterWithName("limit").type(SimpleType.NUMBER).description("조회 개수")
+                                        )
+                                        .responseSchema(Schema.schema("get_book_ranked_list_by_response_body"))
+                                        .responseFields(
+                                                fieldWithPath("status").type(STRING).description("응답 상태"),
+                                                fieldWithPath("message").type(STRING).description("응답 메시지"),
+                                                fieldWithPath("data.books[0].title").type(STRING).description("도서 제목"),
+                                                fieldWithPath("data.books[0].isbn13").type(STRING).description("도서 ISBN13"),
+                                                fieldWithPath("data.books[0].thumbnailUrl").type(STRING).description("도서 썸네일 URL"),
+                                                fieldWithPath("data.books[0].holderCount").type(NUMBER).description("도서 보유 수"),
+                                                fieldWithPath("data.books[0].readCount").type(NUMBER).description("도서 완독 수"),
+                                                fieldWithPath("data.books[0].interestCount").type(NUMBER).description("도서 관심 수"),
+                                                fieldWithPath("data.books[0].recommendationFeedCount").type(NUMBER).description("도서 추천 피드 수"),
+                                                fieldWithPath("data.books[0].reviewCount").type(NUMBER).description("도서 리뷰 수"),
+                                                fieldWithPath("data.books[0].starRating").type(NUMBER).description("도서 별점")
                                         ).build())));
     }
 }

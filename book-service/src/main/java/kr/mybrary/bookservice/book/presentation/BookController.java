@@ -8,13 +8,16 @@ import kr.mybrary.bookservice.book.domain.dto.request.BookDetailServiceRequest;
 import kr.mybrary.bookservice.book.domain.dto.request.BookInterestServiceRequest;
 import kr.mybrary.bookservice.book.domain.dto.request.BookInterestStatusServiceRequest;
 import kr.mybrary.bookservice.book.domain.dto.request.BookMyInterestFindServiceRequest;
+import kr.mybrary.bookservice.book.domain.dto.request.BookRankedByServiceRequest;
 import kr.mybrary.bookservice.book.domain.dto.request.UserInfoWithInterestForBookServiceRequest;
 import kr.mybrary.bookservice.book.persistence.BookOrderType;
+import kr.mybrary.bookservice.book.persistence.BookRankedOrderType;
 import kr.mybrary.bookservice.book.presentation.dto.request.BookCreateRequest;
 import kr.mybrary.bookservice.book.presentation.dto.response.BookDetailResponse;
 import kr.mybrary.bookservice.book.presentation.dto.response.BookInterestElementResponse;
 import kr.mybrary.bookservice.book.presentation.dto.response.BookInterestHandleResponse;
 import kr.mybrary.bookservice.book.presentation.dto.response.BookInterestStatusResponse;
+import kr.mybrary.bookservice.book.presentation.dto.response.BookRankedListByResponse;
 import kr.mybrary.bookservice.book.presentation.dto.response.UserInfoWithInterestForBookResponse;
 import kr.mybrary.bookservice.global.dto.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
@@ -101,4 +104,14 @@ public class BookController {
                 bookInterestService.getUserInfoWithInterestForBook(request)));
     }
 
+    @GetMapping("/ranked")
+    public ResponseEntity<SuccessResponse<BookRankedListByResponse>> getBookRankedListBy(
+            @RequestParam(value = "limit") int limit,
+            @RequestParam(value = "order") String order) {
+
+        BookRankedByServiceRequest request = BookRankedByServiceRequest.of(limit, BookRankedOrderType.of(order));
+
+        return ResponseEntity.ok(SuccessResponse.of(HttpStatus.OK.toString(), "도서 랭킹 조회에 성공했습니다.",
+                bookReadService.getBookRankedListBy(request)));
+    }
 }

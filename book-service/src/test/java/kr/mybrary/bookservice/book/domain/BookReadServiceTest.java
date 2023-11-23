@@ -3,6 +3,7 @@ package kr.mybrary.bookservice.book.domain;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
@@ -10,13 +11,17 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import java.util.List;
 import java.util.Optional;
 import kr.mybrary.bookservice.book.BookDtoTestData;
 import kr.mybrary.bookservice.book.BookFixture;
 import kr.mybrary.bookservice.book.domain.dto.request.BookDetailServiceRequest;
+import kr.mybrary.bookservice.book.domain.dto.request.BookRankedByServiceRequest;
 import kr.mybrary.bookservice.book.persistence.Book;
+import kr.mybrary.bookservice.book.persistence.model.RankedBookElementModel;
 import kr.mybrary.bookservice.book.persistence.repository.BookRepository;
 import kr.mybrary.bookservice.book.presentation.dto.response.BookDetailResponse;
+import kr.mybrary.bookservice.book.presentation.dto.response.BookRankedListByResponse;
 import kr.mybrary.bookservice.booksearch.BookSearchDtoTestData;
 import kr.mybrary.bookservice.booksearch.domain.PlatformBookSearchApiService;
 import kr.mybrary.bookservice.booksearch.presentation.dto.response.BookSearchDetailResponse;
@@ -112,6 +117,26 @@ class BookReadServiceTest {
         assertAll(
                 () -> assertThat(optionalBook).isEmpty(),
                 () -> verify(bookRepository, times(1)).findByIsbn13(anyString())
+        );
+    }
+
+    @Test
+    @DisplayName("등록수/완독수/관심도서수/추천피드수/리뷰수/별점 기준 도서 리스트를 가져온다.")
+    void getBookRankedListBy() {
+
+        // given
+        BookRankedByServiceRequest request = BookDtoTestData.createBookRankedByServiceRequest();
+        List<RankedBookElementModel> rankedBookElementModels = BookDtoTestData.createRankedBookElementModels();
+
+        given(bookRepository.findRankedBookListBy(anyInt(), any())).willReturn(rankedBookElementModels);
+
+        // when
+        BookRankedListByResponse response = bookReadService.getBookRankedListBy(request);
+
+        // then
+        assertAll(
+                () -> assertThat(response.getBooks().size()).isEqualTo(rankedBookElementModels.size()),
+                () -> verify(bookRepository, times(1)).findRankedBookListBy(anyInt(), any())
         );
     }
 }

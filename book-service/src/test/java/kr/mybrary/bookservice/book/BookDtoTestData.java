@@ -7,13 +7,17 @@ import kr.mybrary.bookservice.book.domain.dto.request.BookDetailServiceRequest;
 import kr.mybrary.bookservice.book.domain.dto.request.BookInterestServiceRequest;
 import kr.mybrary.bookservice.book.domain.dto.request.BookInterestStatusServiceRequest;
 import kr.mybrary.bookservice.book.domain.dto.request.BookMyInterestFindServiceRequest;
+import kr.mybrary.bookservice.book.domain.dto.request.BookRankedByServiceRequest;
 import kr.mybrary.bookservice.book.domain.dto.request.UserInfoWithInterestForBookServiceRequest;
+import kr.mybrary.bookservice.book.persistence.BookRankedOrderType;
+import kr.mybrary.bookservice.book.persistence.model.RankedBookElementModel;
 import kr.mybrary.bookservice.book.presentation.dto.response.BookDetailResponse;
 import kr.mybrary.bookservice.book.persistence.BookOrderType;
 import kr.mybrary.bookservice.book.presentation.dto.request.BookCreateRequest;
 import kr.mybrary.bookservice.book.presentation.dto.response.BookInterestElementResponse;
 import kr.mybrary.bookservice.book.presentation.dto.response.BookInterestHandleResponse;
 import kr.mybrary.bookservice.book.presentation.dto.response.BookInterestStatusResponse;
+import kr.mybrary.bookservice.book.presentation.dto.response.BookRankedListByResponse;
 import kr.mybrary.bookservice.book.presentation.dto.response.UserInfoWithInterestForBookResponse;
 import kr.mybrary.bookservice.client.user.dto.response.UserInfoServiceResponse;
 import kr.mybrary.bookservice.client.user.dto.response.UserInfoServiceResponse.UserInfo;
@@ -245,6 +249,108 @@ public class BookDtoTestData {
                                 .userId("USER_ID_2")
                                 .nickname("USER_NICKNAME_2")
                                 .profileImageUrl("USER_PICTURE_URL_2")
+                                .build()
+                )).build();
+    }
+
+    public static RankedBookElementModel createRankedBookElementModel() {
+
+        return RankedBookElementModel.builder()
+                .title("test_title")
+                .isbn13("1111111111111")
+                .thumbnailUrl("test_thumbnailUrl")
+                .starRating(4.5)
+                .reviewCount(100)
+                .holderCount(10)
+                .readCount(10)
+                .interestCount(10)
+                .recommendationFeedCount(10)
+                .build();
+    }
+
+    public static BookRankedByServiceRequest createBookRankedByServiceRequest() {
+
+        return BookRankedByServiceRequest.builder()
+                .bookRankedOrderType(BookRankedOrderType.READ)
+                .limit(10)
+                .build();
+    }
+
+    public static List<RankedBookElementModel> createRankedBookElementModels() {
+
+        return List.of(
+                RankedBookElementModel.builder()
+                        .title("test_title1")
+                        .isbn13("1111111111111")
+                        .thumbnailUrl("test_thumbnailUrl1")
+                        .starRating(4.5)
+                        .reviewCount(100)
+                        .holderCount(10)
+                        .readCount(10)
+                        .interestCount(10)
+                        .recommendationFeedCount(10)
+                        .build(),
+                RankedBookElementModel.builder()
+                        .title("test_title2")
+                        .isbn13("2222222222222")
+                        .thumbnailUrl("test_thumbnailUrl2")
+                        .starRating(4.5)
+                        .reviewCount(100)
+                        .holderCount(10)
+                        .readCount(10)
+                        .interestCount(10)
+                        .recommendationFeedCount(10)
+                        .build(),
+                RankedBookElementModel.builder()
+                        .title("test_title3")
+                        .isbn13("3333333333333")
+                        .thumbnailUrl("test_thumbnailUrl3")
+                        .starRating(4.5)
+                        .reviewCount(100)
+                        .holderCount(10)
+                        .readCount(10)
+                        .interestCount(10)
+                        .recommendationFeedCount(10)
+                        .build()
+        );
+    }
+
+    public static BookRankedListByResponse createBookRankedListByResponse() {
+
+        return BookRankedListByResponse.builder()
+                .books(List.of(
+                        BookRankedListByResponse.BookRankedElement.builder()
+                                .title("test_title1")
+                                .isbn13("1111111111111")
+                                .thumbnailUrl("test_thumbnailUrl1")
+                                .starRating(4.5)
+                                .reviewCount(100)
+                                .holderCount(10)
+                                .readCount(10)
+                                .interestCount(10)
+                                .recommendationFeedCount(10)
+                                .build(),
+                        BookRankedListByResponse.BookRankedElement.builder()
+                                .title("test_title2")
+                                .isbn13("2222222222222")
+                                .thumbnailUrl("test_thumbnailUrl2")
+                                .starRating(4.5)
+                                .reviewCount(100)
+                                .holderCount(10)
+                                .readCount(10)
+                                .interestCount(10)
+                                .recommendationFeedCount(10)
+                                .build(),
+                        BookRankedListByResponse.BookRankedElement.builder()
+                                .title("test_title3")
+                                .isbn13("3333333333333")
+                                .thumbnailUrl("test_thumbnailUrl3")
+                                .starRating(4.5)
+                                .reviewCount(100)
+                                .holderCount(10)
+                                .readCount(10)
+                                .interestCount(10)
+                                .recommendationFeedCount(10)
                                 .build()
                 )).build();
     }
