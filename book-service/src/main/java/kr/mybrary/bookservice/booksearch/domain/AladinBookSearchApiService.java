@@ -4,6 +4,7 @@ import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import java.util.List;
 import java.util.Objects;
+import kr.mybrary.bookservice.book.domain.BookReadService;
 import kr.mybrary.bookservice.booksearch.domain.dto.BookSearchDtoMapper;
 import kr.mybrary.bookservice.booksearch.domain.dto.request.BookListByCategorySearchServiceRequest;
 import kr.mybrary.bookservice.booksearch.domain.dto.request.BookSearchServiceRequest;
@@ -50,6 +51,7 @@ public class AladinBookSearchApiService implements PlatformBookSearchApiService 
     private static final String RETRY_CONFIG = "aladinAPIRetryConfig";
 
     private final RestTemplate restTemplate;
+    private final BookReadService bookReadService;
 
     private static final String BOOK_SEARCH_URL = "http://www.aladin.co.kr/ttb/api/ItemSearch.aspx";
     private static final String BOOK_DETAIL_SEARCH_URL = "http://www.aladin.co.kr/ttb/api/ItemLookUp.aspx";
@@ -88,6 +90,8 @@ public class AladinBookSearchApiService implements PlatformBookSearchApiService 
                 .filter(book -> hasISBN13(book.getIsbn13()))
                 .map(BookSearchDtoMapper.INSTANCE::aladinSearchResponseToServiceResponse)
                 .toList();
+
+        bookReadService.saveBookByISNB13WhenBookSearchKeyword(bookSearchResultResponseElement.get(0).getIsbn13());
 
         if (isLastPage(response.getStartIndex(), response.getItemsPerPage(), response.getTotalResults())) {
             return BookSearchResultResponse.of(bookSearchResultResponseElement, "");

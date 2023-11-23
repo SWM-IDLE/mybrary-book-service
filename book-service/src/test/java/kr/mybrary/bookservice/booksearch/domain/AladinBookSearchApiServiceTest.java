@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import kr.mybrary.bookservice.book.domain.BookReadService;
 import kr.mybrary.bookservice.booksearch.BookSearchDtoTestData;
 import kr.mybrary.bookservice.booksearch.domain.dto.request.BookListByCategorySearchServiceRequest;
 import kr.mybrary.bookservice.booksearch.domain.dto.request.BookSearchServiceRequest;
@@ -46,6 +47,9 @@ class AladinBookSearchApiServiceTest {
     private static final String BOOK_LIST_BY_CATEGORY_SEARCH_URL = "http://www.aladin.co.kr/ttb/api/ItemList.aspx";
     private static final String JSON_FILE_PATH = "src/test/resources/aladinapi/";
 
+    @MockBean
+    private BookReadService bookReadService;
+
     @Autowired
     private RestTemplate restTemplate;
     private AladinBookSearchApiService aladinBookSearchApiService;
@@ -53,7 +57,7 @@ class AladinBookSearchApiServiceTest {
 
     @BeforeEach
     public void setup() {
-        aladinBookSearchApiService = new AladinBookSearchApiService(restTemplate);
+        aladinBookSearchApiService = new AladinBookSearchApiService(restTemplate, bookReadService);
         mockServer = MockRestServiceServer.createServer(restTemplate);
     }
 
@@ -78,7 +82,8 @@ class AladinBookSearchApiServiceTest {
         mockServer.verify();
         assertAll(
                 () -> assertThat(bookSearchResultResponse.getBookSearchResult().size()).isEqualTo(10),
-                () -> assertThat(bookSearchResultResponse.getNextRequestUrl()).isEqualTo(expectNextRequestUrl)
+                () -> assertThat(bookSearchResultResponse.getNextRequestUrl()).isEqualTo(expectNextRequestUrl),
+                () -> verify(bookReadService, times(1)).saveBookByISNB13WhenBookSearchKeyword(any())
         );
     }
 
@@ -103,7 +108,8 @@ class AladinBookSearchApiServiceTest {
         mockServer.verify();
         assertAll(
                 () -> assertThat(bookSearchResultResponse.getBookSearchResult().size()).isLessThan(20),
-                () -> assertThat(bookSearchResultResponse.getNextRequestUrl()).isEqualTo(expectNextRequestUrl)
+                () -> assertThat(bookSearchResultResponse.getNextRequestUrl()).isEqualTo(expectNextRequestUrl),
+                () -> verify(bookReadService, times(1)).saveBookByISNB13WhenBookSearchKeyword(any())
         );
     }
 
@@ -129,7 +135,8 @@ class AladinBookSearchApiServiceTest {
         mockServer.verify();
         assertAll(
                 () -> assertThat(bookSearchResultResponse.getBookSearchResult()).hasSize(10),
-                () -> assertThat(bookSearchResultResponse.getNextRequestUrl()).isEqualTo(expectNextRequestUrl)
+                () -> assertThat(bookSearchResultResponse.getNextRequestUrl()).isEqualTo(expectNextRequestUrl),
+                () -> verify(bookReadService, times(1)).saveBookByISNB13WhenBookSearchKeyword(any())
         );
     }
 
@@ -154,7 +161,8 @@ class AladinBookSearchApiServiceTest {
         mockServer.verify();
         assertAll(
                 () -> assertThat(bookSearchResultResponse.getBookSearchResult().size()).isLessThan(20),
-                () -> assertThat(bookSearchResultResponse.getNextRequestUrl()).isEqualTo(expectNextRequestUrl)
+                () -> assertThat(bookSearchResultResponse.getNextRequestUrl()).isEqualTo(expectNextRequestUrl),
+                () -> verify(bookReadService, times(1)).saveBookByISNB13WhenBookSearchKeyword(any())
         );
     }
 
@@ -178,7 +186,8 @@ class AladinBookSearchApiServiceTest {
         mockServer.verify();
         assertAll(
                 () -> assertThat(response.getBookSearchResult()).isEmpty(),
-                () -> assertThat(response.getNextRequestUrl()).isEqualTo("")
+                () -> assertThat(response.getNextRequestUrl()).isEqualTo(""),
+                () -> verify(bookReadService, never()).saveBookByISNB13WhenBookSearchKeyword(any())
         );
     }
 
