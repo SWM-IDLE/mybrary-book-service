@@ -41,7 +41,6 @@ public class KakaoBookSearchApiService implements PlatformBookSearchApiService {
     private static final String KAKAO_AUTHORIZATION_HEADER_PREFIX = "KakaoAK ";
 
     private final RestTemplate restTemplate;
-    private final BookSearchRankingService bookSearchRankingService;
 
     @Override
     public BookSearchResultResponse searchWithKeyword(BookSearchServiceRequest request) {
@@ -56,8 +55,6 @@ public class KakaoBookSearchApiService implements PlatformBookSearchApiService {
                 searchResponse.getDocuments().stream()
                 .map(BookSearchDtoMapper.INSTANCE::kakaoSearchResponseToServiceResponse)
                 .toList();
-
-        bookSearchRankingService.increaseSearchRankingScore(request.getKeyword());
 
         if (isLastPage(searchResponse.getMeta())) {
             return BookSearchResultResponse.of(response, "");

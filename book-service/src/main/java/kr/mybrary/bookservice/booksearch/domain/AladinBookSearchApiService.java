@@ -50,7 +50,6 @@ public class AladinBookSearchApiService implements PlatformBookSearchApiService 
     private static final String RETRY_CONFIG = "aladinAPIRetryConfig";
 
     private final RestTemplate restTemplate;
-    private final BookSearchRankingService bookSearchRankingService;
 
     private static final String BOOK_SEARCH_URL = "http://www.aladin.co.kr/ttb/api/ItemSearch.aspx";
     private static final String BOOK_DETAIL_SEARCH_URL = "http://www.aladin.co.kr/ttb/api/ItemLookUp.aspx";
@@ -89,8 +88,6 @@ public class AladinBookSearchApiService implements PlatformBookSearchApiService 
                 .filter(book -> hasISBN13(book.getIsbn13()))
                 .map(BookSearchDtoMapper.INSTANCE::aladinSearchResponseToServiceResponse)
                 .toList();
-
-        bookSearchRankingService.increaseSearchRankingScore(request.getKeyword());
 
         if (isLastPage(response.getStartIndex(), response.getItemsPerPage(), response.getTotalResults())) {
             return BookSearchResultResponse.of(bookSearchResultResponseElement, "");

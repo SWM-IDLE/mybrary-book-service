@@ -42,14 +42,11 @@ class KakaoBookSearchApiServiceTest {
     @Autowired
     private RestTemplate restTemplate;
 
-    @MockBean
-    private BookSearchRankingService bookSearchRankingService;
-
     private MockRestServiceServer mockServer;
 
     @BeforeEach
     public void setup() {
-        kakaoBookSearchApiService = new KakaoBookSearchApiService(restTemplate, bookSearchRankingService);
+        kakaoBookSearchApiService = new KakaoBookSearchApiService(restTemplate);
         mockServer = MockRestServiceServer.createServer(restTemplate);
     }
 
@@ -73,8 +70,7 @@ class KakaoBookSearchApiServiceTest {
         mockServer.verify();
         assertAll(
                 () -> assertThat(kakaoBookSearchResultResponse.getBookSearchResult().size()).isEqualTo(10),
-                () -> assertThat(kakaoBookSearchResultResponse.getNextRequestUrl()).isEqualTo(expectNextRequestUrl),
-                () -> verify(bookSearchRankingService, times(1)).increaseSearchRankingScore(request.getKeyword())
+                () -> assertThat(kakaoBookSearchResultResponse.getNextRequestUrl()).isEqualTo(expectNextRequestUrl)
         );
     }
 
@@ -99,8 +95,7 @@ class KakaoBookSearchApiServiceTest {
         mockServer.verify();
         assertAll(
                 () -> assertThat(kakaoBookSearchResultResponse.getBookSearchResult().size()).isLessThan(10),
-                () -> assertThat(kakaoBookSearchResultResponse.getNextRequestUrl()).isEqualTo(expectNextRequestUrl),
-                () -> verify(bookSearchRankingService, times(1)).increaseSearchRankingScore(request.getKeyword())
+                () -> assertThat(kakaoBookSearchResultResponse.getNextRequestUrl()).isEqualTo(expectNextRequestUrl)
         );
     }
 
