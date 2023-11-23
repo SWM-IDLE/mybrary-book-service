@@ -1,4 +1,4 @@
-package kr.mybrary.bookservice.book.persistence.repository;
+package kr.mybrary.bookservice.book.persistence.repository.interest;
 
 import java.util.List;
 import kr.mybrary.bookservice.book.persistence.Book;

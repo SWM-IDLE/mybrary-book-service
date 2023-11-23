@@ -20,11 +20,14 @@ import kr.mybrary.bookservice.mybook.domain.MyBookReadService;
 import kr.mybrary.bookservice.mybook.persistence.MyBook;
 import kr.mybrary.bookservice.review.MyReviewDtoTestData;
 import kr.mybrary.bookservice.review.domain.dto.request.MyReviewOfMyBookGetServiceRequest;
+import kr.mybrary.bookservice.review.domain.dto.request.MyReviewOfUserIdGetServiceRequest;
 import kr.mybrary.bookservice.review.domain.dto.request.MyReviewsOfBookGetServiceRequest;
+import kr.mybrary.bookservice.review.persistence.model.MyReviewElementByUserIdModel;
 import kr.mybrary.bookservice.review.persistence.model.MyReviewElementModel;
 import kr.mybrary.bookservice.review.persistence.model.MyReviewFromMyBookModel;
 import kr.mybrary.bookservice.review.persistence.repository.MyReviewRepository;
 import kr.mybrary.bookservice.review.presentation.dto.response.MyReviewOfMyBookGetResponse;
+import kr.mybrary.bookservice.review.presentation.dto.response.MyReviewOfUserIdGetResponse;
 import kr.mybrary.bookservice.review.presentation.dto.response.MyReviewsOfBookGetResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -136,6 +139,26 @@ class MyReviewReadServiceTest {
                 () -> assertThat(response).isNull(),
                 () -> verify(myBookReviewRepository, times(1)).findReviewByMyBook(any()),
                 () -> verify(myBookReadService, times(1)).findMyBookById(any())
+        );
+    }
+
+    @DisplayName("유저 아이디로 리뷰를 조회한다.")
+    @Test
+    void getReviewsFromUserId() {
+
+        // given
+        List<MyReviewElementByUserIdModel> models = MyReviewDtoTestData.createMyReviewElementByUserIdModelList();
+        MyReviewOfUserIdGetServiceRequest request = MyReviewDtoTestData.createReviewOfUserIdGetServiceRequest();
+
+        given(myBookReviewRepository.findReviewsByUserId(any())).willReturn(models);
+
+        // when
+        MyReviewOfUserIdGetResponse response = myReviewReadService.getReviewsFromUserId(request);
+
+        // then
+        assertAll(
+                () -> assertThat(response.getReviews()).hasSize(5),
+                () -> verify(myBookReviewRepository, times(1)).findReviewsByUserId(any())
         );
     }
 }

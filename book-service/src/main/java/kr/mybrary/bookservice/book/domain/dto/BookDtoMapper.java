@@ -5,12 +5,14 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import kr.mybrary.bookservice.book.domain.dto.request.BookCreateServiceRequest;
+import kr.mybrary.bookservice.book.persistence.model.RankedBookElementModel;
 import kr.mybrary.bookservice.book.presentation.dto.response.BookDetailResponse;
 import kr.mybrary.bookservice.book.persistence.Book;
 import kr.mybrary.bookservice.book.persistence.BookInterest;
 import kr.mybrary.bookservice.book.persistence.bookInfo.BookAuthor;
 import kr.mybrary.bookservice.book.persistence.bookInfo.BookTranslator;
 import kr.mybrary.bookservice.book.presentation.dto.response.BookInterestElementResponse;
+import kr.mybrary.bookservice.book.presentation.dto.response.BookRankedListByResponse;
 import kr.mybrary.bookservice.booksearch.presentation.dto.response.BookSearchDetailResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -59,6 +61,8 @@ public interface BookDtoMapper {
     @Mapping(target = "thumbnailUrl", source = "book.thumbnailUrl")
     @Mapping(target = "author", source = "book.author")
     BookInterestElementResponse bookInterestToBookInterestElementResponse(BookInterest bookInterest);
+
+    BookRankedListByResponse.BookRankedElement RankedBookElementModelToBookRankedElement(RankedBookElementModel rankedBookElementModel);
 
     @Named("mappingAuthors")
     static List<BookDetailResponse.Author> mappingAuthors(List<BookAuthor> bookAuthors) {

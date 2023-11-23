@@ -8,9 +8,12 @@ import java.util.Optional;
 import kr.mybrary.bookservice.PersistenceTest;
 import kr.mybrary.bookservice.book.BookFixture;
 import kr.mybrary.bookservice.book.persistence.Book;
+import kr.mybrary.bookservice.book.persistence.bookInfo.Author;
+import kr.mybrary.bookservice.book.persistence.bookInfo.BookAuthor;
 import kr.mybrary.bookservice.mybook.MyBookFixture;
 import kr.mybrary.bookservice.mybook.persistence.MyBook;
 import kr.mybrary.bookservice.review.MyReviewFixture;
+import kr.mybrary.bookservice.review.persistence.model.MyReviewElementByUserIdModel;
 import kr.mybrary.bookservice.review.persistence.model.MyReviewElementModel;
 import kr.mybrary.bookservice.review.persistence.model.MyReviewFromMyBookModel;
 import kr.mybrary.bookservice.review.persistence.repository.MyReviewRepository;
@@ -142,6 +145,79 @@ class MyReviewRepositoryTest {
                     () -> assertThat(review.getMyBook()).isNotInstanceOf(HibernateProxy.class)
             );
         });
+    }
 
+    @DisplayName("유저 아이디를 통해 마이북 리뷰를 조회한다.")
+    @Test
+    void findReviewsByUserId() {
+
+        // given
+        Author author_1 = entityManager.persist(Author.builder().name("Author_Name_1").aid(1).build());
+        Author author_2 = entityManager.persist(Author.builder().name("Author_Name_2").aid(2).build());
+
+        Book book_1 = entityManager.persist(BookFixture.COMMON_BOOK_WITHOUT_RELATION.getBookBuilder().isbn13("ISBN13_1").isbn10("ISBN10_1").build());
+        Book book_2 = entityManager.persist(BookFixture.COMMON_BOOK_WITHOUT_RELATION.getBookBuilder().isbn13("ISBN13_2").isbn10("ISBN10_2").build());
+        Book book_3 = entityManager.persist(BookFixture.COMMON_BOOK_WITHOUT_RELATION.getBookBuilder().isbn13("ISBN13_3").isbn10("ISBN10_3").build());
+
+        entityManager.persist(BookAuthor.builder().author(author_1).book(book_1).build());
+        entityManager.persist(BookAuthor.builder().author(author_2).book(book_1).build());
+        entityManager.persist(BookAuthor.builder().author(author_1).book(book_2).build());
+
+        MyBook myBook_1 = entityManager.persist(
+                MyBookFixture.MY_BOOK_WITHOUT_RELATION.getMyBookBuilder().userId("USER_ID").book(book_1).build());
+
+        MyBook myBook_2 = entityManager.persist(
+                MyBookFixture.MY_BOOK_WITHOUT_RELATION.getMyBookBuilder().userId("USER_ID").book(book_2).build());
+
+        MyBook myBook_3 = entityManager.persist(
+                MyBookFixture.MY_BOOK_WITHOUT_RELATION.getMyBookBuilder().userId("OTHER_ID").book(book_3).build());
+
+        MyReview myReview_1 = entityManager.persist(MyReviewFixture.MY_BOOK_REVIEW_WITHOUT_RELATION
+                .getMyBookReviewBuilder().book(book_1).myBook(myBook_1).build());
+
+        MyReview myReview_2 = entityManager.persist(MyReviewFixture.MY_BOOK_REVIEW_WITHOUT_RELATION
+                .getMyBookReviewBuilder().book(book_2).myBook(myBook_2).build());
+
+        entityManager.persist(MyReviewFixture.MY_BOOK_REVIEW_WITHOUT_RELATION
+                .getMyBookReviewBuilder().book(book_3).myBook(myBook_3).build());
+
+        entityManager.flush();
+        entityManager.clear();
+
+        // when
+        List<MyReviewElementByUserIdModel> models = myBookReviewRepository.findReviewsByUserId("USER_ID");
+
+        // then
+        assertAll(
+                () -> assertThat(models).hasSize(2),
+                () -> {
+                    assert models != null;
+                    assertThat(models.get(0).getReviewId()).isEqualTo(myReview_2.getId());
+                    assertThat(models.get(0).getMyBookId()).isEqualTo(myBook_2.getId());
+                    assertThat(models.get(0).getBookTitle()).isEqualTo(book_2.getTitle());
+                    assertThat(models.get(0).getBookIsbn13()).isEqualTo(book_2.getIsbn13());
+                    assertThat(models.get(0).getBookThumbnailUrl()).isEqualTo(book_2.getThumbnailUrl());
+                    assertThat(models.get(0).getContent()).isEqualTo(myReview_2.getContent());
+                    assertThat(models.get(0).getStarRating()).isEqualTo(myReview_2.getStarRating());
+                    assertThat(models.get(0).getCreatedAt()).isNotNull();
+                    assertThat(models.get(0).getUpdatedAt()).isNotNull();
+                    assertThat(models.get(0).getBookAuthors()).extracting("name")
+                            .containsExactlyInAnyOrder("Author_Name_1");
+                },
+                () -> {
+                    assert models != null;
+                    assertThat(models.get(1).getReviewId()).isEqualTo(myReview_1.getId());
+                    assertThat(models.get(1).getMyBookId()).isEqualTo(myBook_1.getId());
+                    assertThat(models.get(1).getBookTitle()).isEqualTo(book_1.getTitle());
+                    assertThat(models.get(1).getBookIsbn13()).isEqualTo(book_1.getIsbn13());
+                    assertThat(models.get(1).getBookThumbnailUrl()).isEqualTo(book_1.getThumbnailUrl());
+                    assertThat(models.get(1).getContent()).isEqualTo(myReview_1.getContent());
+                    assertThat(models.get(1).getStarRating()).isEqualTo(myReview_1.getStarRating());
+                    assertThat(models.get(1).getCreatedAt()).isNotNull();
+                    assertThat(models.get(1).getUpdatedAt()).isNotNull();
+                    assertThat(models.get(1).getBookAuthors()).extracting("name")
+                            .containsExactlyInAnyOrder("Author_Name_1", "Author_Name_2");
+                }
+        );
     }
 }

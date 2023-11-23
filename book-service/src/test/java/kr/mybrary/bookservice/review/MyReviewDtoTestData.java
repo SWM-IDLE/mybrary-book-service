@@ -8,14 +8,17 @@ import kr.mybrary.bookservice.client.user.dto.response.UserInfoServiceResponse.U
 import kr.mybrary.bookservice.review.domain.dto.request.MyReviewCreateServiceRequest;
 import kr.mybrary.bookservice.review.domain.dto.request.MyReviewDeleteServiceRequest;
 import kr.mybrary.bookservice.review.domain.dto.request.MyReviewOfMyBookGetServiceRequest;
+import kr.mybrary.bookservice.review.domain.dto.request.MyReviewOfUserIdGetServiceRequest;
 import kr.mybrary.bookservice.review.domain.dto.request.MyReviewUpdateServiceRequest;
 import kr.mybrary.bookservice.review.domain.dto.request.MyReviewsOfBookGetServiceRequest;
 import kr.mybrary.bookservice.review.domain.dto.request.MyReviewsOfBookGetServiceRequest.MyReviewsOfBookGetServiceRequestBuilder;
+import kr.mybrary.bookservice.review.persistence.model.MyReviewElementByUserIdModel;
 import kr.mybrary.bookservice.review.persistence.model.MyReviewElementModel;
 import kr.mybrary.bookservice.review.persistence.model.MyReviewFromMyBookModel;
 import kr.mybrary.bookservice.review.presentation.dto.request.MyReviewCreateRequest;
 import kr.mybrary.bookservice.review.presentation.dto.request.MyReviewUpdateRequest;
 import kr.mybrary.bookservice.review.presentation.dto.response.MyReviewOfMyBookGetResponse;
+import kr.mybrary.bookservice.review.presentation.dto.response.MyReviewOfUserIdGetResponse;
 import kr.mybrary.bookservice.review.presentation.dto.response.MyReviewUpdateResponse;
 import kr.mybrary.bookservice.review.presentation.dto.response.MyReviewsOfBookGetResponse;
 import kr.mybrary.bookservice.review.presentation.dto.response.MyReviewsOfBookGetResponse.ReviewElement;
@@ -160,4 +163,97 @@ public class MyReviewDtoTestData {
                 .build();
     }
 
+    public static MyReviewElementByUserIdModel createMyReviewElementByUserIdModel() {
+        return MyReviewElementByUserIdModel.builder()
+                .reviewId(1L)
+                .myBookId(1L)
+                .bookTitle("Test Book Title")
+                .bookIsbn13("9788956609959")
+                .bookThumbnailUrl("Test Book Thumbnail Url")
+                .content("리뷰 내용입니다.")
+                .starRating(4.5)
+                .createdAt(LocalDateTime.of(2023, 1, 1, 0, 0, 0))
+                .updatedAt(LocalDateTime.of(2023, 1, 1, 0, 0, 0))
+                .bookAuthors(List.of(
+                        MyReviewElementByUserIdModel.BookAuthorModel.builder()
+                                .authorId(1L)
+                                .aid(1)
+                                .name("Author_Name_1")
+                                .build(),
+                        MyReviewElementByUserIdModel.BookAuthorModel.builder()
+                                .authorId(2L)
+                                .aid(2)
+                                .name("Author_Name_2")
+                                .build()
+                ))
+                .build();
+    }
+
+    public static List<MyReviewElementByUserIdModel> createMyReviewElementByUserIdModelList() {
+
+        return IntStream.range(1, 6)
+                .mapToObj(i -> MyReviewElementByUserIdModel.builder()
+                        .reviewId((long) i)
+                        .myBookId((long) i)
+                        .bookTitle("Test Book Title")
+                        .bookIsbn13("9788956609959")
+                        .bookThumbnailUrl("Test Book Thumbnail Url")
+                        .content("리뷰 내용입니다.")
+                        .starRating(4.5)
+                        .createdAt(LocalDateTime.of(2023, 1, 1, i, 0, 0))
+                        .updatedAt(LocalDateTime.of(2023, 1, 1, i, 0, 0))
+                        .bookAuthors(List.of(
+                                MyReviewElementByUserIdModel.BookAuthorModel.builder()
+                                        .authorId(1L)
+                                        .aid(1)
+                                        .name("Author_Name_1")
+                                        .build(),
+                                MyReviewElementByUserIdModel.BookAuthorModel.builder()
+                                        .authorId(2L)
+                                        .aid(2)
+                                        .name("Author_Name_2")
+                                        .build()
+                        ))
+                        .build())
+                .toList();
+    }
+
+    public static MyReviewOfUserIdGetServiceRequest createReviewOfUserIdGetServiceRequest() {
+
+        return MyReviewOfUserIdGetServiceRequest.builder()
+                .userId("USER_ID")
+                .build();
+    }
+
+    public static MyReviewOfUserIdGetResponse createReviewOfUserIdGetResponse() {
+
+        return MyReviewOfUserIdGetResponse.builder()
+                .reviews(List.of(
+                        MyReviewOfUserIdGetResponse.MyReviewOfUserIdElement.builder()
+                                .reviewId(1L)
+                                .myBookId(1L)
+                                .bookTitle("Test Book Title")
+                                .bookIsbn13("9788956609959")
+                                .bookThumbnailUrl("Test Book Thumbnail Url")
+                                .content("리뷰 내용입니다.")
+                                .starRating(4.5)
+                                .createdAt("2023.01.01")
+                                .updatedAt("2023.01.01")
+                                .authors(List.of("Author_Name_1", "Author_Name_2"))
+                                .build(),
+                        MyReviewOfUserIdGetResponse.MyReviewOfUserIdElement.builder()
+                                .reviewId(2L)
+                                .myBookId(2L)
+                                .bookTitle("Test Book Title")
+                                .bookIsbn13("9788956609959")
+                                .bookThumbnailUrl("Test Book Thumbnail Url")
+                                .content("리뷰 내용입니다.")
+                                .starRating(4.5)
+                                .createdAt("2023.01.01")
+                                .updatedAt("2023.01.01")
+                                .authors(List.of("Author_Name_2", "Author_Name_3"))
+                                .build()
+                ))
+                .build();
+    }
 }
