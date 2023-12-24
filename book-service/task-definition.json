@@ -1,10 +1,10 @@
 {
-    "taskDefinitionArn": "arn:aws:ecs:ap-northeast-2:133172301128:task-definition/bookServiceFamily:11",
+    "taskDefinitionArn": "arn:aws:ecs:ap-northeast-2:085136004895:task-definition/bookServiceFamily:1",
     "containerDefinitions": [
         {
             "name": "bookService",
-            "image": "133172301128.dkr.ecr.ap-northeast-2.amazonaws.com/book-service",
-            "cpu": 1024,
+            "image": "085136004895.dkr.ecr.ap-northeast-2.amazonaws.com/book-service:9428625b417d941af23ba21607414f2fce3b034d",
+            "cpu": 0,
             "portMappings": [
                 {
                     "name": "bookservice-80-tcp",
@@ -18,15 +18,17 @@
             "environment": [
                 {
                     "name": "CONFIG_SERVER_URI",
-                    "value": "http://10.0.3.105:8888"
+                    "value": "http://10.0.3.203:8888"
                 },
                 {
                     "name": "TZ",
                     "value": "Asia/Seoul"
                 }
             ],
+            "environmentFiles": [],
             "mountPoints": [],
             "volumesFrom": [],
+            "ulimits": [],
             "logConfiguration": {
                 "logDriver": "awslogs",
                 "options": {
@@ -34,15 +36,16 @@
                     "awslogs-group": "/ecs/bookServiceFamily",
                     "awslogs-region": "ap-northeast-2",
                     "awslogs-stream-prefix": "ecs"
-                }
+                },
+                "secretOptions": []
             }
         }
     ],
     "family": "bookServiceFamily",
-    "taskRoleArn": "arn:aws:iam::133172301128:role/ecsTaskExecutionRole",
-    "executionRoleArn": "arn:aws:iam::133172301128:role/ecsTaskExecutionRole",
+    "taskRoleArn": "arn:aws:iam::085136004895:role/ecsTaskExecutionRole",
+    "executionRoleArn": "arn:aws:iam::085136004895:role/ecsTaskExecutionRole",
     "networkMode": "awsvpc",
-    "revision": 11,
+    "revision": 1,
     "volumes": [],
     "status": "ACTIVE",
     "requiresAttributes": [
@@ -88,12 +91,12 @@
         "cpuArchitecture": "X86_64",
         "operatingSystemFamily": "LINUX"
     },
-    "registeredAt": "2023-09-14T06:34:42.490Z",
-    "registeredBy": "arn:aws:iam::133172301128:user/soma1415",
+    "registeredAt": "2023-12-23T15:41:50.681Z",
+    "registeredBy": "arn:aws:iam::085136004895:root",
     "tags": [
         {
             "key": "Name",
-            "value": "bookService"
+            "value": "bookServiceFamily"
         }
     ]
 }
