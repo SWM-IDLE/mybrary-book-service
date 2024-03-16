@@ -77,6 +77,9 @@ public class Book extends BaseEntity {
     private Double aladinStarRating;
     private Integer aladinReviewCount;
 
+    private String authors;
+    private String translators;
+
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     private BookCategory bookCategory;
 
