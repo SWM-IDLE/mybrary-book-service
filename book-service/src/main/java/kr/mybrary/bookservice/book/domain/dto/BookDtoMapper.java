@@ -31,6 +31,8 @@ public interface BookDtoMapper {
     @Mapping(target = "starRating", constant = "0")
     @Mapping(target = "reviewCount", constant = "0")
     @Mapping(target = "recommendationFeedCount", constant = "0")
+    @Mapping(target = "authors", constant = "")
+    @Mapping(target = "translators", constant = "")
     @Mapping(target = "aladinStarRating", source = "starRating")
     @Mapping(target = "aladinReviewCount", source = "reviewCount")
     Book bookCreateRequestToEntity(BookCreateServiceRequest request);

@@ -11,6 +11,9 @@ import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import kr.mybrary.bookservice.book.persistence.bookInfo.BookAuthor;
 import kr.mybrary.bookservice.book.persistence.bookInfo.BookCategory;
 import kr.mybrary.bookservice.book.persistence.bookInfo.BookTranslator;
@@ -19,10 +22,6 @@ import kr.mybrary.bookservice.mybook.persistence.ReadStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.NoArgsConstructor;
 
 @Entity
@@ -166,5 +165,13 @@ public class Book extends BaseEntity {
     public void updateWhenDeleteReview(Double originStarRating) {
         this.reviewCount--;
         this.starRating -= originStarRating;
+    }
+
+    public void updateAuthorWithComma(String authors) {
+        this.authors = authors;
+    }
+
+    public void updateTranslatorWithComma(String translators) {
+        this.translators = translators;
     }
 }
