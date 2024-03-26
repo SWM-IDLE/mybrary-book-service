@@ -93,17 +93,7 @@ public class RecommendationFeedDtoTestData {
                                     RecommendationFeedViewAllModel.RecommendationTargetModel.builder()
                                             .targetId((long) i + 1)
                                             .targetName("TARGET_NAME_" + (i + 1)).build()))
-                            .bookAuthors(List.of(
-                                    RecommendationFeedViewAllModel.BookAuthorModel.builder()
-                                                    .authorId((long) i)
-                                                    .aid(i)
-                                                    .name("AUTHOR_NAME_" + i)
-                                                    .build(),
-                                    RecommendationFeedViewAllModel.BookAuthorModel.builder()
-                                                    .authorId((long) i + 1)
-                                                    .aid(i + 1)
-                                                    .name("AUTHOR_NAME_" + (i + 1))
-                                                    .build()))
+                            .bookAuthors("AUTHOR_NAME_" + i + ", " + "AUTHOR_NAME_" + (i + 1))
                             .build())
                     .toList();
     }
@@ -179,17 +169,7 @@ public class RecommendationFeedDtoTestData {
                             .thumbnailUrl("THUMBNAIL_URL_" + i)
                             .isbn13("ISBN13_" + i)
                             .createdAt(LocalDateTime.now())
-                            .bookAuthors(List.of(
-                                    RecommendationFeedOfUserViewModel.RecommendationFeedOfUserBookAuthorModel.builder()
-                                            .authorId((long) i)
-                                            .aid(i)
-                                            .name("AUTHOR_NAME_" + i)
-                                            .build(),
-                                    RecommendationFeedOfUserViewModel.RecommendationFeedOfUserBookAuthorModel.builder()
-                                            .authorId((long) i + 1)
-                                            .aid(i + 1)
-                                            .name("AUTHOR_NAME_" + (i + 1))
-                                            .build()))
+                            .bookAuthors("AUTHOR_NAME_" + i + ", " + "AUTHOR_NAME_" + (i + 1))
                             .recommendationTargets(List.of(
                                     RecommendationFeedOfUserViewModel.RecommendationTargetOfUserModel.builder()
                                             .targetId((long) i)

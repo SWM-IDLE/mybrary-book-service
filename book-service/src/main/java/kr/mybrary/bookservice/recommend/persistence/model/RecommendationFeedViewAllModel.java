@@ -15,7 +15,7 @@ public class RecommendationFeedViewAllModel {
 
     private String content;
     private List<RecommendationTargetModel> recommendationTargets;
-    private List<BookAuthorModel> bookAuthors;
+    private String bookAuthors;
 
     private String userId;
 
@@ -33,10 +33,6 @@ public class RecommendationFeedViewAllModel {
         this.recommendationTargets = recommendationTargetModels;
     }
 
-    public void setBookAuthors(List<BookAuthorModel> bookAuthorModels) {
-        this.bookAuthors = bookAuthorModels;
-    }
-
     public void setInterested(boolean interested) {
         this.interested = interested;
     }
@@ -50,17 +46,5 @@ public class RecommendationFeedViewAllModel {
 
         private Long targetId;
         private String targetName;
-    }
-
-    @Getter
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @EqualsAndHashCode
-    public static class BookAuthorModel {
-
-        private Long authorId;
-        private Integer aid;
-        private String name;
     }
 }

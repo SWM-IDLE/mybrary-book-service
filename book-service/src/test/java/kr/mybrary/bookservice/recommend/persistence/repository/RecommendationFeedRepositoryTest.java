@@ -120,14 +120,7 @@ class RecommendationFeedRepositoryTest {
     void getRecentRecommendationFeedView() {
 
         // given
-        Author author_1 = entityManager.persist(Author.builder().aid(11).name("테스트 저자 1").build());
-        Author author_2 = entityManager.persist(Author.builder().aid(12).name("테스트 저자 2").build());
-        Author author_3 = entityManager.persist(Author.builder().aid(13).name("테스트 저자 3").build());
-
         Book book = entityManager.persist(BookFixture.COMMON_BOOK_WITHOUT_RELATION.getBook());
-        entityManager.persist(BookAuthor.builder().book(book).author(author_1).build());
-        entityManager.persist(BookAuthor.builder().book(book).author(author_2).build());
-        entityManager.persist(BookAuthor.builder().book(book).author(author_3).build());
 
         IntStream.range(1, 21)
                 .forEach(i -> {
@@ -162,14 +155,14 @@ class RecommendationFeedRepositoryTest {
                     assertThat(recommendationFeedViewAll.get(0).getContent()).isEqualTo("NEW_CONTENT_20");
                     assertThat(recommendationFeedViewAll.get(0).getRecommendationTargets()).extracting("targetName")
                             .containsExactly("TARGET_NAME_20");
-                    assertThat(recommendationFeedViewAll.get(0).getBookAuthors()).extracting("name")
-                            .containsExactly("테스트 저자 1", "테스트 저자 2", "테스트 저자 3");
+                    assertThat(recommendationFeedViewAll.get(0).getBookAuthors().split(", "))
+                            .containsExactly("author_1", "author_2", "author_3");
                     assertThat(recommendationFeedViewAll.get(9).getRecommendationTargets()).hasSize(1);
                     assertThat(recommendationFeedViewAll.get(9).getContent()).isEqualTo("NEW_CONTENT_11");
                     assertThat(recommendationFeedViewAll.get(9).getRecommendationTargets()).extracting("targetName")
                             .containsExactly("TARGET_NAME_11");
-                    assertThat(recommendationFeedViewAll.get(9).getBookAuthors()).extracting("name")
-                            .containsExactly("테스트 저자 1", "테스트 저자 2", "테스트 저자 3");
+                    assertThat(recommendationFeedViewAll.get(9).getBookAuthors().split(", "))
+                            .containsExactly("author_1", "author_2", "author_3");
                 }
         );
     }
@@ -179,14 +172,7 @@ class RecommendationFeedRepositoryTest {
     void getRecommendationFeedViewOf10to20() {
 
         // given
-        Author author_1 = entityManager.persist(Author.builder().aid(11).name("테스트 저자 1").build());
-        Author author_2 = entityManager.persist(Author.builder().aid(12).name("테스트 저자 2").build());
-        Author author_3 = entityManager.persist(Author.builder().aid(13).name("테스트 저자 3").build());
-
         Book book = entityManager.persist(BookFixture.COMMON_BOOK_WITHOUT_RELATION.getBook());
-        entityManager.persist(BookAuthor.builder().book(book).author(author_1).build());
-        entityManager.persist(BookAuthor.builder().book(book).author(author_2).build());
-        entityManager.persist(BookAuthor.builder().book(book).author(author_3).build());
 
         IntStream.range(1, 21)
                 .forEach(i -> {
@@ -225,14 +211,14 @@ class RecommendationFeedRepositoryTest {
                 () -> assertThat(recommendationFeedViewAll.get(0).getContent()).isEqualTo("NEW_CONTENT_10"),
                 () -> assertThat(recommendationFeedViewAll.get(0).getRecommendationTargets()).extracting("targetName")
                         .containsExactly("TARGET_NAME_10"),
-                () -> assertThat(recommendationFeedViewAll.get(0).getBookAuthors()).extracting("name")
-                        .containsExactly("테스트 저자 1", "테스트 저자 2", "테스트 저자 3"),
+                () -> assertThat(recommendationFeedViewAll.get(0).getBookAuthors().split(", "))
+                        .containsExactly("author_1", "author_2", "author_3"),
                 () -> assertThat(recommendationFeedViewAll.get(9).getRecommendationTargets()).hasSize(1),
                 () -> assertThat(recommendationFeedViewAll.get(9).getContent()).isEqualTo("NEW_CONTENT_1"),
                 () -> assertThat(recommendationFeedViewAll.get(9).getRecommendationTargets()).extracting("targetName")
                         .containsExactly("TARGET_NAME_1"),
-                () -> assertThat(recommendationFeedViewAll.get(9).getBookAuthors()).extracting("name")
-                        .containsExactly("테스트 저자 1", "테스트 저자 2", "테스트 저자 3")
+                () -> assertThat(recommendationFeedViewAll.get(9).getBookAuthors().split(", "))
+                        .containsExactly("author_1", "author_2", "author_3")
         );
     }
 
@@ -421,14 +407,14 @@ class RecommendationFeedRepositoryTest {
                 () -> assertThat(recommendationFeedViewAll.get(0).getContent()).isEqualTo("NEW_CONTENT_20"),
                 () -> assertThat(recommendationFeedViewAll.get(0).getRecommendationTargets()).extracting("targetName")
                         .containsExactly("TARGET_NAME_20"),
-                () -> assertThat(recommendationFeedViewAll.get(0).getBookAuthors()).extracting("name")
-                        .containsExactly("테스트 저자 1", "테스트 저자 2", "테스트 저자 3"),
+                () -> assertThat(recommendationFeedViewAll.get(0).getBookAuthors().split(", "))
+                        .containsExactly("author_1", "author_2", "author_3"),
                 () -> assertThat(recommendationFeedViewAll.get(9).getRecommendationTargets()).hasSize(1),
                 () -> assertThat(recommendationFeedViewAll.get(9).getContent()).isEqualTo("NEW_CONTENT_11"),
                 () -> assertThat(recommendationFeedViewAll.get(9).getRecommendationTargets()).extracting("targetName")
                         .containsExactly("TARGET_NAME_11"),
-                () -> assertThat(recommendationFeedViewAll.get(9).getBookAuthors()).extracting("name")
-                        .containsExactly("테스트 저자 1", "테스트 저자 2", "테스트 저자 3"),
+                () -> assertThat(recommendationFeedViewAll.get(9).getBookAuthors().split(", "))
+                        .containsExactly("author_1", "author_2", "author_3"),
                 () -> assertThat(recommendationFeedViewAll.get(0).getInterested()).isTrue(),
                 () -> assertThat(recommendationFeedViewAll.get(9).getInterested()).isTrue()
         );
@@ -439,14 +425,7 @@ class RecommendationFeedRepositoryTest {
     void getRecommendationFeedViewOfUserModel() {
 
         // given
-        Author author_1 = entityManager.persist(Author.builder().aid(11).name("테스트 저자 1").build());
-        Author author_2 = entityManager.persist(Author.builder().aid(12).name("테스트 저자 2").build());
-        Author author_3 = entityManager.persist(Author.builder().aid(13).name("테스트 저자 3").build());
-
         Book book = entityManager.persist(BookFixture.COMMON_BOOK_WITHOUT_RELATION.getBook());
-        entityManager.persist(BookAuthor.builder().book(book).author(author_1).build());
-        entityManager.persist(BookAuthor.builder().book(book).author(author_2).build());
-        entityManager.persist(BookAuthor.builder().book(book).author(author_3).build());
 
         IntStream.range(1, 5)
                 .forEach(i -> {
@@ -499,10 +478,10 @@ class RecommendationFeedRepositoryTest {
                             .containsExactly("TARGET_NAME_4");
                     assertThat(recommendationFeedOfUserView.get(3).getRecommendationTargets()).extracting("targetName")
                             .containsExactly("TARGET_NAME_1");
-                    assertThat(recommendationFeedOfUserView.get(0).getBookAuthors()).extracting("name")
-                            .containsExactly("테스트 저자 1", "테스트 저자 2", "테스트 저자 3");
-                    assertThat(recommendationFeedOfUserView.get(3).getBookAuthors()).extracting("name")
-                            .containsExactly("테스트 저자 1", "테스트 저자 2", "테스트 저자 3");
+                    assertThat(recommendationFeedOfUserView.get(0).getBookAuthors().split(", "))
+                            .containsExactly("author_1", "author_2", "author_3");
+                    assertThat(recommendationFeedOfUserView.get(3).getBookAuthors().split(", "))
+                            .containsExactly("author_1", "author_2", "author_3");
                 },
                 () -> assertThat(recommendationFeedOfUserView).extracting("content").containsExactlyInAnyOrder(
                         "NEW_CONTENT_1", "NEW_CONTENT_2", "NEW_CONTENT_3", "NEW_CONTENT_4")
