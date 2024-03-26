@@ -1,9 +1,9 @@
 package kr.mybrary.bookservice.recommend.presentation.dto.response;
 
+import java.util.Arrays;
 import java.util.List;
 import kr.mybrary.bookservice.global.util.DateUtils;
 import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedOfUserViewModel;
-import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedOfUserViewModel.RecommendationFeedOfUserBookAuthorModel;
 import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedOfUserViewModel.RecommendationTargetOfUserModel;
 import lombok.Builder;
 import lombok.Getter;
@@ -28,8 +28,7 @@ public class RecommendationFeedOfUserViewResponse {
                                 .createdAt(DateUtils.toDotFormatYYYYMMDD(recommendationFeed.getCreatedAt()))
                                 .recommendationTargetNames(recommendationFeed.getRecommendationTargets().stream()
                                         .map(RecommendationTargetOfUserModel::getTargetName).toList())
-                                .authors(recommendationFeed.getBookAuthors().stream().map(
-                                        RecommendationFeedOfUserBookAuthorModel::getName).toList())
+                                .authors(getAuthorList(recommendationFeed))
                                 .build()).toList()).build();
     }
 
@@ -48,5 +47,14 @@ public class RecommendationFeedOfUserViewResponse {
 
         private List<String> recommendationTargetNames;
         private List<String> authors;
+    }
+
+    private static List<String> getAuthorList(RecommendationFeedOfUserViewModel recommendationFeed) {
+        if (recommendationFeed.getBookAuthors() == null) {
+            return List.of();
+        }
+
+        return Arrays.stream(recommendationFeed.getBookAuthors().split(", "))
+                .toList();
     }
 }

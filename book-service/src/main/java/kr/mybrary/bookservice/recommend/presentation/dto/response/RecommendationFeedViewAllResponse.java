@@ -1,10 +1,10 @@
 package kr.mybrary.bookservice.recommend.presentation.dto.response;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import kr.mybrary.bookservice.client.user.dto.response.UserInfoServiceResponse.UserInfo;
 import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedViewAllModel;
-import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedViewAllModel.BookAuthorModel;
 import kr.mybrary.bookservice.recommend.persistence.model.RecommendationFeedViewAllModel.RecommendationTargetModel;
 import lombok.Builder;
 import lombok.Getter;
@@ -59,9 +59,7 @@ public class RecommendationFeedViewAllResponse {
                                 .title(recommendationFeed.getTitle())
                                 .thumbnailUrl(recommendationFeed.getThumbnailUrl())
                                 .isbn13(recommendationFeed.getIsbn13())
-                                .authors(recommendationFeed.getBookAuthors().stream()
-                                        .map(BookAuthorModel::getName)
-                                        .toList())
+                                .authors(getAuthorList(recommendationFeed))
                                 .holderCount(recommendationFeed.getHolderCount())
                                 .interestCount(recommendationFeed.getInterestCount())
                                 .interested(recommendationFeed.getInterested())
@@ -70,5 +68,14 @@ public class RecommendationFeedViewAllResponse {
                         .toList())
                 .lastRecommendationFeedId(lastRecommendationFeedId)
                 .build();
+    }
+
+    private static List<String> getAuthorList(RecommendationFeedViewAllModel recommendationFeed) {
+        if (recommendationFeed.getBookAuthors() == null) {
+            return List.of();
+        }
+
+        return Arrays.stream(recommendationFeed.getBookAuthors().split(", "))
+                .toList();
     }
 }
