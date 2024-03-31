@@ -1,19 +1,20 @@
 package kr.mybrary.bookservice.book.domain;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import kr.mybrary.bookservice.book.domain.dto.BookDtoMapper;
 import kr.mybrary.bookservice.book.domain.dto.request.BookCreateServiceRequest;
 import kr.mybrary.bookservice.book.domain.exception.BookAlreadyExistsException;
 import kr.mybrary.bookservice.book.persistence.Book;
-import kr.mybrary.bookservice.book.persistence.bookInfo.BookCategory;
 import kr.mybrary.bookservice.book.persistence.bookInfo.Author;
 import kr.mybrary.bookservice.book.persistence.bookInfo.BookAuthor;
+import kr.mybrary.bookservice.book.persistence.bookInfo.BookCategory;
+import kr.mybrary.bookservice.book.persistence.bookInfo.BookTranslator;
+import kr.mybrary.bookservice.book.persistence.bookInfo.Translator;
 import kr.mybrary.bookservice.book.persistence.repository.AuthorRepository;
 import kr.mybrary.bookservice.book.persistence.repository.BookCategoryRepository;
 import kr.mybrary.bookservice.book.persistence.repository.BookRepository;
 import kr.mybrary.bookservice.book.persistence.repository.TranslatorRepository;
-import kr.mybrary.bookservice.book.persistence.bookInfo.BookTranslator;
-import kr.mybrary.bookservice.book.persistence.bookInfo.Translator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.retry.annotation.Backoff;
@@ -42,22 +43,38 @@ public class BookWriteService {
         checkBookAlreadyRegistered(request);
         Book book = BookDtoMapper.INSTANCE.bookCreateRequestToEntity(request);
 
-        List<BookAuthor> bookAuthors = request.getAuthors().stream()
-                .map(r -> getAuthor(r.getAuthorId(), r.getName()))
-                .map(author -> BookAuthor.builder().author(author).build())
-                .toList();
-
-        List<BookTranslator> bookTranslators = request.getTranslators().stream()
-                .map(r -> getTranslator(r.getTranslatorId(), r.getName()))
-                .map(translator -> BookTranslator.builder().translator(translator).build())
-                .toList();
-
-        book.addBookAuthor(bookAuthors);
-        book.addBookTranslator(bookTranslators);
+        book.addBookAuthor(getBookAuthors(request));
+        book.addBookTranslator(getBookTranslators(request));
         book.assignCategory(getBookCategory(request.getCategoryId(), request.getCategory()));
+        book.updateAuthorWithComma(joiningAuthorWithComma(request));
+        book.updateTranslatorWithComma(joiningTranslatorWithComma(request));
 
         bookRepository.save(book);
         log.info("New Book Saved : {}, {}", book.getTitle(), book.getIsbn13());
+    }
+
+    private String joiningAuthorWithComma(BookCreateServiceRequest request) {
+        return request.getAuthors().stream().map(BookCreateServiceRequest.Author::getName)
+                .collect(Collectors.joining(", "));
+    }
+
+    private String joiningTranslatorWithComma(BookCreateServiceRequest request) {
+        return request.getTranslators().stream().map(BookCreateServiceRequest.Translator::getName)
+                .collect(Collectors.joining(", "));
+    }
+
+    private List<BookTranslator> getBookTranslators(BookCreateServiceRequest request) {
+        return request.getTranslators().stream()
+                .map(r -> getTranslator(r.getTranslatorId(), r.getName()))
+                .map(translator -> BookTranslator.builder().translator(translator).build())
+                .toList();
+    }
+
+    private List<BookAuthor> getBookAuthors(BookCreateServiceRequest request) {
+        return request.getAuthors().stream()
+                .map(r -> getAuthor(r.getAuthorId(), r.getName()))
+                .map(author -> BookAuthor.builder().author(author).build())
+                .toList();
     }
 
     private void checkBookAlreadyRegistered(BookCreateServiceRequest request) {
