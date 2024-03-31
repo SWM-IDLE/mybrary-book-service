@@ -49,7 +49,7 @@ jobs:
       - name: Upload OpenApi Specification to S3
         working-directory: book-service
         run: |
-          aws s3 cp build/resources/main/static/docs/book-service.json s3://mybrary-swagger-ui/docs/book-service.json
+          aws s3 cp build/resources/main/static/docs/book-service.json s3://mybrary-api-docs/docs/book-service.json
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.OPEN_API_GIT_ACTIONS_ACCESS_KEY }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.OPEN_API_GIT_ACTIONS_SECRET_KEY }}
